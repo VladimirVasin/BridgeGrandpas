@@ -1,0 +1,36 @@
+# Unity generated folders
+/Library/
+/Temp/
+/Obj/
+/Build/
+/Builds/
+/Logs/
+/UserSettings/
+/MemoryCaptures/
+
+# IDE and editor local state
+/.vs/
+/.vscode/
+/.idea/
+*.user
+*.userprefs
+*.pidb
+*.suo
+*.tmp
+*.booproj
+
+# OS junk
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Unity cache / crash files
+sysinfo.txt
+*.stackdump
+
+# Local raw audio sources
+*.wav
+*.wav.meta
+
+# Local packages cache
+/[Pp]ackages/packages-lock.json.bak
