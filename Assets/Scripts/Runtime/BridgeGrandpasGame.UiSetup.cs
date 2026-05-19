@@ -313,7 +313,7 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         eventModal.anchorMax = new Vector2(0.5f, 0.5f);
         eventModal.pivot = new Vector2(0.5f, 0.5f);
         eventModal.anchoredPosition = new Vector2(0f, 26f);
-        eventModal.sizeDelta = new Vector2(560f, 390f);
+        eventModal.sizeDelta = new Vector2(660f, 520f);
         eventModal.gameObject.SetActive(false);
 
         eventTitleText = CreateText("Event Title", eventModal, 24, FontStyle.Bold, TextAnchor.UpperLeft, new Color(1f, 0.82f, 0.48f));
@@ -325,18 +325,18 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         eventBodyText = CreateText("Event Body", eventModal, 17, FontStyle.Normal, TextAnchor.UpperLeft, new Color(0.92f, 0.92f, 0.88f));
         eventBodyText.rectTransform.anchorMin = new Vector2(0f, 0f);
         eventBodyText.rectTransform.anchorMax = new Vector2(1f, 1f);
-        eventBodyText.rectTransform.offsetMin = new Vector2(22f, 138f);
+        eventBodyText.rectTransform.offsetMin = new Vector2(22f, 294f);
         eventBodyText.rectTransform.offsetMax = new Vector2(-22f, -92f);
 
         eventChoicesRoot = CreatePanel("Event Choices", eventModal, new Color(0f, 0f, 0f, 0f));
         eventChoicesRoot.anchorMin = new Vector2(0f, 0f);
         eventChoicesRoot.anchorMax = new Vector2(1f, 0f);
         eventChoicesRoot.offsetMin = new Vector2(22f, 22f);
-        eventChoicesRoot.offsetMax = new Vector2(-22f, 130f);
+        eventChoicesRoot.offsetMax = new Vector2(-22f, 282f);
         VerticalLayoutGroup layout = eventChoicesRoot.gameObject.AddComponent<VerticalLayoutGroup>();
         layout.spacing = 8f;
         layout.childForceExpandWidth = true;
-        layout.childForceExpandHeight = true;
+        layout.childForceExpandHeight = false;
     }
 
     private void CreateExpeditionModal(Transform parent)
@@ -346,7 +346,7 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         expeditionModal.anchorMax = new Vector2(0.5f, 0.5f);
         expeditionModal.pivot = new Vector2(0.5f, 0.5f);
         expeditionModal.anchoredPosition = new Vector2(0f, 18f);
-        expeditionModal.sizeDelta = new Vector2(600f, 340f);
+        expeditionModal.sizeDelta = new Vector2(660f, 500f);
         expeditionModal.gameObject.SetActive(false);
 
         expeditionTitleText = CreateText("Expedition Title", expeditionModal, 23, FontStyle.Bold, TextAnchor.UpperLeft, new Color(1f, 0.82f, 0.48f));
@@ -358,8 +358,8 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         expeditionBodyText = CreateText("Expedition Body", expeditionModal, 16, FontStyle.Normal, TextAnchor.UpperLeft, new Color(0.91f, 0.90f, 0.84f));
         expeditionBodyText.rectTransform.anchorMin = new Vector2(0f, 0f);
         expeditionBodyText.rectTransform.anchorMax = new Vector2(1f, 1f);
-        expeditionBodyText.rectTransform.offsetMin = new Vector2(22f, 140f);
-        expeditionBodyText.rectTransform.offsetMax = new Vector2(-22f, -78f);
+        expeditionBodyText.rectTransform.offsetMin = new Vector2(22f, 292f);
+        expeditionBodyText.rectTransform.offsetMax = new Vector2(-22f, -84f);
 
         expeditionDicePanel = CreatePanel("Expedition Dice", expeditionModal, new Color(0.095f, 0.075f, 0.055f, 0.98f));
         expeditionDicePanel.anchorMin = new Vector2(0.5f, 0.5f);
@@ -387,11 +387,11 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         expeditionChoicesRoot.anchorMin = new Vector2(0f, 0f);
         expeditionChoicesRoot.anchorMax = new Vector2(1f, 0f);
         expeditionChoicesRoot.offsetMin = new Vector2(22f, 20f);
-        expeditionChoicesRoot.offsetMax = new Vector2(-22f, 132f);
+        expeditionChoicesRoot.offsetMax = new Vector2(-22f, 280f);
         VerticalLayoutGroup layout = expeditionChoicesRoot.gameObject.AddComponent<VerticalLayoutGroup>();
         layout.spacing = 8f;
         layout.childForceExpandWidth = true;
-        layout.childForceExpandHeight = true;
+        layout.childForceExpandHeight = false;
     }
 
     private void ShowExpeditionNarrativeModal(Grandpa grandpa)
@@ -410,15 +410,15 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         ClearChildren(expeditionChoicesRoot);
         expeditionTitleText.text = "Вылазка: " + ExpeditionName(grandpa.ExpeditionType);
         expeditionBodyText.text = grandpa.Name + " поднялся из-под моста. Наверху мокрый свет, чужие ботинки и шанс вернуться не с пустыми руками.\n\nВыбери, как он поведёт себя в городе.";
-        AddExpeditionChoice(grandpa, "Тише под перилами\n<color=#9cff93>меньше подозрения</color>, добычи тоже меньше", 0.82f, 0.45f, "пошёл тихо, почти как тень с авоськой");
-        AddExpeditionChoice(grandpa, "Собрать всё блестящее\n<color=#ffcf7a>больше добычи</color>, город заметит шум", 1.35f, 1.45f, "решил, что осторожность сегодня не главный ресурс");
-        AddExpeditionChoice(grandpa, "Действовать по-дедовски\nсбалансированный путь с ролью и характером", 1.08f, 0.92f, "применил старую тактику: выглядеть так, будто всё так и было");
+        AddExpeditionChoice(grandpa, "Тише под перилами", "<color=#9cff93>меньше подозрения</color> | <color=#ffcf7a>добычи меньше</color> | бросок кубика", 0.82f, 0.45f, "пошёл тихо, почти как тень с авоськой");
+        AddExpeditionChoice(grandpa, "Собрать всё блестящее", "<color=#9cff93>добычи больше</color> | <color=#ff8f7a>подозрение выше</color> | бросок кубика", 1.35f, 1.45f, "решил, что осторожность сегодня не главный ресурс");
+        AddExpeditionChoice(grandpa, "Действовать по-дедовски", "<color=#9cff93>сбалансированная добыча</color> | <color=#ffcf7a>обычный риск</color> | бросок кубика", 1.08f, 0.92f, "применил старую тактику: выглядеть так, будто всё так и было");
         expeditionModal.gameObject.SetActive(true);
     }
 
-    private void AddExpeditionChoice(Grandpa grandpa, string label, float reward, float risk, string result)
+    private void AddExpeditionChoice(Grandpa grandpa, string label, string preview, float reward, float risk, string result)
     {
-        CreateButton(label, expeditionChoicesRoot, delegate
+        CreateDialogChoiceButton(label, preview, expeditionChoicesRoot, delegate
         {
             StartExpeditionDiceRoll(grandpa, reward, risk, result);
         });

@@ -162,11 +162,13 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
     private sealed class EventChoice
     {
         public readonly string Label;
+        public readonly string Preview;
         public readonly Action<BridgeGrandpasGame> Apply;
 
-        public EventChoice(string label, Action<BridgeGrandpasGame> apply)
+        public EventChoice(string label, string preview, Action<BridgeGrandpasGame> apply)
         {
             Label = label;
+            Preview = preview;
             Apply = apply;
         }
     }

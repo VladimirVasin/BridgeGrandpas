@@ -11,11 +11,16 @@ using UnityEngine.UI;
 public sealed partial class BridgeGrandpasGame : MonoBehaviour
 {
     private const float BackgroundMusicStartDelay = 10f;
+    private const float BackgroundMusicTrackGap = 10f;
 
     private AudioSource menuMusicSource;
     private AudioSource musicSource;
+    private AudioClip[] ingameMusicClips = Array.Empty<AudioClip>();
     private AudioClip[] footstepClips;
+    private int currentMusicClipIndex = -1;
     private int footstepClipCursor;
+    private float nextMusicStartAt;
+    private bool waitingForNextMusic;
 
     private void SetupMenuMusic()
     {
@@ -55,8 +60,8 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
     {
         SetupFootstepClips();
 
-        AudioClip clip = FindMusicClip(false);
-        if (clip == null)
+        ingameMusicClips = FindIngameMusicClips();
+        if (ingameMusicClips.Length == 0)
         {
             Debug.LogWarning("[BridgeGrandpas] No music clips found in Resources/Music.");
             return;
@@ -66,8 +71,7 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         audioObject.transform.SetParent(transform, false);
 
         musicSource = audioObject.AddComponent<AudioSource>();
-        musicSource.clip = clip;
-        musicSource.loop = true;
+        musicSource.loop = false;
         musicSource.playOnAwake = false;
         musicSource.spatialBlend = 0f;
         musicSource.volume = 0.16f;
@@ -77,21 +81,104 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         AudioReverbFilter reverb = audioObject.AddComponent<AudioReverbFilter>();
         reverb.reverbPreset = AudioReverbPreset.User;
         reverb.dryLevel = 0f;
-        reverb.room = -1200;
-        reverb.roomHF = -1800;
-        reverb.decayTime = 1.55f;
-        reverb.decayHFRatio = 0.52f;
-        reverb.reflectionsLevel = -1800f;
-        reverb.reverbLevel = -950f;
+        reverb.room = -950;
+        reverb.roomHF = -1450;
+        reverb.decayTime = 2.35f;
+        reverb.decayHFRatio = 0.58f;
+        reverb.reflectionsLevel = -1350f;
+        reverb.reverbLevel = -560f;
 
         AudioEchoFilter echo = audioObject.AddComponent<AudioEchoFilter>();
-        echo.delay = 210f;
-        echo.decayRatio = 0.24f;
-        echo.wetMix = 0.12f;
-        echo.dryMix = 0.88f;
+        echo.delay = 245f;
+        echo.decayRatio = 0.34f;
+        echo.wetMix = 0.22f;
+        echo.dryMix = 0.86f;
 
-        musicSource.PlayDelayed(BackgroundMusicStartDelay);
-        Debug.Log("[BridgeGrandpas] Background music scheduled: " + clip.name);
+        waitingForNextMusic = true;
+        nextMusicStartAt = Time.time + BackgroundMusicStartDelay;
+        Debug.Log("[BridgeGrandpas] Background music rotation ready: " + ingameMusicClips.Length + " clips.");
+    }
+
+    private void UpdateBackgroundMusic()
+    {
+        if (musicSource == null || ingameMusicClips == null || ingameMusicClips.Length == 0)
+        {
+            return;
+        }
+
+        if (musicSource.isPlaying)
+        {
+            waitingForNextMusic = false;
+            return;
+        }
+
+        if (!waitingForNextMusic)
+        {
+            waitingForNextMusic = true;
+            nextMusicStartAt = Time.time + BackgroundMusicTrackGap;
+            return;
+        }
+
+        if (Time.time < nextMusicStartAt)
+        {
+            return;
+        }
+
+        PlayNextBackgroundMusicTrack();
+    }
+
+    private void PlayNextBackgroundMusicTrack()
+    {
+        currentMusicClipIndex = PickNextMusicClipIndex();
+        AudioClip clip = ingameMusicClips[currentMusicClipIndex];
+        musicSource.clip = clip;
+        musicSource.pitch = UnityEngine.Random.Range(0.985f, 1.015f);
+        musicSource.Play();
+        waitingForNextMusic = false;
+        Debug.Log("[BridgeGrandpas] Background music started: " + clip.name);
+    }
+
+    private int PickNextMusicClipIndex()
+    {
+        int index = UnityEngine.Random.Range(0, ingameMusicClips.Length);
+        if (ingameMusicClips.Length > 1 && index == currentMusicClipIndex)
+        {
+            index = (index + UnityEngine.Random.Range(1, ingameMusicClips.Length)) % ingameMusicClips.Length;
+        }
+
+        return index;
+    }
+
+    private AudioClip[] FindIngameMusicClips()
+    {
+        AudioClip[] clips = Resources.LoadAll<AudioClip>("Music");
+        if (clips == null || clips.Length == 0)
+        {
+            return Array.Empty<AudioClip>();
+        }
+
+        List<AudioClip> ingame = new List<AudioClip>();
+        List<AudioClip> fallback = new List<AudioClip>();
+        for (int i = 0; i < clips.Length; i++)
+        {
+            string name = clips[i].name;
+            bool isMenu = name.IndexOf("menu", StringComparison.OrdinalIgnoreCase) >= 0;
+            if (isMenu)
+            {
+                continue;
+            }
+
+            if (name.IndexOf("ingame", StringComparison.OrdinalIgnoreCase) >= 0)
+            {
+                ingame.Add(clips[i]);
+            }
+            else
+            {
+                fallback.Add(clips[i]);
+            }
+        }
+
+        return ingame.Count > 0 ? ingame.ToArray() : fallback.ToArray();
     }
 
     private AudioClip FindMusicClip(bool menu)
@@ -190,17 +277,51 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         AudioReverbFilter reverb = audioObject.AddComponent<AudioReverbFilter>();
         reverb.reverbPreset = AudioReverbPreset.User;
         reverb.dryLevel = 0f;
-        reverb.room = -900;
-        reverb.roomHF = -2100;
-        reverb.decayTime = 1.1f;
-        reverb.decayHFRatio = 0.42f;
-        reverb.reflectionsLevel = -1600f;
-        reverb.reverbLevel = -1150f;
+        reverb.room = -650;
+        reverb.roomHF = -1850;
+        reverb.decayTime = 1.65f;
+        reverb.decayHFRatio = 0.46f;
+        reverb.reflectionsLevel = -1250f;
+        reverb.reverbLevel = -820f;
 
         AudioEchoFilter echo = audioObject.AddComponent<AudioEchoFilter>();
-        echo.delay = 95f;
-        echo.decayRatio = 0.16f;
-        echo.wetMix = 0.10f;
+        echo.delay = 118f;
+        echo.decayRatio = 0.24f;
+        echo.wetMix = 0.17f;
+        echo.dryMix = 0.92f;
+    }
+
+    private void EnsureMasterAudioEffects()
+    {
+        if (mainCamera == null)
+        {
+            return;
+        }
+
+        AudioReverbFilter reverb = mainCamera.GetComponent<AudioReverbFilter>();
+        if (reverb == null)
+        {
+            reverb = mainCamera.gameObject.AddComponent<AudioReverbFilter>();
+        }
+
+        reverb.reverbPreset = AudioReverbPreset.User;
+        reverb.dryLevel = 0f;
+        reverb.room = -520;
+        reverb.roomHF = -1650;
+        reverb.decayTime = 2.65f;
+        reverb.decayHFRatio = 0.54f;
+        reverb.reflectionsLevel = -1050f;
+        reverb.reverbLevel = -520f;
+
+        AudioEchoFilter echo = mainCamera.GetComponent<AudioEchoFilter>();
+        if (echo == null)
+        {
+            echo = mainCamera.gameObject.AddComponent<AudioEchoFilter>();
+        }
+
+        echo.delay = 155f;
+        echo.decayRatio = 0.27f;
+        echo.wetMix = 0.16f;
         echo.dryMix = 0.95f;
     }
 

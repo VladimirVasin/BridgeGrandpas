@@ -44,7 +44,7 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         for (int i = 0; i < bridgeEvent.Choices.Length; i++)
         {
             EventChoice choice = bridgeEvent.Choices[i];
-            CreateButton(choice.Label, eventChoicesRoot, delegate
+            CreateDialogChoiceButton(choice.Label, choice.Preview, eventChoicesRoot, delegate
             {
                 choice.Apply(this);
                 pendingEvent = null;

@@ -131,7 +131,8 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         switch (building.Type)
         {
             case BuildingType.FireBarrel:
-                return "Эффект: тепло +" + F((0.23f + building.Level * 0.11f) * 60f) + "/мин.";
+                return "Эффект: тепло +" + F((0.23f + building.Level * 0.11f) * 60f) + "/мин.\n" +
+                    "Радиус света: " + Mathf.RoundToInt(FireBarrelLightRangeBoost(building.Level) * 100f) + "%.";
             case BuildingType.Samovar:
                 return "Эффект: чай +" + F((0.16f + building.Level * 0.08f + CountRole(GrandpaRole.SamovarKeeper) * 0.11f) * 60f) + "/мин.";
             case BuildingType.Bedroom:

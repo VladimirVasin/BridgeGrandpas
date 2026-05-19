@@ -95,7 +95,7 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         switch (tier)
         {
             case 1: return "чайный коврик";
-            case 2: return "лампочка на верёвке";
+            case 2: return "гирлянда между столбами";
             case 3: return "чайные кружки";
             case 4: return "стопка газет";
             case 5: return "старый плед";
@@ -134,14 +134,19 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
     private void CreateCozyStringLights()
     {
         Material wire = Mat("cozy_wire", new Color(0.05f, 0.04f, 0.035f));
-        CozyBox("Bulb wire", new Vector3(0f, 1.95f, -1.55f), new Vector3(4.2f, 0.035f, 0.035f), wire);
+        CozyBox("Bulb wire", new Vector3(0f, 2.16f, 2.68f), new Vector3(6.35f, 0.035f, 0.035f), wire);
+        CozyBox("Left pillar tie", new Vector3(-3.18f, 2.08f, 2.68f), new Vector3(0.10f, 0.20f, 0.055f), wire);
+        CozyBox("Right pillar tie", new Vector3(3.18f, 2.08f, 2.68f), new Vector3(0.10f, 0.20f, 0.055f), wire);
         Material bulb = EmissiveMat("cozy_bulb", new Color(1f, 0.58f, 0.22f), 1.8f);
-        for (int i = 0; i < 5; i++)
+        for (int i = 0; i < 7; i++)
         {
-            CozySphere("Warm bulb " + i, new Vector3(-1.7f + i * 0.85f, 1.82f, -1.55f), new Vector3(0.13f, 0.13f, 0.13f), bulb);
+            float x = -2.52f + i * 0.84f;
+            float sag = i == 3 ? -0.10f : Mathf.Abs(i - 3) == 1 ? -0.06f : -0.02f;
+            CozyBox("Bulb drop " + i, new Vector3(x, 2.05f + sag, 2.68f), new Vector3(0.025f, 0.16f, 0.025f), wire);
+            CozySphere("Warm bulb " + i, new Vector3(x, 1.93f + sag, 2.68f), new Vector3(0.13f, 0.13f, 0.13f), bulb);
         }
 
-        AddPointLight(cozyDecorRoot, "Cozy bulbs glow", new Vector3(0f, 1.65f, -1.35f), new Color(1f, 0.54f, 0.22f), 3.8f, 0.55f);
+        AddPointLight(cozyDecorRoot, "Cozy bulbs glow", new Vector3(0f, 1.90f, 2.38f), new Color(1f, 0.54f, 0.22f), 4.8f, 0.55f);
     }
 
     private void CreateCozyNewspaperStack()

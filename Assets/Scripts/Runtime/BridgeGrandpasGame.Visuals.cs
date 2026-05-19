@@ -144,10 +144,11 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
             case BuildingType.FireBarrel:
                 CreateCylinder("Barrel", root, new Vector3(0f, 0.36f, 0f), new Vector3(0.58f, 0.58f, 0.58f), Mat("barrel", new Color(0.11f, 0.075f, 0.055f)));
                 fireFlames = CreateFireFlames(root);
-                fireBarrelCoreLight = AddPointLight(root, "Fire Core Light", new Vector3(0f, 0.96f, 0f), new Color(1f, 0.45f, 0.14f), 4.3f, 10.5f);
-                fireBarrelPoolLight = AddPointLight(root, "Fire Warm Pool Light", new Vector3(0f, 0.70f, 0f), new Color(1f, 0.52f, 0.20f), 8.8f, 6.8f);
-                fireBarrelFlickerLightA = AddPointLight(root, "Fire Side Flicker A", new Vector3(0.48f, 0.92f, -0.20f), new Color(1f, 0.32f, 0.08f), 2.4f, 3.5f);
-                fireBarrelFlickerLightB = AddPointLight(root, "Fire Side Flicker B", new Vector3(-0.34f, 1.02f, 0.28f), new Color(1f, 0.74f, 0.22f), 2.1f, 2.8f);
+                float lightRange = FireBarrelLightRangeBoost(building.Level);
+                fireBarrelCoreLight = AddPointLight(root, "Fire Core Light", new Vector3(0f, 0.96f, 0f), new Color(1f, 0.45f, 0.14f), 5.4f * lightRange, 17.0f);
+                fireBarrelPoolLight = AddPointLight(root, "Fire Warm Pool Light", new Vector3(0f, 0.70f, 0f), new Color(1f, 0.52f, 0.20f), 13.0f * lightRange, 11.5f);
+                fireBarrelFlickerLightA = AddPointLight(root, "Fire Side Flicker A", new Vector3(0.48f, 0.92f, -0.20f), new Color(1f, 0.32f, 0.08f), 3.0f * lightRange, 5.5f);
+                fireBarrelFlickerLightB = AddPointLight(root, "Fire Side Flicker B", new Vector3(-0.34f, 1.02f, 0.28f), new Color(1f, 0.74f, 0.22f), 2.8f * lightRange, 4.8f);
                 AddSmokeOrSteam(root, "Fire Sparks", new Color(1f, 0.38f, 0.05f, 0.82f), 46f, 1.05f);
                 break;
             case BuildingType.Samovar:

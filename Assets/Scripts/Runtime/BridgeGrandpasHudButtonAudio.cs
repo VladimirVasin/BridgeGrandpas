@@ -4,6 +4,8 @@ using UnityEngine.UI;
 
 public sealed class BridgeGrandpasHudButtonAudio : MonoBehaviour, IPointerEnterHandler, IPointerDownHandler, IPointerClickHandler
 {
+    private const float HudVolumeScale = 0.18f;
+
     private static AudioClip hoverClip;
     private static AudioClip clickClip;
     private static AudioClip confirmClip;
@@ -91,7 +93,7 @@ public sealed class BridgeGrandpasHudButtonAudio : MonoBehaviour, IPointerEnterH
 
         EnsureSource();
         source.pitch = pitch;
-        source.PlayOneShot(clip, volume);
+        source.PlayOneShot(clip, volume * HudVolumeScale);
     }
 
     private static void EnsureSource()
@@ -107,7 +109,7 @@ public sealed class BridgeGrandpasHudButtonAudio : MonoBehaviour, IPointerEnterH
         source.playOnAwake = false;
         source.loop = false;
         source.spatialBlend = 0f;
-        source.volume = 1f;
+        source.volume = 0.72f;
         source.priority = 72;
 
         AudioReverbFilter reverb = audioObject.AddComponent<AudioReverbFilter>();

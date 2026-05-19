@@ -47,21 +47,11 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         cityTraffic.Clear();
         cityLamps.Clear();
 
-        CreateWorldEdgeDarkness();
         CreateCityGroundBands();
         CreateCityPrefabRing();
         CreateCityWindowField();
         CreateCityTraffic();
         CreateCitySmoke();
-    }
-
-    private void CreateWorldEdgeDarkness()
-    {
-        Material dark = Mat("world_edge_darkness", new Color(0f, 0f, 0.001f));
-        CreateDecorBox("Left darkness mask", new Vector3(-9.05f, -0.015f, -0.2f), new Vector3(3.0f, 0.11f, 13.5f), dark);
-        CreateDecorBox("Right darkness mask", new Vector3(9.05f, -0.015f, -0.2f), new Vector3(3.0f, 0.11f, 13.5f), dark);
-        CreateDecorBox("Back darkness mask", new Vector3(0f, -0.015f, 6.05f), new Vector3(26f, 0.11f, 2.5f), dark);
-        CreateDecorBox("Back darkness curtain", new Vector3(0f, 1.75f, 6.55f), new Vector3(26f, 3.5f, 0.35f), dark);
     }
 
     private void CreateCityGroundBands()

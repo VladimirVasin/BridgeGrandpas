@@ -99,6 +99,7 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         RectTransform buttons = CreatePanel("Menu Buttons", contentRoot, new Color(0f, 0f, 0f, 0f));
         startMenuButtonsRect = buttons;
         buttons.GetComponent<Image>().raycastTarget = false;
+        startMenuButtonsGroup = buttons.gameObject.AddComponent<CanvasGroup>();
         buttons.anchorMin = new Vector2(0.5f, 0.5f);
         buttons.anchorMax = new Vector2(0.5f, 0.5f);
         buttons.pivot = new Vector2(0.5f, 0.5f);
@@ -110,8 +111,47 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         layout.childForceExpandWidth = true;
         layout.childForceExpandHeight = false;
 
-        CreateMenuButton("Новая игра", buttons, StartNewGame);
+        CreateMenuButton("Новая игра", buttons, BeginStartMenuLoading);
         CreateMenuButton("Выход", buttons, QuitGameFromMenu);
+        CreateMenuLoadingBar(contentRoot);
+    }
+
+    private void CreateMenuLoadingBar(Transform parent)
+    {
+        RectTransform root = CreatePanel("Menu Loading", parent, new Color(0f, 0f, 0f, 0f));
+        startMenuLoadingRoot = root;
+        root.anchorMin = new Vector2(0.5f, 0.5f);
+        root.anchorMax = new Vector2(0.5f, 0.5f);
+        root.pivot = new Vector2(0.5f, 0.5f);
+        root.anchoredPosition = new Vector2(0f, -94f);
+        root.sizeDelta = new Vector2(420f, 52f);
+        root.gameObject.SetActive(false);
+
+        Text text = CreateText("Menu Loading Text", root, 16, FontStyle.Bold, TextAnchor.MiddleCenter, new Color(1f, 0.83f, 0.52f));
+        startMenuLoadingText = text;
+        text.rectTransform.anchorMin = new Vector2(0f, 0.52f);
+        text.rectTransform.anchorMax = new Vector2(1f, 1f);
+        text.rectTransform.offsetMin = Vector2.zero;
+        text.rectTransform.offsetMax = Vector2.zero;
+        text.text = "Готовим место под мостом... 0%";
+
+        RectTransform track = CreatePanel("Menu Loading Track", root, new Color(0.01f, 0.012f, 0.015f, 0.88f));
+        track.anchorMin = new Vector2(0.5f, 0f);
+        track.anchorMax = new Vector2(0.5f, 0f);
+        track.pivot = new Vector2(0.5f, 0f);
+        track.anchoredPosition = new Vector2(0f, 4f);
+        track.sizeDelta = new Vector2(380f, 16f);
+
+        RectTransform fill = CreatePanel("Menu Loading Fill", track, new Color(1f, 0.63f, 0.22f, 0.98f));
+        fill.anchorMin = Vector2.zero;
+        fill.anchorMax = Vector2.one;
+        fill.offsetMin = new Vector2(2f, 2f);
+        fill.offsetMax = new Vector2(-2f, -2f);
+        startMenuLoadingFill = fill.GetComponent<Image>();
+        startMenuLoadingFill.type = Image.Type.Filled;
+        startMenuLoadingFill.fillMethod = Image.FillMethod.Horizontal;
+        startMenuLoadingFill.fillOrigin = (int)Image.OriginHorizontal.Left;
+        startMenuLoadingFill.fillAmount = 0f;
     }
 
     private RectTransform CreateMenuContentRoot(Transform parent)
@@ -136,6 +176,47 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         {
             layout.minHeight = 58f;
             layout.preferredHeight = 64f;
+        }
+    }
+
+    private void BeginStartMenuLoading()
+    {
+        if (gameStarted || startMenuLoading)
+        {
+            return;
+        }
+
+        startMenuLoading = true;
+        startMenuLoadingStartedAt = Time.unscaledTime;
+        SetStartMenuButtonsInteractable(false);
+        if (startMenuLoadingRoot != null)
+        {
+            startMenuLoadingRoot.gameObject.SetActive(true);
+        }
+
+        if (startMenuLoadingFill != null)
+        {
+            startMenuLoadingFill.fillAmount = 0f;
+        }
+    }
+
+    private void SetStartMenuButtonsInteractable(bool interactable)
+    {
+        if (startMenuButtonsGroup != null)
+        {
+            startMenuButtonsGroup.interactable = interactable;
+            startMenuButtonsGroup.blocksRaycasts = interactable;
+        }
+
+        if (startMenuButtonsRect == null)
+        {
+            return;
+        }
+
+        Button[] buttons = startMenuButtonsRect.GetComponentsInChildren<Button>(true);
+        for (int i = 0; i < buttons.Length; i++)
+        {
+            buttons[i].interactable = interactable;
         }
     }
 

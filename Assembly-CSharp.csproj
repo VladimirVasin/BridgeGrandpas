@@ -66,6 +66,7 @@
     <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.UiRuntime.cs" />
     <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.Expeditions.cs" />
     <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.GrandpaAnimation.cs" />
+    <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.DialogChoices.cs" />
     <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.UiSetup.cs" />
     <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.Production.cs" />
     <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.Cozy.cs" />

@@ -12,20 +12,20 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         float philosopher = CountRole(GrandpaRole.Philosopher);
         ResourceStock income = new ResourceStock(0f, 0f, 0f, 0f, 0f);
 
-        Building fire = buildings[BuildingType.FireBarrel];
-        if (fire.Built && !fire.IsBlocked)
+        Building fire;
+        if (buildings.TryGetValue(BuildingType.FireBarrel, out fire) && fire.Built && !fire.IsBlocked)
         {
             income.Heat += 0.23f + fire.Level * 0.11f;
         }
 
-        Building samovarBuilding = buildings[BuildingType.Samovar];
-        if (samovarBuilding.Built && !samovarBuilding.IsBlocked)
+        Building samovarBuilding;
+        if (buildings.TryGetValue(BuildingType.Samovar, out samovarBuilding) && samovarBuilding.Built && !samovarBuilding.IsBlocked)
         {
             income.Tea += 0.16f + samovarBuilding.Level * 0.08f + samovar * 0.11f;
         }
 
-        Building bench = buildings[BuildingType.GrumbleBench];
-        if (bench.Built && !bench.IsBlocked)
+        Building bench;
+        if (buildings.TryGetValue(BuildingType.GrumbleBench, out bench) && bench.Built && !bench.IsBlocked)
         {
             income.Grumble += 0.11f + bench.Level * 0.06f + mutterer * 0.14f + philosopher * 0.05f;
         }
@@ -33,7 +33,8 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         income.Grumble += common * 0.035f + mutterer * 0.05f;
         income.Cardboard += common * 0.025f + cardboarder * 0.12f;
 
-        if (buildings[BuildingType.RadioMayak].Built && !buildings[BuildingType.RadioMayak].IsBlocked)
+        Building radio;
+        if (buildings.TryGetValue(BuildingType.RadioMayak, out radio) && radio.Built && !radio.IsBlocked)
         {
             income.Coins += CountRole(GrandpaRole.RadioReceiver) * 0.012f;
         }

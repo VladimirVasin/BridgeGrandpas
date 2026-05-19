@@ -136,7 +136,6 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
             return;
         }
 
-        gameStarted = true;
         StopMenuMusic();
         if (startMenuCanvas != null)
         {
@@ -151,6 +150,7 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         BuildInitialState();
         SelectOverview();
         RefreshAllUi();
+        gameStarted = true;
     }
 
     private void Update()
@@ -179,6 +179,7 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         UpdateBillboards();
         UpdateFireBarrelLighting();
         UpdateBuildingAnimations(deltaTime);
+        UpdateBackgroundMusic();
         UpdateAmbience(deltaTime);
         UpdateCityAmbience(deltaTime);
         UpdateAmbientUi();

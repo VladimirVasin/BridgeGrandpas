@@ -26,20 +26,22 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         growth += grandpas.Count * 0.0048f;
         growth += BuiltCount() * 0.0065f;
 
-        if (buildings[BuildingType.Samovar].Built && !buildings[BuildingType.Samovar].IsBlocked)
+        Building samovar;
+        if (buildings.TryGetValue(BuildingType.Samovar, out samovar) && samovar.Built && !samovar.IsBlocked)
         {
-            growth += 0.010f + buildings[BuildingType.Samovar].Level * 0.002f;
+            growth += 0.010f + samovar.Level * 0.002f;
         }
 
-        if (buildings[BuildingType.FireBarrel].Built && !buildings[BuildingType.FireBarrel].IsBlocked)
+        Building fire;
+        if (buildings.TryGetValue(BuildingType.FireBarrel, out fire) && fire.Built && !fire.IsBlocked)
         {
             growth += 0.006f;
         }
 
         growth -= CountRole(GrandpaRole.Guard) * 0.014f;
 
-        Building curtain = buildings[BuildingType.CarpetCurtain];
-        if (curtain.Built && !curtain.IsBlocked)
+        Building curtain;
+        if (buildings.TryGetValue(BuildingType.CarpetCurtain, out curtain) && curtain.Built && !curtain.IsBlocked)
         {
             growth -= 0.030f + curtain.Level * 0.015f;
         }
@@ -60,7 +62,8 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
             return;
         }
 
-        bool radioBuilt = buildings[BuildingType.RadioMayak].Built && !buildings[BuildingType.RadioMayak].IsBlocked;
+        Building radio;
+        bool radioBuilt = buildings.TryGetValue(BuildingType.RadioMayak, out radio) && radio.Built && !radio.IsBlocked;
         nextEventIn -= deltaTime;
         if (radioBuilt)
         {

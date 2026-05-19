@@ -10,16 +10,24 @@ using UnityEngine.UI;
 
 public sealed partial class BridgeGrandpasGame : MonoBehaviour
 {
+    private const float StartMenuLoadingDuration = 1.45f;
+
     private RectTransform startMenuBackgroundRect;
     private RectTransform startMenuShadeRect;
     private RectTransform startMenuContentRoot;
     private RectTransform startMenuTitleRect;
     private RectTransform startMenuSubtitleRect;
     private RectTransform startMenuButtonsRect;
+    private RectTransform startMenuLoadingRoot;
+    private Image startMenuLoadingFill;
+    private Text startMenuLoadingText;
     private CanvasGroup startMenuContentGroup;
+    private CanvasGroup startMenuButtonsGroup;
     private RectTransform startMenuFireGlowRect;
     private RectTransform startMenuFireCoreRect;
     private Vector2 startMenuCursorParallax;
+    private bool startMenuLoading;
+    private float startMenuLoadingStartedAt;
     private readonly List<MenuParticle> menuParticles = new List<MenuParticle>();
 
     private sealed class MenuParticle
@@ -121,6 +129,7 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         AnimateMenuFire(t);
         AnimateMenuParticles(deltaTime, t);
         AnimateMenuContent(t);
+        UpdateStartMenuLoading(t);
     }
 
     private void UpdateMenuCursorParallax(float deltaTime)
@@ -225,9 +234,49 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
             startMenuButtonsRect.anchoredPosition = new Vector2(startMenuCursorParallax.x * 3f, 18f + Mathf.Sin(t * 0.72f) * 2f + startMenuCursorParallax.y * 2f);
         }
 
+        if (startMenuButtonsGroup != null)
+        {
+            float targetAlpha = startMenuLoading ? 0.36f : 1f;
+            startMenuButtonsGroup.alpha = Mathf.Lerp(startMenuButtonsGroup.alpha, targetAlpha, Time.unscaledDeltaTime * 9f);
+        }
+
         if (startMenuContentGroup != null)
         {
             startMenuContentGroup.alpha = Mathf.Lerp(startMenuContentGroup.alpha, 1f, Time.unscaledDeltaTime * 4.5f);
+        }
+    }
+
+    private void UpdateStartMenuLoading(float t)
+    {
+        if (!startMenuLoading)
+        {
+            return;
+        }
+
+        float raw = Mathf.Clamp01((Time.unscaledTime - startMenuLoadingStartedAt) / StartMenuLoadingDuration);
+        float eased = 1f - Mathf.Pow(1f - raw, 2.7f);
+        if (startMenuLoadingFill != null)
+        {
+            startMenuLoadingFill.fillAmount = eased;
+        }
+
+        if (startMenuLoadingText != null)
+        {
+            int percent = Mathf.RoundToInt(eased * 100f);
+            string dots = new string('.', 1 + Mathf.FloorToInt(t * 4f) % 3);
+            startMenuLoadingText.text = "Готовим место под мостом" + dots + " " + percent + "%";
+        }
+
+        if (startMenuLoadingRoot != null)
+        {
+            float pulse = 1f + Mathf.Sin(t * 8f) * 0.012f;
+            startMenuLoadingRoot.localScale = new Vector3(pulse, pulse, 1f);
+        }
+
+        if (raw >= 1f)
+        {
+            startMenuLoading = false;
+            StartNewGame();
         }
     }
 }
