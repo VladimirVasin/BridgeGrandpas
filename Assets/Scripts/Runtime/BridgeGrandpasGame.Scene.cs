@@ -102,6 +102,7 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         }
 
         CreateBridgeDetailLayer(bridgeLength, concrete, rail);
+        CreateBridgeTraffic();
 
         CreateBox("Puddle left", worldRoot, new Vector3(-4.8f, -0.01f, -2.8f), new Vector3(1.7f, 0.03f, 0.9f), water);
         CreateBox("Puddle right", worldRoot, new Vector3(4.3f, -0.01f, -2.35f), new Vector3(1.2f, 0.03f, 0.7f), water);
@@ -125,19 +126,23 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
 
     private void CreateForegroundGroundCurtain()
     {
-        Material face = AsphaltMat(
-            "foreground_asphalt_face",
-            new Color(0.055f, 0.064f, 0.072f),
-            new Vector2(18f, 3.4f),
-            0.30f);
+        Material apron = AsphaltMat(
+            "foreground_asphalt_apron",
+            new Color(0.095f, 0.112f, 0.128f),
+            new Vector2(20f, 6.5f),
+            0.52f);
         Material lip = AsphaltMat(
             "foreground_asphalt_lip",
-            new Color(0.12f, 0.135f, 0.145f),
+            new Color(0.135f, 0.152f, 0.165f),
             new Vector2(20f, 1.2f),
-            0.38f);
+            0.50f);
+        Material wet = TransparentMat("foreground_wet_reflection", new Color(0.18f, 0.26f, 0.34f, 0.28f));
 
         CreateBox("Foreground asphalt lip", worldRoot, new Vector3(0f, -0.075f, -3.35f), new Vector3(280f, 0.05f, 0.58f), lip);
-        CreateBox("Foreground ground curtain", worldRoot, new Vector3(0f, -1.68f, -3.66f), new Vector3(280f, 3.18f, 0.26f), face);
+        CreateGroundPlane("Foreground visible wet asphalt", worldRoot, new Vector3(0f, -0.082f, -7.8f), new Vector2(280f, 9.2f), apron);
+        CreateBox("Foreground fire reflection smear", worldRoot, new Vector3(0.15f, -0.047f, -5.05f), new Vector3(3.8f, 0.014f, 0.70f), wet);
+        CreateBox("Foreground cold puddle smear L", worldRoot, new Vector3(-6.0f, -0.048f, -5.8f), new Vector3(2.4f, 0.012f, 0.44f), wet);
+        CreateBox("Foreground cold puddle smear R", worldRoot, new Vector3(6.5f, -0.048f, -6.35f), new Vector3(2.8f, 0.012f, 0.48f), wet);
     }
 
     private GameObject CreateGroundPlane(string name, Transform parent, Vector3 localPosition, Vector2 size, Material material)

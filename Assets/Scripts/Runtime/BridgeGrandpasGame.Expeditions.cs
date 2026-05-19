@@ -3,6 +3,9 @@ using UnityEngine.UI;
 
 public sealed partial class BridgeGrandpasGame : MonoBehaviour
 {
+    private static readonly bool ExpeditionsEnabled = false;
+    private static readonly bool ExpeditionNarrativeAutoTriggerEnabled = false;
+
     private bool UpdateGrandpaExpedition(Grandpa grandpa)
     {
         if (!grandpa.IsOnExpedition)
@@ -16,7 +19,7 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
             return true;
         }
 
-        if (!grandpa.ExpeditionNarrativeResolved)
+        if (ExpeditionNarrativeAutoTriggerEnabled && !grandpa.ExpeditionNarrativeResolved)
         {
             ShowExpeditionNarrativeModal(grandpa);
         }
@@ -38,6 +41,13 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
     private void BuildExpeditionsTray()
     {
         trayTitleText.text = "Вылазки наверх";
+        if (!ExpeditionsEnabled)
+        {
+            AddTrayNote("Вылазки временно не стартуют. Наблюдатель ещё не нашёл правильный триггер.");
+            AddExpeditionReturnNotes();
+            return;
+        }
+
         Grandpa chosen = selectedGrandpa != null && !selectedGrandpa.IsOnExpedition
             ? selectedGrandpa
             : FirstAvailableGrandpa();
@@ -89,6 +99,13 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
 
     private void TryStartGrandpaExpedition(Grandpa grandpa, ExpeditionType type)
     {
+        if (!ExpeditionsEnabled)
+        {
+            Notify("Вылазки пока отключены. Триггер появится позже.");
+            RefreshAllUi();
+            return;
+        }
+
         if (grandpa == null || grandpa.IsOnExpedition)
         {
             Notify("Этот дедушка уже где-то между лестницей и судьбой.");
@@ -105,7 +122,7 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
 
         grandpa.IsOnExpedition = true;
         grandpa.ExpeditionLeaving = true;
-        grandpa.ExpeditionNarrativeResolved = false;
+        grandpa.ExpeditionNarrativeResolved = !ExpeditionNarrativeAutoTriggerEnabled;
         grandpa.ExpeditionType = type;
         grandpa.ExpeditionDepartureUntil = Time.time + 3.6f;
         grandpa.ExpeditionUntil = grandpa.ExpeditionDepartureUntil + ExpeditionDuration(grandpa, type);
@@ -201,7 +218,10 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
 
         grandpa.ExpeditionLeaving = false;
         grandpa.Root.SetActive(false);
-        ShowExpeditionNarrativeModal(grandpa);
+        if (ExpeditionNarrativeAutoTriggerEnabled)
+        {
+            ShowExpeditionNarrativeModal(grandpa);
+        }
     }
 
     private Vector3 ExpeditionExitPosition(ExpeditionType type)

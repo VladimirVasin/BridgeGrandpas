@@ -150,16 +150,20 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         SetupUi();
         SetupBackgroundMusic();
         SetupAmbience();
-        if (!TryLoadGame())
+        if (startMenuLoadSavedGame && TryLoadGame())
+        {
+            Notify("Старые записи подняты из-под мокрой обложки.");
+        }
+        else
         {
             BuildInitialState();
         }
 
+        startMenuLoadSavedGame = false;
         BeginStartIrisFade();
         SelectOverview();
         RefreshAllUi();
         gameStarted = true;
-        nextAutoSaveAt = Time.time + AutoSaveInterval;
     }
 
     private void Update()
@@ -194,8 +198,8 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         UpdateBackgroundMusic();
         UpdateAmbience(deltaTime);
         UpdateCityAmbience(deltaTime);
+        UpdateBridgeTraffic(deltaTime);
         UpdateAmbientUi();
-        UpdateAutoSave();
     }
 
 }

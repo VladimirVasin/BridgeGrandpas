@@ -5,8 +5,6 @@ using UnityEngine;
 public sealed partial class BridgeGrandpasGame : MonoBehaviour
 {
     private const string SaveKey = "BridgeGrandpas.Save.v1";
-    private const float AutoSaveInterval = 12f;
-    private float nextAutoSaveAt;
 
     [Serializable]
     private sealed class SaveData
@@ -77,9 +75,76 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
             return false;
         }
 
+        ClearPlayableStateForLoad();
         RestoreSaveData(data);
-        Notify("Блокнот нашёл старые записи. Коммуна продолжает шуршать.");
         return true;
+    }
+
+    private bool HasSavedGame()
+    {
+        return !string.IsNullOrEmpty(PlayerPrefs.GetString(SaveKey, ""));
+    }
+
+    private void SaveGameFromMenu()
+    {
+        if (!gameStarted)
+        {
+            return;
+        }
+
+        SaveGame();
+        Notify("Сохранено: блокнот прижал страницу, чтобы её не унесло ветром.");
+        MarkNotebookDirty();
+        RefreshAllUi();
+    }
+
+    private void LoadGameFromMenu()
+    {
+        if (!HasSavedGame())
+        {
+            Notify("Загружать нечего: старых записей пока нет.");
+            return;
+        }
+
+        if (!TryLoadGame())
+        {
+            Notify("Сохранение не прочиталось. Блокнот делает вид, что так и было.");
+            return;
+        }
+
+        SelectOverview();
+        BeginStartIrisFade();
+        MarkNotebookDirty();
+        RefreshAllUi();
+        Notify("Загружено: дедовская коммуна вернулась к старым записям.");
+    }
+
+    private void ClearPlayableStateForLoad()
+    {
+        selectedGrandpa = null;
+        selectedBuilding = null;
+        hoveredTarget = null;
+        pendingEvent = null;
+        trayOpen = false;
+        trayDirty = true;
+        microHudUntil = 0f;
+
+        if (settlementRoot != null)
+        {
+            ClearChildren(settlementRoot);
+        }
+
+        cozyDecorRoot = null;
+        grandpas.Clear();
+        buildings.Clear();
+        SetupBuildings();
+        fireBarrelCoreLight = null;
+        fireBarrelPoolLight = null;
+        fireBarrelFlickerLightA = null;
+        fireBarrelFlickerLightB = null;
+        fireFlames = Array.Empty<Transform>();
+        ResetNotebookObservations();
+        ResetObservationLeads();
     }
 
     private void RestoreSaveData(SaveData data)
@@ -101,7 +166,6 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         RestoreNotebookObservations(data.Observations);
         CreateStarterCommuneProps();
         RefreshCozyDecor();
-        nextAutoSaveAt = Time.time + AutoSaveInterval;
     }
 
     private void RestoreBuildings(List<BuildingSaveData> savedBuildings)
@@ -176,17 +240,6 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         }
     }
 
-    private void UpdateAutoSave()
-    {
-        if (!gameStarted || Time.time < nextAutoSaveAt)
-        {
-            return;
-        }
-
-        SaveGame();
-        nextAutoSaveAt = Time.time + AutoSaveInterval;
-    }
-
     private void SaveGame()
     {
         if (!gameStarted)
@@ -258,8 +311,4 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         return data;
     }
 
-    private void OnApplicationQuit()
-    {
-        SaveGame();
-    }
 }

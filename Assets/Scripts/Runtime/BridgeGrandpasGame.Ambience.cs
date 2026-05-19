@@ -68,6 +68,7 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         AddAmbienceLayer("Rain On Shelter", rain.ToArray(), 0.11f, 34f, 68f, 7f, 0.12f);
         AddAmbienceLayer("Wind Under Arch", wind.ToArray(), 0.08f, 80f, 130f, 10f, 0.42f);
         AddAmbienceLayer("Distant Thunder Bed", thunderBeds.ToArray(), 0.055f, 95f, 170f, 12f, 0.20f);
+        SetupNatureEssentialsAmbience();
         SetupThunderAccents(thunderAccents.ToArray());
         Debug.Log("[BridgeGrandpas] Ambience clips loaded: " + clips.Length);
     }
@@ -85,6 +86,7 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         }
 
         UpdateThunderAccents();
+        UpdateNatureEssentialsAmbience(deltaTime);
     }
 
     private AudioClip[] LoadAmbienceClips()

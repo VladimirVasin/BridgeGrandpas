@@ -46,6 +46,13 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
 
     private void ShowEventModal(BridgeEvent bridgeEvent)
     {
+        if (bridgeEvent == null || bridgeEvent.Choices == null || bridgeEvent.Choices.Length == 0 ||
+            eventTitleText == null || eventBodyText == null || eventChoicesRoot == null || eventModal == null)
+        {
+            pendingEvent = null;
+            return;
+        }
+
         pendingEvent = bridgeEvent;
         eventTitleText.text = bridgeEvent.Title;
         eventBodyText.text = bridgeEvent.Body;
@@ -53,13 +60,28 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
 
         for (int i = 0; i < bridgeEvent.Choices.Length; i++)
         {
-            EventChoice choice = bridgeEvent.Choices[i];
-            CreateDialogChoiceButton(choice.Label, choice.Preview, eventChoicesRoot, delegate
+            EventChoice choiceSnapshot = bridgeEvent.Choices[i];
+            if (choiceSnapshot == null)
             {
-                BridgeEvent handledEvent = pendingEvent;
-                choice.Apply(this);
-                QueueObservationLead("версия события", "Событие \"" + handledEvent.Title + "\": записана версия \"" +
-                    choice.Label + "\". " + PlainNotebookText(choice.Preview), null, DefaultObservationPosition(), 0.12f);
+                continue;
+            }
+
+            CreateDialogChoiceButton(choiceSnapshot.Label, choiceSnapshot.Preview, eventChoicesRoot, delegate
+            {
+                if (pendingEvent != bridgeEvent)
+                {
+                    Notify("Это событие уже закрыто.");
+                    RefreshAllUi();
+                    return;
+                }
+
+                if (choiceSnapshot.Apply != null)
+                {
+                    choiceSnapshot.Apply(this);
+                }
+
+                QueueObservationLead("версия события", "Событие \"" + bridgeEvent.Title + "\": записана версия \"" +
+                    choiceSnapshot.Label + "\". " + PlainNotebookText(choiceSnapshot.Preview), null, DefaultObservationPosition(), 0.12f);
                 pendingEvent = null;
                 eventModal.gameObject.SetActive(false);
                 suspicion = Mathf.Clamp(suspicion, 0f, MaxSuspicion);

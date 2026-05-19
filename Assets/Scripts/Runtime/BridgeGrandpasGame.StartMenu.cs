@@ -83,7 +83,7 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         title.rectTransform.anchorMin = new Vector2(0.5f, 0.5f);
         title.rectTransform.anchorMax = new Vector2(0.5f, 0.5f);
         title.rectTransform.pivot = new Vector2(0.5f, 0.5f);
-        title.rectTransform.anchoredPosition = new Vector2(0f, 212f);
+        title.rectTransform.anchoredPosition = new Vector2(0f, 242f);
         title.rectTransform.sizeDelta = new Vector2(760f, 82f);
 
         Text subtitle = CreateText("Menu Subtitle", contentRoot, 20, FontStyle.Bold, TextAnchor.MiddleLeft, new Color(0.94f, 0.88f, 0.76f));
@@ -93,7 +93,7 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         subtitle.rectTransform.anchorMin = new Vector2(0.5f, 0.5f);
         subtitle.rectTransform.anchorMax = new Vector2(0.5f, 0.5f);
         subtitle.rectTransform.pivot = new Vector2(0.5f, 0.5f);
-        subtitle.rectTransform.anchoredPosition = new Vector2(0f, 154f);
+        subtitle.rectTransform.anchoredPosition = new Vector2(0f, 184f);
         subtitle.rectTransform.sizeDelta = new Vector2(620f, 36f);
 
         RectTransform buttons = CreatePanel("Menu Buttons", contentRoot, new Color(0f, 0f, 0f, 0f));
@@ -103,8 +103,8 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         buttons.anchorMin = new Vector2(0.5f, 0.5f);
         buttons.anchorMax = new Vector2(0.5f, 0.5f);
         buttons.pivot = new Vector2(0.5f, 0.5f);
-        buttons.anchoredPosition = new Vector2(0f, 18f);
-        buttons.sizeDelta = new Vector2(320f, 150f);
+        buttons.anchoredPosition = new Vector2(0f, 46f);
+        buttons.sizeDelta = new Vector2(320f, 228f);
 
         VerticalLayoutGroup layout = buttons.gameObject.AddComponent<VerticalLayoutGroup>();
         layout.spacing = 14f;
@@ -112,6 +112,13 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         layout.childForceExpandHeight = false;
 
         CreateMenuButton("Новая игра", buttons, BeginStartMenuLoading);
+        RectTransform loadButton = CreateMenuButton("Загрузить", buttons, BeginStartMenuLoad);
+        Button load = loadButton.GetComponent<Button>();
+        if (load != null)
+        {
+            load.interactable = HasSavedGame();
+        }
+
         CreateMenuButton("Выход", buttons, QuitGameFromMenu);
         CreateMenuLoadingBar(contentRoot);
     }
@@ -123,7 +130,7 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         root.anchorMin = new Vector2(0.5f, 0.5f);
         root.anchorMax = new Vector2(0.5f, 0.5f);
         root.pivot = new Vector2(0.5f, 0.5f);
-        root.anchoredPosition = new Vector2(0f, -94f);
+        root.anchoredPosition = new Vector2(0f, -122f);
         root.sizeDelta = new Vector2(420f, 52f);
         root.gameObject.SetActive(false);
 
@@ -168,7 +175,7 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         return startMenuContentRoot;
     }
 
-    private void CreateMenuButton(string label, Transform parent, UnityEngine.Events.UnityAction action)
+    private RectTransform CreateMenuButton(string label, Transform parent, UnityEngine.Events.UnityAction action)
     {
         RectTransform buttonRect = CreateButton(label, parent, action);
         LayoutElement layout = buttonRect.GetComponent<LayoutElement>();
@@ -177,15 +184,33 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
             layout.minHeight = 58f;
             layout.preferredHeight = 64f;
         }
+
+        return buttonRect;
     }
 
     private void BeginStartMenuLoading()
+    {
+        BeginStartMenuLoading(false);
+    }
+
+    private void BeginStartMenuLoad()
+    {
+        if (!HasSavedGame())
+        {
+            return;
+        }
+
+        BeginStartMenuLoading(true);
+    }
+
+    private void BeginStartMenuLoading(bool loadSavedGame)
     {
         if (gameStarted || startMenuLoading)
         {
             return;
         }
 
+        startMenuLoadSavedGame = loadSavedGame;
         startMenuLoading = true;
         startMenuLoadingStartedAt = Time.unscaledTime;
         SetStartMenuButtonsInteractable(false);

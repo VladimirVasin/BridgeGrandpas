@@ -14,6 +14,9 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         CreateNotebookButton("Проверить следы строительства", notebookPageContent, delegate { SetNotebookPage(NotebookPage.Build); });
         CreateNotebookButton("Сверить замеченных дедушек", notebookPageContent, delegate { SetNotebookPage(NotebookPage.Grandpas); });
         CreateNotebookButton("Открыть записи о вылазках", notebookPageContent, delegate { SetNotebookPage(NotebookPage.Expeditions); });
+        CreateNotebookButton("Сохранить текущие записи", notebookPageContent, SaveGameFromMenu);
+        RectTransform load = CreateNotebookButton("Загрузить старые записи", notebookPageContent, LoadGameFromMenu);
+        load.GetComponent<Button>().interactable = HasSavedGame();
     }
 
     private void BuildNotebookBuildPage()
@@ -117,15 +120,38 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
             return;
         }
 
-        for (int i = 0; i < pendingEvent.Choices.Length; i++)
+        BridgeEvent eventSnapshot = pendingEvent;
+        if (eventSnapshot == null || eventSnapshot.Choices == null || eventSnapshot.Choices.Length == 0)
         {
-            EventChoice choice = pendingEvent.Choices[i];
-            CreateNotebookButton("Записать версию: " + choice.Label + "\n" + choice.Preview, notebookPageContent, delegate
+            AddNotebookText("Событие уже рассеялось. Наблюдатель оставил пустую строку.", 16, FontStyle.Italic, 48f);
+            return;
+        }
+
+        for (int i = 0; i < eventSnapshot.Choices.Length; i++)
+        {
+            EventChoice choiceSnapshot = eventSnapshot.Choices[i];
+            if (choiceSnapshot == null)
             {
-                BridgeEvent handledEvent = pendingEvent;
-                choice.Apply(this);
-                QueueObservationLead("версия события", "Событие \"" + handledEvent.Title + "\": записана версия \"" +
-                    choice.Label + "\". " + PlainNotebookText(choice.Preview), null, DefaultObservationPosition(), 0.12f);
+                continue;
+            }
+
+            CreateNotebookButton("Записать версию: " + choiceSnapshot.Label + "\n" + choiceSnapshot.Preview, notebookPageContent, delegate
+            {
+                if (pendingEvent != eventSnapshot)
+                {
+                    Notify("Эта запись уже неактуальна.");
+                    MarkNotebookDirty();
+                    RefreshAllUi();
+                    return;
+                }
+
+                if (choiceSnapshot.Apply != null)
+                {
+                    choiceSnapshot.Apply(this);
+                }
+
+                QueueObservationLead("версия события", "Событие \"" + eventSnapshot.Title + "\": записана версия \"" +
+                    choiceSnapshot.Label + "\". " + PlainNotebookText(choiceSnapshot.Preview), null, DefaultObservationPosition(), 0.12f);
                 pendingEvent = null;
                 if (eventModal != null)
                 {
@@ -142,6 +168,13 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
 
     private void BuildNotebookExpeditionsPage()
     {
+        if (!ExpeditionsEnabled)
+        {
+            AddNotebookText("Вылазки временно не инициируются. Наблюдатель оставил страницу под будущий триггер.", 16, FontStyle.Italic, 62f);
+            AddNotebookExpeditionReturnNotes();
+            return;
+        }
+
         Grandpa narrativeGrandpa = PendingExpeditionNarrativeGrandpa();
         if (narrativeGrandpa != null)
         {
@@ -213,6 +246,11 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
 
     private Grandpa PendingExpeditionNarrativeGrandpa()
     {
+        if (!ExpeditionNarrativeAutoTriggerEnabled)
+        {
+            return null;
+        }
+
         for (int i = 0; i < grandpas.Count; i++)
         {
             Grandpa grandpa = grandpas[i];

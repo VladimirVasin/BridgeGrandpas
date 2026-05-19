@@ -114,6 +114,7 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         {
             vhsLensDistortion.intensity.Override(active ? -0.085f - zoomPulse * 0.055f - trackingPulse * 0.025f : 0f);
         }
+
     }
 
     private void SetupSceneLighting(Light moon)

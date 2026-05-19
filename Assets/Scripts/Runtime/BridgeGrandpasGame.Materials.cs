@@ -72,6 +72,33 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         return material;
     }
 
+    private Material TransparentGlowMat(string key, Color color)
+    {
+        Material material;
+        if (materialCache.TryGetValue(key, out material))
+        {
+            return material;
+        }
+
+        Shader shader = Shader.Find("Universal Render Pipeline/Unlit");
+        if (shader == null)
+        {
+            shader = Shader.Find("Unlit/Color");
+        }
+
+        material = shader == null ? TransparentMat(key, color) : new Material(shader);
+        ApplyColor(material, "_Color", color);
+        ApplyColor(material, "_BaseColor", color);
+        SetFloat(material, "_Surface", 1f);
+        SetFloat(material, "_SrcBlend", (float)BlendMode.SrcAlpha);
+        SetFloat(material, "_DstBlend", (float)BlendMode.OneMinusSrcAlpha);
+        SetFloat(material, "_ZWrite", 0f);
+        material.renderQueue = (int)RenderQueue.Transparent;
+        material.EnableKeyword("_SURFACE_TYPE_TRANSPARENT");
+        materialCache[key] = material;
+        return material;
+    }
+
     private Material ParticleMat(string key, Color color)
     {
         Material material;

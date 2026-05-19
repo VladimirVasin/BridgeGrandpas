@@ -93,6 +93,11 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
 
     private void ShowExpeditionNarrativeModal(Grandpa grandpa)
     {
+        if (!ExpeditionNarrativeAutoTriggerEnabled)
+        {
+            return;
+        }
+
         if (grandpa == null || grandpa.ExpeditionNarrativeResolved)
         {
             return;
