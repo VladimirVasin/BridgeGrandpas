@@ -97,6 +97,8 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
             UpdateGrandpaMovement(grandpa, deltaTime);
             UpdateGrandpaThought(grandpa);
         }
+
+        UpdateAutoBudding();
     }
 
     private void UpdateGrandpaBudding(Grandpa grandpa, float deltaTime)

@@ -63,68 +63,15 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
 
     private void TryBudSelected()
     {
-        Grandpa candidate = selectedGrandpa;
-        if (candidate == null || candidate.IsOnExpedition || candidate.Budding < BuddingGoal)
-        {
-            candidate = null;
-            for (int i = 0; i < grandpas.Count; i++)
-            {
-                if (!grandpas[i].IsOnExpedition && grandpas[i].Budding >= BuddingGoal)
-                {
-                    candidate = grandpas[i];
-                    break;
-                }
-            }
-        }
-
+        Grandpa candidate = FindBuddingCandidate(selectedGrandpa);
         if (candidate == null)
         {
-            Grandpa closest = null;
-            for (int i = 0; i < grandpas.Count; i++)
-            {
-                if (grandpas[i].IsOnExpedition)
-                {
-                    continue;
-                }
-
-                if (closest == null || grandpas[i].Budding > closest.Budding)
-                {
-                    closest = grandpas[i];
-                }
-            }
-
+            Grandpa closest = FindClosestBuddingGrandpa();
             Notify(closest == null ? "Пока некому почковаться." : "Самый готовый дедушка: " + Mathf.FloorToInt(closest.Budding) + "%.");
             return;
         }
 
-        if (grandpas.Count >= PopulationCap())
-        {
-            Notify("Нужна Картонная спальня или её улучшение: лимит дедушек достигнут.");
-            return;
-        }
-
-        ResourceStock cost = BuddingCost();
-        if (!Spend(cost))
-        {
-            Notify("Для почкования нужны чай, тепло и ворчание.");
-            return;
-        }
-
-        candidate.Budding = 0f;
-        GrandpaRole role = RollMutationRole();
-        Grandpa child = SpawnGrandpa(role, Jitter(candidate.Root.transform.position, 0.75f));
-        child.Budding = UnityEngine.Random.Range(0f, 18f);
-        child.BirthAnimStart = Time.time;
-        child.BirthAnimUntil = Time.time + 1.35f;
-        child.BudBurstUntil = Time.time + 0.9f;
-        candidate.BudBurstUntil = Time.time + 0.75f;
-        CreateBuddingBurst(candidate.Root.transform.position);
-        suspicion += 7f;
-        ShowThought(candidate, "Почкуется!", 3f);
-        ShowThought(child, "Я новый дед", 3.5f);
-        SelectGrandpa(child);
-        string cozy = GainCozy(0.8f);
-        Notify(candidate.Name + " почковался. Появился " + child.Name + " (" + RoleName(role) + "). Уют +0.8." + cozy);
+        TryBudGrandpa(candidate, false);
     }
 
     private Grandpa SpawnGrandpa(GrandpaRole role, Vector3 position)

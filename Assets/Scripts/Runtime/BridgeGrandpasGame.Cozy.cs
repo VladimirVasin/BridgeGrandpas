@@ -74,6 +74,7 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         if (tier >= 7) CreateCozyJarShelf();
         if (tier >= 8) CreateCozyCanopy();
         if (tier >= 9) CreateCozyWelcomeSign();
+        CreateCozyAtmosphere(tier);
     }
 
     private int CozyTierForScore()
@@ -206,6 +207,44 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         Material chalk = Mat("cozy_chalk_marks", new Color(0.86f, 0.80f, 0.65f));
         CozyBox("Quiet sign mark A", new Vector3(-0.12f, 0.82f, 1.18f), new Vector3(0.42f, 0.045f, 0.035f), chalk);
         CozyBox("Quiet sign mark B", new Vector3(0.28f, 0.72f, 1.18f), new Vector3(0.30f, 0.045f, 0.035f), chalk);
+    }
+
+    private void CreateCozyAtmosphere(int tier)
+    {
+        if (tier >= 3)
+        {
+            AddCozyNoShadowLight("Cup tea warmth", new Vector3(0.62f, 0.32f, -0.72f), new Color(1f, 0.50f, 0.20f), 1.55f, 0.22f);
+            AddCozySteam("Cup steam", new Vector3(0.60f, 0.25f, -0.72f), new Color(0.92f, 0.78f, 0.58f, 0.24f), 2.2f);
+        }
+
+        if (tier >= 5)
+        {
+            AddCozyNoShadowLight("Plaid soft warmth", new Vector3(-0.72f, 0.52f, -1.28f), new Color(1f, 0.38f, 0.18f), 2.4f, 0.16f);
+        }
+
+        if (tier >= 7)
+        {
+            AddCozyNoShadowLight("Jar shelf glint", new Vector3(1.66f, 1.02f, 0.55f), new Color(0.72f, 0.95f, 0.86f), 2.0f, 0.12f);
+        }
+
+        if (tier >= 9)
+        {
+            AddCozyNoShadowLight("Quiet sign warm edge", new Vector3(0.15f, 1.02f, 1.02f), new Color(1f, 0.58f, 0.24f), 2.8f, 0.18f);
+        }
+    }
+
+    private void AddCozyNoShadowLight(string name, Vector3 position, Color color, float range, float intensity)
+    {
+        Light light = AddPointLight(cozyDecorRoot, name, position, color, range, intensity);
+        light.shadows = LightShadows.None;
+    }
+
+    private void AddCozySteam(string name, Vector3 position, Color color, float rate)
+    {
+        GameObject anchor = new GameObject(name);
+        anchor.transform.SetParent(cozyDecorRoot, false);
+        anchor.transform.localPosition = position;
+        AddSmokeOrSteam(anchor.transform, name + " particles", color, rate, 2.8f);
     }
 
     private GameObject CozyBox(string name, Vector3 position, Vector3 scale, Material material)

@@ -31,6 +31,8 @@ sysinfo.txt
 # Local raw audio sources
 *.wav
 *.wav.meta
+*.asd
+*.asd.meta
 
 # Local packages cache
 /[Pp]ackages/packages-lock.json.bak

@@ -43,18 +43,19 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         CreateEventModal(canvasObject.transform);
         CreateExpeditionModal(canvasObject.transform);
         CreateVictoryModal(canvasObject.transform);
+        SetupVhsOverlay();
     }
 
     private void CreateTopPanel(Transform parent)
     {
-        RectTransform panel = CreatePanel("Top Stats", parent, new Color(0.055f, 0.06f, 0.075f, 0.92f));
+        RectTransform panel = CreatePanel("Top Stats", parent, new Color(0.045f, 0.050f, 0.062f, 0.78f));
         panel.anchorMin = new Vector2(0f, 1f);
         panel.anchorMax = new Vector2(1f, 1f);
         panel.pivot = new Vector2(0.5f, 1f);
         panel.anchoredPosition = Vector2.zero;
-        panel.sizeDelta = new Vector2(0f, 70f);
+        panel.sizeDelta = new Vector2(0f, 58f);
 
-        topStatsText = CreateText("Top Stats Text", panel, 18, FontStyle.Bold, TextAnchor.MiddleLeft, Color.white);
+        topStatsText = CreateText("Top Stats Text", panel, 16, FontStyle.Bold, TextAnchor.MiddleLeft, Color.white);
         topStatsText.rectTransform.anchorMin = new Vector2(0f, 0f);
         topStatsText.rectTransform.anchorMax = new Vector2(1f, 1f);
         topStatsText.rectTransform.offsetMin = new Vector2(18f, 0f);
@@ -91,7 +92,7 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         panel.anchorMin = new Vector2(0f, 0f);
         panel.anchorMax = new Vector2(1f, 0f);
         panel.pivot = new Vector2(0.5f, 0f);
-        panel.anchoredPosition = new Vector2(0f, 78f);
+        panel.anchoredPosition = new Vector2(0f, 64f);
         panel.sizeDelta = new Vector2(0f, 30f);
         panel.GetComponent<Image>().raycastTarget = false;
 
@@ -174,16 +175,16 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
 
     private void CreateBottomPanel(Transform parent)
     {
-        RectTransform panel = CreatePanel("Bottom Controls", parent, new Color(0.045f, 0.05f, 0.06f, 0.95f));
+        RectTransform panel = CreatePanel("Bottom Controls", parent, new Color(0.035f, 0.039f, 0.046f, 0.74f));
         panel.anchorMin = new Vector2(0f, 0f);
         panel.anchorMax = new Vector2(1f, 0f);
         panel.pivot = new Vector2(0.5f, 0f);
         panel.anchoredPosition = Vector2.zero;
-        panel.sizeDelta = new Vector2(0f, 76f);
+        panel.sizeDelta = new Vector2(0f, 62f);
 
         HorizontalLayoutGroup layout = panel.gameObject.AddComponent<HorizontalLayoutGroup>();
-        layout.padding = new RectOffset(14, 14, 11, 11);
-        layout.spacing = 10f;
+        layout.padding = new RectOffset(14, 14, 8, 8);
+        layout.spacing = 8f;
         layout.childForceExpandWidth = true;
         layout.childForceExpandHeight = true;
 
@@ -236,13 +237,13 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
 
     private void CreateTray(Transform parent)
     {
-        RectTransform panel = CreatePanel("Action Tray", parent, new Color(0.06f, 0.065f, 0.075f, 0.93f));
+        RectTransform panel = CreatePanel("Action Tray", parent, new Color(0.050f, 0.055f, 0.064f, 0.88f));
         trayPanel = panel;
         panel.anchorMin = new Vector2(0f, 0f);
         panel.anchorMax = new Vector2(0f, 0f);
         panel.pivot = new Vector2(0f, 0f);
-        panel.anchoredPosition = new Vector2(16f, 88f);
-        panel.sizeDelta = new Vector2(620f, 280f);
+        panel.anchoredPosition = new Vector2(16f, 72f);
+        panel.sizeDelta = new Vector2(600f, 260f);
 
         trayTitleText = CreateText("Tray Title", panel, 19, FontStyle.Bold, TextAnchor.MiddleLeft, new Color(1f, 0.84f, 0.56f));
         trayTitleText.rectTransform.anchorMin = new Vector2(0f, 1f);

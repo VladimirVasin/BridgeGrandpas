@@ -90,7 +90,7 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
                 continue;
             }
 
-            bool visible = Time.time < grandpa.ThoughtUntil;
+            bool visible = !vhsModeEnabled && Time.time < grandpa.ThoughtUntil;
             grandpa.ThoughtText.gameObject.SetActive(visible);
             if (!visible)
             {
@@ -310,7 +310,7 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
 
     private string BuildBuddingMicroHudText()
     {
-        return "Почкование требует готового дедушку, свободное место и ресурсы.\n\n" +
+        return "Почкование автоматическое: готовый дед сам почкуется, если есть место и ресурсы.\n\n" +
             "Самый готовый дедушка: " + Mathf.FloorToInt(BestBuddingPercent()) + "%\n" +
             "Население: " + grandpas.Count + "/" + PopulationCap() + "\n\n" +
             "Стоимость:\n" + BuddingCost().ColoredCost(stock);

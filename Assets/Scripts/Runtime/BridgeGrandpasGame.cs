@@ -172,6 +172,7 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         SimulateEvents(deltaTime);
         SimulateGrandpas(deltaTime);
         UpdateCameraControls(deltaTime);
+        UpdateVhsOverlay(deltaTime);
         HandlePointer();
         UpdateMicroHudPanel(deltaTime);
         UpdateExpeditionDice(deltaTime);

@@ -56,35 +56,38 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
 
     private void CreateCityGroundBands()
     {
-        Material wall = Mat("city_retaining_wall_deep", new Color(0.024f, 0.027f, 0.032f));
-        Material curb = Mat("city_curb_damp", new Color(0.13f, 0.13f, 0.13f));
+        Material wall = Mat("city_retaining_wall_deep", new Color(0.030f, 0.035f, 0.043f));
+        Material curb = Mat("city_curb_damp", new Color(0.115f, 0.125f, 0.13f));
 
-        CreateDecorBox("Back upper wall cap", new Vector3(0f, 1.85f, 4.25f), new Vector3(18f, 1.2f, 0.28f), wall);
+        CreateDecorBox("Back upper wall cap", new Vector3(0f, 1.85f, 4.25f), new Vector3(28f, 1.2f, 0.28f), wall);
+        CreateDecorBox("Far wet road band", new Vector3(0f, 0.02f, 5.25f), new Vector3(30f, 0.035f, 1.35f), curb);
 
-        for (int i = 0; i < 8; i++)
+        for (int i = 0; i < 12; i++)
         {
-            float x = -6.7f + i * 1.9f;
+            float x = -10.45f + i * 1.9f;
             CreateDecorBox("Back curb slab " + i, new Vector3(x, 0.02f, 3.92f), new Vector3(1.35f, 0.08f, 0.18f), curb);
         }
     }
 
     private void CreateCityPrefabRing()
     {
-        CreateCitySupport(-6.9f);
-        CreateCitySupport(6.9f);
+        CreateCitySupport(-8.8f);
+        CreateCitySupport(8.8f);
         CreateCityBench(new Vector3(-6.55f, 0.02f, -2.8f), 28f);
         CreateCityConcreteBlock(new Vector3(6.45f, 0.06f, -2.65f), -18f);
-        CreateCityLampPost(new Vector3(-7.15f, 0f, -0.9f), 8f);
-        CreateCityLampPost(new Vector3(7.15f, 0f, -0.35f), -10f);
-        CreateCityWallLamp(new Vector3(-5.4f, 1.45f, 4.02f));
-        CreateCityWallLamp(new Vector3(5.15f, 1.35f, 4.02f));
+        CreateCityLampPost(new Vector3(-8.9f, 0f, -0.9f), 8f);
+        CreateCityLampPost(new Vector3(8.9f, 0f, -0.35f), -10f);
+        CreateCityWallLamp(new Vector3(-7.7f, 1.45f, 4.02f));
+        CreateCityWallLamp(new Vector3(7.3f, 1.35f, 4.02f));
 
-        CreateCityBuildingBlock("Distant office block A", -6.4f, 5.95f, 1.2f, 2.8f, 0.6f);
-        CreateCityBuildingBlock("Distant factory block", -4.35f, 6.15f, 1.45f, 1.9f, 0.7f);
-        CreateCityBuildingBlock("Distant house block A", -2.1f, 5.75f, 0.95f, 1.65f, 0.52f);
-        CreateCityBuildingBlock("Distant office block B", 0.4f, 6.05f, 1.35f, 2.55f, 0.62f);
-        CreateCityBuildingBlock("Distant factory block B", 2.9f, 6.2f, 1.55f, 2.15f, 0.72f);
-        CreateCityBuildingBlock("Distant house block B", 5.55f, 5.8f, 1.05f, 1.75f, 0.55f);
+        CreateCityBuildingBlock("Distant office block A", -10.0f, 5.95f, 1.5f, 2.9f, 0.65f);
+        CreateCityBuildingBlock("Distant factory block", -7.45f, 6.15f, 1.75f, 2.05f, 0.7f);
+        CreateCityBuildingBlock("Distant house block A", -4.8f, 5.75f, 1.15f, 1.75f, 0.55f);
+        CreateCityBuildingBlock("Distant office block B", -1.7f, 6.05f, 1.55f, 2.65f, 0.66f);
+        CreateCityBuildingBlock("Distant factory block B", 1.4f, 6.2f, 1.85f, 2.25f, 0.72f);
+        CreateCityBuildingBlock("Distant house block B", 4.45f, 5.8f, 1.25f, 1.85f, 0.57f);
+        CreateCityBuildingBlock("Distant tower block", 7.55f, 6.08f, 1.45f, 3.25f, 0.62f);
+        CreateCityBuildingBlock("Distant narrow block", 10.2f, 5.82f, 1.05f, 2.15f, 0.55f);
         CreateCityChimney(new Vector3(4.15f, 0f, 4.95f));
     }
 
@@ -149,13 +152,13 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
 
     private void CreateCityWindowField()
     {
-        Color warm = new Color(1f, 0.48f, 0.18f);
-        for (int i = 0; i < 28; i++)
+        Color warm = new Color(1f, 0.50f, 0.20f);
+        for (int i = 0; i < 42; i++)
         {
-            float x = -7.2f + (i % 14) * 1.1f;
+            float x = -11.4f + (i % 21) * 1.08f;
             float y = 1.15f + (i % 4) * 0.38f + Random.Range(-0.05f, 0.06f);
             float z = 4.05f + (i / 14) * 0.12f;
-            if (Random.value < 0.18f)
+            if (Random.value < 0.22f)
             {
                 continue;
             }
@@ -166,7 +169,7 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
 
     private void CreateCityWindow(Vector3 position, Vector3 scale, Color color)
     {
-        Material material = EmissiveMat("city_window_" + cityWindows.Count, color, 0.18f);
+        Material material = EmissiveMat("city_window_" + cityWindows.Count, color, 0.24f);
         GameObject window = CreateDecorBox("Distant window", position, scale, material);
         cityWindows.Add(new CityWindowGlow
         {
@@ -179,9 +182,9 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
 
     private void CreateCityTraffic()
     {
-        CreateTrafficGlow(new Vector3(-7.0f, 3.55f, 0.92f), new Vector3(7.0f, 3.55f, 0.92f), new Color(1f, 0.86f, 0.55f), 0.045f);
-        CreateTrafficGlow(new Vector3(7.0f, 3.58f, 2.26f), new Vector3(-7.0f, 3.58f, 2.26f), new Color(1f, 0.18f, 0.11f), 0.038f);
-        CreateTrafficGlow(new Vector3(-6.2f, 3.62f, 2.62f), new Vector3(6.4f, 3.62f, 2.62f), new Color(1f, 0.72f, 0.24f), 0.031f);
+        CreateTrafficGlow(new Vector3(-12.5f, 3.55f, 0.92f), new Vector3(12.5f, 3.55f, 0.92f), new Color(1f, 0.86f, 0.55f), 0.045f);
+        CreateTrafficGlow(new Vector3(12.5f, 3.58f, 2.26f), new Vector3(-12.5f, 3.58f, 2.26f), new Color(1f, 0.18f, 0.11f), 0.038f);
+        CreateTrafficGlow(new Vector3(-11.2f, 3.62f, 2.62f), new Vector3(11.4f, 3.62f, 2.62f), new Color(1f, 0.72f, 0.24f), 0.031f);
     }
 
     private void CreateTrafficGlow(Vector3 start, Vector3 end, Color color, float speed)

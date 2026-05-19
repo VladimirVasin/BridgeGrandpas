@@ -51,8 +51,10 @@
     <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.ExpeditionDice.cs" />
     <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.Camera.cs" />
     <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasHudButtonAudio.cs" />
+    <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.AutoBudding.cs" />
     <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.cs" />
     <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.Ambience.cs" />
+    <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.VhsOverlay.cs" />
     <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.RulesAndText.cs" />
     <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.BuildingsCatalog.cs" />
     <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.IdleLife.cs" />
@@ -64,10 +66,13 @@
     <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.BuildingAnimation.cs" />
     <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.Thoughts.cs" />
     <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.UiRuntime.cs" />
+    <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.VisualAtmosphere.cs" />
     <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.Expeditions.cs" />
     <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.GrandpaAnimation.cs" />
+    <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.CameraBreathingAudio.cs" />
     <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.DialogChoices.cs" />
     <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.UiSetup.cs" />
+    <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.CommuneProps.cs" />
     <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.Production.cs" />
     <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.Cozy.cs" />
     <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.EventsCatalog.cs" />

@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Rendering;
 
 public sealed partial class BridgeGrandpasGame : MonoBehaviour
 {
@@ -38,6 +39,62 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
 
         SetFloat(material, "_Smoothness", smoothness);
         SetFloat(material, "_Glossiness", smoothness);
+        SetFloat(material, "_Metallic", 0f);
+        return material;
+    }
+
+    private Material TransparentMat(string key, Color color)
+    {
+        Material material;
+        if (materialCache.TryGetValue(key, out material))
+        {
+            return material;
+        }
+
+        Shader shader = Shader.Find("Universal Render Pipeline/Lit");
+        if (shader == null)
+        {
+            shader = Shader.Find("Standard");
+        }
+
+        material = new Material(shader);
+        ApplyColor(material, "_Color", color);
+        ApplyColor(material, "_BaseColor", color);
+        SetFloat(material, "_Surface", 1f);
+        SetFloat(material, "_AlphaClip", 0f);
+        SetFloat(material, "_SrcBlend", (float)BlendMode.SrcAlpha);
+        SetFloat(material, "_DstBlend", (float)BlendMode.OneMinusSrcAlpha);
+        SetFloat(material, "_ZWrite", 0f);
+        SetFloat(material, "_Smoothness", 0.25f);
+        material.renderQueue = (int)RenderQueue.Transparent;
+        material.EnableKeyword("_SURFACE_TYPE_TRANSPARENT");
+        materialCache[key] = material;
+        return material;
+    }
+
+    private Material ParticleMat(string key, Color color)
+    {
+        Material material;
+        if (materialCache.TryGetValue(key, out material))
+        {
+            return material;
+        }
+
+        Shader shader = Shader.Find("Universal Render Pipeline/Particles/Unlit");
+        if (shader == null)
+        {
+            shader = Shader.Find("Particles/Standard Unlit");
+        }
+
+        material = shader == null ? TransparentMat(key, color) : new Material(shader);
+        ApplyColor(material, "_Color", color);
+        ApplyColor(material, "_BaseColor", color);
+        SetFloat(material, "_Surface", 1f);
+        SetFloat(material, "_SrcBlend", (float)BlendMode.SrcAlpha);
+        SetFloat(material, "_DstBlend", (float)BlendMode.OneMinusSrcAlpha);
+        SetFloat(material, "_ZWrite", 0f);
+        material.renderQueue = (int)RenderQueue.Transparent;
+        materialCache[key] = material;
         return material;
     }
 

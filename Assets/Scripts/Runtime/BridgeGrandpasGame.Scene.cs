@@ -17,10 +17,10 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
 
         RenderSettings.skybox = null;
         RenderSettings.ambientMode = UnityEngine.Rendering.AmbientMode.Flat;
-        RenderSettings.ambientLight = new Color(0.006f, 0.006f, 0.009f);
+        RenderSettings.ambientLight = new Color(0.050f, 0.058f, 0.070f);
         RenderSettings.fog = true;
         RenderSettings.fogColor = new Color(0.001f, 0.001f, 0.002f);
-        RenderSettings.fogDensity = 0.038f;
+        RenderSettings.fogDensity = 0.022f;
 
         mainCamera = Camera.main;
         if (mainCamera == null)
@@ -32,13 +32,14 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
 
         mainCamera.orthographic = true;
         mainCamera.clearFlags = CameraClearFlags.SolidColor;
-        mainCamera.orthographicSize = 2.85f;
-        mainCamera.transform.position = new Vector3(0f, 1.08f, -8.65f);
-        mainCamera.transform.LookAt(new Vector3(0f, 0.62f, -0.1f));
+        mainCamera.orthographicSize = CameraDefaultZoom;
+        mainCamera.transform.position = new Vector3(1.15f, 1.05f, -7.25f);
+        mainCamera.transform.LookAt(new Vector3(0f, 0.58f, -0.25f));
         mainCamera.nearClipPlane = 0.1f;
         mainCamera.farClipPlane = 95f;
         mainCamera.backgroundColor = Color.black;
         EnsureCameraAudioListener();
+        SetupAtmospherePostProcessing();
 
         Light sun = FindAnyObjectByType<Light>();
         if (sun == null)
@@ -48,9 +49,10 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         }
 
         sun.type = LightType.Directional;
-        sun.intensity = 0.018f;
-        sun.color = new Color(0.18f, 0.22f, 0.30f);
+        sun.intensity = 0.075f;
+        sun.color = new Color(0.26f, 0.32f, 0.43f);
         sun.transform.rotation = Quaternion.Euler(42f, -32f, 0f);
+        SetupSceneLighting(sun);
 
         CreateBridgeWorld();
         selectionMarker = CreateMarker("Selection Marker", new Color(1f, 0.76f, 0.24f, 0.85f));
@@ -74,33 +76,36 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
 
     private void CreateBridgeWorld()
     {
-        Material ground = AsphaltMat("wet_asphalt_ground", new Color(0.19f, 0.20f, 0.215f), new Vector2(22f, 18f), 0.48f);
-        Material concrete = Mat("old_concrete", new Color(0.11f, 0.11f, 0.12f));
+        Material ground = AsphaltMat("wet_asphalt_ground", new Color(0.14f, 0.155f, 0.17f), new Vector2(18f, 14f), 0.64f);
+        Material concrete = Mat("old_concrete", new Color(0.12f, 0.125f, 0.13f));
         Material darkConcrete = Mat("dark_concrete", new Color(0.045f, 0.050f, 0.060f));
         Material rail = Mat("rail", new Color(0.025f, 0.028f, 0.034f));
         Material warm = EmissiveMat("warm_window", new Color(1.0f, 0.48f, 0.18f), 0.35f);
         Material city = Mat("city_silhouette", new Color(0.020f, 0.024f, 0.032f));
         Material water = Mat("rain_puddle", new Color(0.025f, 0.032f, 0.038f));
-        Material road = AsphaltMat("bridge_asphalt_road", new Color(0.46f, 0.45f, 0.43f), new Vector2(6.0f, 1.15f), 0.42f);
-        const float bridgeLength = 24.5f;
+        Material road = AsphaltMat("bridge_asphalt_road", new Color(0.30f, 0.31f, 0.32f), new Vector2(7.5f, 1.35f), 0.48f);
+        const float bridgeLength = 46f;
 
         CreateGroundPlane("Continuous wet city asphalt", worldRoot, new Vector3(0f, -0.08f, -18f), new Vector2(260f, 220f), ground);
         CreateForegroundGroundCurtain();
-        CreateBox("Back retaining wall", worldRoot, new Vector3(0f, 1.15f, 3.85f), new Vector3(bridgeLength + 1.2f, 2.3f, 0.25f), darkConcrete);
-        CreateBox("Bridge deck", worldRoot, new Vector3(0f, 3.15f, 1.55f), new Vector3(bridgeLength, 0.52f, 3.15f), concrete);
-        CreateBox("Road strip on bridge", worldRoot, new Vector3(0f, 3.45f, 1.55f), new Vector3(bridgeLength - 0.65f, 0.05f, 2.1f), road);
-        CreateBox("Left bridge rail", worldRoot, new Vector3(0f, 3.85f, 0.05f), new Vector3(bridgeLength - 0.35f, 0.22f, 0.12f), rail);
-        CreateBox("Right bridge rail", worldRoot, new Vector3(0f, 3.85f, 3.05f), new Vector3(bridgeLength - 0.35f, 0.22f, 0.12f), rail);
+        CreateBox("Back retaining wall", worldRoot, new Vector3(0f, 1.28f, 3.85f), new Vector3(bridgeLength + 2.6f, 2.55f, 0.32f), darkConcrete);
+        CreateBox("Bridge deck", worldRoot, new Vector3(0f, 3.08f, 1.55f), new Vector3(bridgeLength, 0.72f, 3.25f), concrete);
+        CreateBox("Road strip on bridge", worldRoot, new Vector3(0f, 3.48f, 1.55f), new Vector3(bridgeLength - 0.65f, 0.06f, 2.15f), road);
+        CreateBox("Left bridge rail", worldRoot, new Vector3(0f, 3.86f, 0.05f), new Vector3(bridgeLength - 0.35f, 0.26f, 0.14f), rail);
+        CreateBox("Right bridge rail", worldRoot, new Vector3(0f, 3.86f, 3.05f), new Vector3(bridgeLength - 0.35f, 0.26f, 0.14f), rail);
 
-        for (int i = -3; i <= 3; i++)
+        for (int i = -2; i <= 2; i++)
         {
-            float x = i * 3.55f;
-            CreateBox("Bridge pillar " + i, worldRoot, new Vector3(x, 1.4f, 2.9f), new Vector3(0.55f, 2.8f, 0.45f), concrete);
-            CreateBox("Bridge arch hint " + i, worldRoot, new Vector3(x + 1.72f, 2.05f, 2.86f), new Vector3(2.42f, 0.16f, 0.18f), concrete);
+            float x = i * 5.7f;
+            CreateBox("Bridge pillar " + i, worldRoot, new Vector3(x, 1.42f, 2.76f), new Vector3(0.92f, 2.85f, 0.78f), concrete);
+            CreateBox("Bridge underside mass " + i, worldRoot, new Vector3(x + 2.85f, 2.34f, 2.76f), new Vector3(3.5f, 0.28f, 0.42f), concrete);
         }
+
+        CreateBridgeDetailLayer(bridgeLength, concrete, rail);
 
         CreateBox("Puddle left", worldRoot, new Vector3(-4.8f, -0.01f, -2.8f), new Vector3(1.7f, 0.03f, 0.9f), water);
         CreateBox("Puddle right", worldRoot, new Vector3(4.3f, -0.01f, -2.35f), new Vector3(1.2f, 0.03f, 0.7f), water);
+        CreateSceneDecalLayer();
 
         for (int i = 0; i < 9; i++)
         {
@@ -115,6 +120,7 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
 
         CreateCityAmbience();
         CreateRain();
+        CreateSceneAtmosphereParticles();
     }
 
     private void CreateForegroundGroundCurtain()
@@ -199,30 +205,30 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
 
         if (fireBarrelCoreLight != null)
         {
-            fireBarrelCoreLight.intensity = 16.5f * flicker;
-            fireBarrelCoreLight.range = (5.4f + pulseB * 1.15f) * rangeBoost;
+            fireBarrelCoreLight.intensity = 6.0f * flicker;
+            fireBarrelCoreLight.range = (5.2f + pulseB * 1.10f) * rangeBoost;
         }
 
         if (fireBarrelPoolLight != null)
         {
-            fireBarrelPoolLight.intensity = 11.2f * (0.88f + pulseA * 0.28f);
-            fireBarrelPoolLight.range = (12.8f + pulseB * 2.1f) * rangeBoost;
+            fireBarrelPoolLight.intensity = 4.4f * (0.88f + pulseA * 0.28f);
+            fireBarrelPoolLight.range = (8.2f + pulseB * 1.45f) * rangeBoost;
         }
 
         if (fireBarrelFlickerLightA != null)
         {
             float sideA = Mathf.PerlinNoise(Time.time * 6.3f, 9.1f);
             fireBarrelFlickerLightA.transform.localPosition = new Vector3(0.38f + sideA * 0.22f, 0.86f + sideA * 0.24f, -0.28f);
-            fireBarrelFlickerLightA.intensity = 3.2f + sideA * 6.8f;
-            fireBarrelFlickerLightA.range = (2.5f + sideA * 1.45f) * rangeBoost;
+            fireBarrelFlickerLightA.intensity = 1.4f + sideA * 2.7f;
+            fireBarrelFlickerLightA.range = (2.1f + sideA * 0.95f) * rangeBoost;
         }
 
         if (fireBarrelFlickerLightB != null)
         {
             float sideB = Mathf.PerlinNoise(11.7f, Time.time * 7.4f);
             fireBarrelFlickerLightB.transform.localPosition = new Vector3(-0.42f, 0.96f + sideB * 0.30f, 0.18f + sideB * 0.28f);
-            fireBarrelFlickerLightB.intensity = 2.8f + sideB * 5.7f;
-            fireBarrelFlickerLightB.range = (2.3f + sideB * 1.25f) * rangeBoost;
+            fireBarrelFlickerLightB.intensity = 1.2f + sideB * 2.3f;
+            fireBarrelFlickerLightB.range = (2.0f + sideB * 0.85f) * rangeBoost;
         }
 
         UpdateFireFlames(pulseA, pulseB);

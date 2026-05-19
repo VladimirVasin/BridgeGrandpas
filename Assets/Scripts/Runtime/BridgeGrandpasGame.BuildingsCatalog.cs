@@ -34,8 +34,9 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
     private void BuildInitialState()
     {
         TryBuild(BuildingType.FireBarrel, true);
+        CreateStarterCommuneProps();
         SpawnGrandpa(GrandpaRole.Common, new Vector3(-0.6f, 0f, -1.15f));
-        Notify("Дед Тихон нашёл сухое место под мостом. Это уже почти государство.");
+        Notify("Первый дедушка обжил сухое пятно под мостом. Государство пока помещается в одном пальто.");
     }
 }
 

@@ -145,10 +145,10 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
                 CreateCylinder("Barrel", root, new Vector3(0f, 0.36f, 0f), new Vector3(0.58f, 0.58f, 0.58f), Mat("barrel", new Color(0.11f, 0.075f, 0.055f)));
                 fireFlames = CreateFireFlames(root);
                 float lightRange = FireBarrelLightRangeBoost(building.Level);
-                fireBarrelCoreLight = AddPointLight(root, "Fire Core Light", new Vector3(0f, 0.96f, 0f), new Color(1f, 0.45f, 0.14f), 5.4f * lightRange, 17.0f);
-                fireBarrelPoolLight = AddPointLight(root, "Fire Warm Pool Light", new Vector3(0f, 0.70f, 0f), new Color(1f, 0.52f, 0.20f), 13.0f * lightRange, 11.5f);
-                fireBarrelFlickerLightA = AddPointLight(root, "Fire Side Flicker A", new Vector3(0.48f, 0.92f, -0.20f), new Color(1f, 0.32f, 0.08f), 3.0f * lightRange, 5.5f);
-                fireBarrelFlickerLightB = AddPointLight(root, "Fire Side Flicker B", new Vector3(-0.34f, 1.02f, 0.28f), new Color(1f, 0.74f, 0.22f), 2.8f * lightRange, 4.8f);
+                fireBarrelCoreLight = AddPointLight(root, "Fire Core Light", new Vector3(0f, 0.96f, 0f), new Color(1f, 0.42f, 0.12f), 5.2f * lightRange, 6.2f);
+                fireBarrelPoolLight = AddPointLight(root, "Fire Warm Pool Light", new Vector3(0f, 0.70f, 0f), new Color(1f, 0.50f, 0.18f), 8.2f * lightRange, 4.6f);
+                fireBarrelFlickerLightA = AddPointLight(root, "Fire Side Flicker A", new Vector3(0.48f, 0.92f, -0.20f), new Color(1f, 0.30f, 0.06f), 2.4f * lightRange, 2.4f);
+                fireBarrelFlickerLightB = AddPointLight(root, "Fire Side Flicker B", new Vector3(-0.34f, 1.02f, 0.28f), new Color(1f, 0.62f, 0.18f), 2.2f * lightRange, 2.1f);
                 AddSmokeOrSteam(root, "Fire Sparks", new Color(1f, 0.38f, 0.05f, 0.82f), 46f, 1.05f);
                 break;
             case BuildingType.Samovar:
@@ -187,8 +187,8 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
 
     private Transform[] CreateFireFlames(Transform root)
     {
-        Material orange = EmissiveMat("fire_flame_orange", new Color(1f, 0.42f, 0.08f), 4.8f);
-        Material yellow = EmissiveMat("fire_flame_yellow", new Color(1f, 0.72f, 0.18f), 5.4f);
+        Material orange = EmissiveMat("fire_flame_orange", new Color(1f, 0.34f, 0.05f), 1.9f);
+        Material yellow = EmissiveMat("fire_flame_yellow", new Color(1f, 0.58f, 0.12f), 2.2f);
         return new[]
         {
             CreateFireFlame("Fire Flame A", root, new Vector3(-0.12f, 0.86f, -0.03f), yellow, -14f),
@@ -254,6 +254,8 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         box.transform.localScale = localScale;
         Renderer renderer = box.GetComponent<Renderer>();
         renderer.sharedMaterial = material;
+        renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.On;
+        renderer.receiveShadows = true;
         return box;
     }
 
@@ -266,6 +268,8 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         sphere.transform.localScale = localScale;
         Renderer renderer = sphere.GetComponent<Renderer>();
         renderer.sharedMaterial = material;
+        renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.On;
+        renderer.receiveShadows = true;
         return sphere;
     }
 
@@ -278,6 +282,8 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         cylinder.transform.localScale = new Vector3(localScale.x, localScale.z, localScale.y);
         Renderer renderer = cylinder.GetComponent<Renderer>();
         renderer.sharedMaterial = material;
+        renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.On;
+        renderer.receiveShadows = true;
         return cylinder;
     }
 
@@ -293,6 +299,9 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         light.intensity = intensity;
         light.shadows = LightShadows.Soft;
         light.shadowStrength = 0.45f;
+        light.shadowBias = 0.035f;
+        light.shadowNormalBias = 0.20f;
+        light.shadowNearPlane = 0.05f;
         return light;
     }
 
@@ -367,12 +376,12 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
 
     private RectTransform CreateButton(string label, Transform parent, UnityEngine.Events.UnityAction action)
     {
-        RectTransform rect = CreatePanel("Button - " + label, parent, new Color(0.17f, 0.20f, 0.22f, 0.96f));
-        rect.sizeDelta = new Vector2(0f, 54f);
+        RectTransform rect = CreatePanel("Button - " + label, parent, new Color(0.075f, 0.085f, 0.095f, 0.82f));
+        rect.sizeDelta = new Vector2(0f, 48f);
 
         LayoutElement layout = rect.gameObject.AddComponent<LayoutElement>();
-        layout.minHeight = 48f;
-        layout.preferredHeight = 54f;
+        layout.minHeight = 42f;
+        layout.preferredHeight = 48f;
         layout.flexibleWidth = 1f;
 
         Button button = rect.gameObject.AddComponent<Button>();
@@ -380,8 +389,8 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         button.onClick.AddListener(action);
 
         ColorBlock colors = button.colors;
-        colors.normalColor = new Color(0.17f, 0.20f, 0.22f, 0.96f);
-        colors.highlightedColor = new Color(0.27f, 0.32f, 0.34f, 1f);
+        colors.normalColor = new Color(0.075f, 0.085f, 0.095f, 0.82f);
+        colors.highlightedColor = new Color(0.18f, 0.22f, 0.23f, 0.96f);
         colors.pressedColor = new Color(0.95f, 0.61f, 0.25f, 1f);
         colors.disabledColor = new Color(0.12f, 0.12f, 0.13f, 0.62f);
         button.colors = colors;

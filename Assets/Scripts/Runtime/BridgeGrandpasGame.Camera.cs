@@ -14,22 +14,27 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
     private const float CameraDragPanSpeed = 0.012f;
     private const float CameraWheelZoomStep = 0.72f;
     private const float CameraKeyboardZoomSpeed = 2.4f;
-    private const float CameraDefaultZoom = 2.85f;
-    private const float CameraMinZoom = 1.55f;
-    private const float CameraMaxZoom = 5.4f;
-    private const float CameraMinPanX = -8.4f;
-    private const float CameraMaxPanX = 8.4f;
+    private const float CameraMinZoom = 1.30f;
+    private const float CameraMaxZoom = 5.65f;
+    private const float CameraDefaultZoom = 7.15f;
+    private const float CameraVhsDefaultZoom = 2.35f;
+    private const float CameraMinPanX = -7.2f;
+    private const float CameraMaxPanX = 7.2f;
     private const float CameraMinPanY = -0.55f;
     private const float CameraMaxPanY = 1.15f;
-    private const float CameraCloseZoomPanBonus = 1.85f;
+    private const float CameraCloseZoomPanBonus = 1.55f;
     private const float CameraVerticalPanScale = 0.28f;
 
     private Vector3 cameraHomePosition;
+    private Quaternion cameraHomeRotation;
     private Vector2 cameraPanOffset;
     private Vector2 cameraPanVelocity;
     private Vector3 cameraGroundRight;
     private Vector3 cameraGroundForward;
     private float cameraZoomTarget;
+    private float vhsSavedZoom;
+    private float delayedVhsZoomAmount;
+    private float delayedVhsZoomWait;
     private bool cameraDragActive;
     private Vector2 cameraDragPointer;
 
@@ -41,7 +46,10 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         }
 
         cameraHomePosition = mainCamera.transform.position;
-        cameraZoomTarget = mainCamera.orthographicSize;
+        cameraHomeRotation = mainCamera.transform.rotation;
+        cameraZoomTarget = CameraDefaultZoom;
+        mainCamera.orthographicSize = cameraZoomTarget;
+        vhsSavedZoom = CameraVhsDefaultZoom;
         cameraGroundRight = Vector3.ProjectOnPlane(mainCamera.transform.right, Vector3.up).normalized;
         cameraGroundForward = Vector3.ProjectOnPlane(mainCamera.transform.forward, Vector3.up).normalized;
         cameraPanOffset = Vector2.zero;
@@ -68,13 +76,18 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
 
         HandleCameraMouseInput();
         HandleCameraKeyboardZoom(deltaTime);
+        UpdateDelayedVhsZoom(deltaTime);
         ClampCameraPan();
 
         if (WasCameraResetPressed())
         {
             cameraPanOffset = Vector2.zero;
             cameraPanVelocity = Vector2.zero;
-            cameraZoomTarget = CameraDefaultZoom;
+            cameraZoomTarget = vhsModeEnabled ? CameraVhsDefaultZoom : CameraDefaultZoom;
+            if (vhsModeEnabled)
+            {
+                vhsSavedZoom = cameraZoomTarget;
+            }
         }
 
         ApplyCameraPose(false);
@@ -158,8 +171,82 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
 
     private void ApplyCameraZoom(float amount, bool instant)
     {
+        if (!vhsModeEnabled)
+        {
+            return;
+        }
+
+        QueueDelayedVhsZoom(amount);
+    }
+
+    private void ApplyCameraZoomNow(float amount, bool instant)
+    {
+        float previousZoom = cameraZoomTarget;
         cameraZoomTarget = Mathf.Clamp(cameraZoomTarget - amount, CameraMinZoom, CameraMaxZoom);
+        if (Mathf.Abs(previousZoom - cameraZoomTarget) > 0.001f)
+        {
+            TriggerVhsZoomPulse();
+        }
+
         if (instant && mainCamera != null)
+        {
+            mainCamera.orthographicSize = cameraZoomTarget;
+        }
+    }
+
+    private void QueueDelayedVhsZoom(float amount)
+    {
+        delayedVhsZoomAmount += amount * 0.85f;
+        delayedVhsZoomAmount = Mathf.Clamp(delayedVhsZoomAmount, -2.4f, 2.4f);
+        delayedVhsZoomWait = 0.07f;
+        TriggerVhsZoomPulse();
+    }
+
+    private void UpdateDelayedVhsZoom(float deltaTime)
+    {
+        if (!vhsModeEnabled)
+        {
+            delayedVhsZoomAmount = 0f;
+            delayedVhsZoomWait = 0f;
+            return;
+        }
+
+        if (delayedVhsZoomWait > 0f)
+        {
+            delayedVhsZoomWait -= deltaTime;
+            return;
+        }
+
+        if (Mathf.Abs(delayedVhsZoomAmount) <= 0.001f)
+        {
+            return;
+        }
+
+        float speed = 2.25f + Mathf.Clamp01(Mathf.Abs(delayedVhsZoomAmount)) * 1.45f;
+        float step = Mathf.Sign(delayedVhsZoomAmount) * Mathf.Min(Mathf.Abs(delayedVhsZoomAmount), speed * deltaTime);
+        delayedVhsZoomAmount -= step;
+        ApplyCameraZoomNow(step, false);
+        vhsSavedZoom = cameraZoomTarget;
+    }
+
+    private void RestoreVhsCameraZoom()
+    {
+        delayedVhsZoomAmount = 0f;
+        delayedVhsZoomWait = 0f;
+        cameraZoomTarget = Mathf.Clamp(vhsSavedZoom, CameraMinZoom, CameraMaxZoom);
+        if (mainCamera != null)
+        {
+            mainCamera.orthographicSize = cameraZoomTarget;
+        }
+    }
+
+    private void ReturnToNormalCameraZoom()
+    {
+        vhsSavedZoom = Mathf.Clamp(cameraZoomTarget, CameraMinZoom, CameraMaxZoom);
+        delayedVhsZoomAmount = 0f;
+        delayedVhsZoomWait = 0f;
+        cameraZoomTarget = CameraDefaultZoom;
+        if (mainCamera != null)
         {
             mainCamera.orthographicSize = cameraZoomTarget;
         }
@@ -292,8 +379,35 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
             cameraGroundRight * cameraPanOffset.x +
             cameraGroundForward * cameraPanOffset.y;
 
-        float lerp = instant ? 1f : 1f - Mathf.Exp(-Time.deltaTime * 12f);
-        mainCamera.transform.position = Vector3.Lerp(mainCamera.transform.position, targetPosition, lerp);
-        mainCamera.orthographicSize = Mathf.Lerp(mainCamera.orthographicSize, cameraZoomTarget, lerp);
+        float positionLerp = instant ? 1f : 1f - Mathf.Exp(-Time.deltaTime * 12f);
+        float zoomSpeed = vhsModeEnabled ? 5.2f : 12f;
+        float zoomLerp = instant && !vhsModeEnabled ? 1f : 1f - Mathf.Exp(-Time.deltaTime * zoomSpeed);
+        Vector3 swayedPosition = targetPosition;
+        Quaternion swayedRotation = cameraHomeRotation;
+        if (vhsModeEnabled)
+        {
+            ApplyVhsCameraSway(ref swayedPosition, ref swayedRotation);
+        }
+
+        mainCamera.transform.position = Vector3.Lerp(mainCamera.transform.position, swayedPosition, positionLerp);
+        mainCamera.transform.rotation = Quaternion.Slerp(mainCamera.transform.rotation, swayedRotation, positionLerp);
+        mainCamera.orthographicSize = Mathf.Lerp(mainCamera.orthographicSize, cameraZoomTarget, zoomLerp);
+    }
+
+    private void ApplyVhsCameraSway(ref Vector3 position, ref Quaternion rotation)
+    {
+        float zoom01 = Mathf.InverseLerp(CameraMaxZoom, CameraMinZoom, mainCamera.orthographicSize);
+        float strength = Mathf.Lerp(0.18f, 1.0f, zoom01);
+        float slowX = Mathf.Sin(Time.time * 1.35f) * 0.018f;
+        float slowY = Mathf.Sin(Time.time * 1.85f + 1.4f) * 0.014f;
+        float handX = (Mathf.PerlinNoise(Time.time * 5.8f, 2.7f) - 0.5f) * 0.035f;
+        float handY = (Mathf.PerlinNoise(8.1f, Time.time * 5.2f) - 0.5f) * 0.026f;
+        position += cameraGroundRight * (slowX + handX) * strength;
+        position += Vector3.up * (slowY + handY) * strength;
+
+        float pitch = (Mathf.PerlinNoise(Time.time * 2.6f, 4.2f) - 0.5f) * 1.2f * strength;
+        float yaw = (Mathf.PerlinNoise(6.5f, Time.time * 2.2f) - 0.5f) * 1.6f * strength;
+        float roll = Mathf.Sin(Time.time * 1.15f) * 0.85f * strength;
+        rotation = cameraHomeRotation * Quaternion.Euler(pitch, yaw, roll);
     }
 }
