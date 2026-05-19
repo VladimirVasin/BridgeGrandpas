@@ -18,6 +18,8 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         BlockRandomBuilding(UnityEngine.Random.Range(40f, 75f));
         BoostCityAmbience(55f);
         Notify("Городская комиссия провела проверку. Часть картона забрали, один объект временно опечатан.");
+        QueueObservationLead("следы комиссии", "Городская комиссия заглянула под мост. Картон поредел, один объект временно притих.",
+            null, DefaultObservationPosition(), 0.10f);
         RefreshAllUi();
     }
 
@@ -30,7 +32,15 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
 
         pendingEvent = events[random.Next(events.Count)];
         Notify("Новое событие: " + pendingEvent.Title + ".");
-        ShowEventModal(pendingEvent);
+        QueueObservationLead("новый шорох", "Сверху пришёл новый шорох: \"" + pendingEvent.Title + "\".",
+            null, DefaultObservationPosition(), 0.08f);
+        if (!vhsModeEnabled)
+        {
+            SetNotebookPage(NotebookPage.Events);
+            SetNotebookMode(true);
+        }
+
+        MarkNotebookDirty();
         RefreshTray();
     }
 
@@ -46,7 +56,10 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
             EventChoice choice = bridgeEvent.Choices[i];
             CreateDialogChoiceButton(choice.Label, choice.Preview, eventChoicesRoot, delegate
             {
+                BridgeEvent handledEvent = pendingEvent;
                 choice.Apply(this);
+                QueueObservationLead("версия события", "Событие \"" + handledEvent.Title + "\": записана версия \"" +
+                    choice.Label + "\". " + PlainNotebookText(choice.Preview), null, DefaultObservationPosition(), 0.12f);
                 pendingEvent = null;
                 eventModal.gameObject.SetActive(false);
                 suspicion = Mathf.Clamp(suspicion, 0f, MaxSuspicion);
@@ -132,7 +145,14 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         if (grandpas.Count >= VictoryGrandpas && BuiltCount() >= VictoryBuildings && inspectionsSurvived >= VictoryInspections && rareMutationSeen)
         {
             victoryShown = true;
-            victoryModal.gameObject.SetActive(true);
+            if (victoryModal != null)
+            {
+                victoryModal.gameObject.SetActive(false);
+            }
+
+            SetNotebookPage(NotebookPage.Summary);
+            SetNotebookMode(true);
+            MarkNotebookDirty();
             Notify("MVP-цель выполнена. Под мостом стало исторически важно.");
         }
     }

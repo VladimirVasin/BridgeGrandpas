@@ -11,6 +11,18 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
 {
     private void HandlePointer()
     {
+        if (notebookModeEnabled)
+        {
+            hoveredTarget = null;
+            return;
+        }
+
+        if (vhsModeEnabled)
+        {
+            hoveredTarget = null;
+            return;
+        }
+
         if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject())
         {
             hoveredTarget = null;
@@ -22,6 +34,17 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         BridgeGrandpasSelectionTarget target = null;
         if (Physics.Raycast(ray, out hit, 80f))
         {
+            if (hit.collider.GetComponentInParent<BridgeGrandpasNotebookClickTarget>() != null)
+            {
+                hoveredTarget = null;
+                if (WasPrimaryPointerPressed())
+                {
+                    SetNotebookMode(true);
+                }
+
+                return;
+            }
+
             target = hit.collider.GetComponentInParent<BridgeGrandpasSelectionTarget>();
         }
 
@@ -121,6 +144,7 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         RefreshDetails();
         RefreshTray();
         RefreshSuspicionBar();
+        MarkNotebookDirty();
     }
 
     private void ToggleTray(UiTab tab)

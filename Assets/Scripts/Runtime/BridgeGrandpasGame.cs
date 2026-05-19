@@ -148,6 +148,7 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         SetupBackgroundMusic();
         SetupAmbience();
         BuildInitialState();
+        BeginStartIrisFade();
         SelectOverview();
         RefreshAllUi();
         gameStarted = true;
@@ -171,6 +172,8 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         SimulateSuspicion(deltaTime);
         SimulateEvents(deltaTime);
         SimulateGrandpas(deltaTime);
+        UpdateStartIrisFade(deltaTime);
+        UpdateNotebookMode(deltaTime);
         UpdateCameraControls(deltaTime);
         UpdateVhsOverlay(deltaTime);
         HandlePointer();

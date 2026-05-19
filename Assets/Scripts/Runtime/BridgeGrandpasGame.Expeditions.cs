@@ -120,6 +120,9 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
 
         suspicion += 0.8f;
         Notify(grandpa.Name + " собирается наверх: " + ExpeditionName(type) + ".");
+        QueueObservationLead("уход наверх", grandpa.Name + " ушёл наверх: " + ExpeditionName(type) +
+            ". В блокноте оставлено место под возвращение.",
+            grandpa.Root != null ? grandpa.Root.transform : null, grandpa.Target, 0.12f);
         RefreshAllUi();
     }
 
@@ -159,6 +162,9 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         grandpa.ExpeditionRiskMultiplier = 1f;
         ShowThought(grandpa, "Я видел верх", 3.2f);
         Notify(grandpa.Name + " вернулся: +" + reward.ShortText() + ", подозрение +" + RateF(risk) + ".");
+        QueueObservationLead("возвращение", grandpa.Name + " вернулся сверху: +" + reward.ShortText() +
+            ", город насторожился на " + RateF(risk) + ".",
+            grandpa.Root != null ? grandpa.Root.transform : null, grandpa.ExpeditionReturnPosition, 0.10f);
         RefreshAllUi();
     }
 

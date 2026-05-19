@@ -384,6 +384,7 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         float zoomLerp = instant && !vhsModeEnabled ? 1f : 1f - Mathf.Exp(-Time.deltaTime * zoomSpeed);
         Vector3 swayedPosition = targetPosition;
         Quaternion swayedRotation = cameraHomeRotation;
+        ApplyNotebookCameraPose(ref swayedPosition, ref swayedRotation);
         if (vhsModeEnabled)
         {
             ApplyVhsCameraSway(ref swayedPosition, ref swayedRotation);

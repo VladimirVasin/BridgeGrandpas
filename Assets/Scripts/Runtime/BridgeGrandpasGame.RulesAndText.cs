@@ -22,6 +22,7 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         selectedGrandpa = grandpa;
         selectedBuilding = null;
         microHudUntil = 0f;
+        OpenNotebookFromSelection(NotebookPage.Grandpas);
         RefreshDetails();
     }
 
@@ -30,7 +31,20 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         selectedBuilding = building;
         selectedGrandpa = null;
         microHudUntil = 0f;
+        OpenNotebookFromSelection(NotebookPage.Build);
         RefreshDetails();
+    }
+
+    private void OpenNotebookFromSelection(NotebookPage page)
+    {
+        if (notebookCanvas == null || vhsModeEnabled)
+        {
+            return;
+        }
+
+        SetNotebookPage(page);
+        SetNotebookMode(true);
+        MarkNotebookDirty();
     }
 
     private int PopulationCap()

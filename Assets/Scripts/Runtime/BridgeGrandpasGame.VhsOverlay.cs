@@ -124,6 +124,7 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         vhsStatusText = CreateVhsText("VHS Status", vhsFrameRoot, 16, TextAnchor.MiddleRight, new Color(0.86f, 0.92f, 0.88f));
         PlaceVhsText(vhsStatusText.rectTransform, new Vector2(1f, 0f), new Vector2(-42f, 88f), new Vector2(440f, 28f));
         vhsStatusText.text = "CAM 03  UNDERPASS  SP";
+        CreateVhsObservationReadout();
     }
 
     private void CreateVhsScanlines()
@@ -204,6 +205,7 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         vhsRecordTime += deltaTime;
         vhsZoomPulse = Mathf.Max(0f, vhsZoomPulse - deltaTime * 2.8f);
         vhsTrackingPulse = Mathf.Max(0f, vhsTrackingPulse - deltaTime * 1.7f);
+        UpdateObservationScan(deltaTime);
         ApplyVhsCameraViewport(true);
         UpdateVhsFrame();
         UpdateVhsReadouts();
@@ -260,6 +262,7 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         float zoom = mainCamera == null ? 1f : CameraDefaultZoom / Mathf.Max(0.01f, mainCamera.orthographicSize);
         vhsZoomText.text = vhsZoomPulse > 0.02f ? "ZOOM x" + zoom.ToString("0.0") : "AUTO TRACKING";
         UpdateVhsZoomSlider();
+        UpdateVhsObservationReadout();
         float blink = Mathf.PingPong(Time.time * 2.4f, 1f);
         vhsRecDot.color = new Color(1f, 0.08f, 0.05f, 0.35f + blink * 0.60f);
     }
@@ -354,6 +357,11 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         bool wasEnabled = vhsModeEnabled;
         if (enabled)
         {
+            if (notebookModeEnabled)
+            {
+                SetNotebookMode(false);
+            }
+
             vhsModeEnabled = true;
             RestoreVhsCameraZoom();
         }
@@ -375,12 +383,7 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         ApplyVhsCameraViewport(enabled);
         SetCameraBreathingLoop(enabled);
 
-        if (hudCanvasGroup != null)
-        {
-            hudCanvasGroup.alpha = enabled ? 0f : 1f;
-            hudCanvasGroup.interactable = !enabled;
-            hudCanvasGroup.blocksRaycasts = !enabled;
-        }
+        ApplyLegacyHudVisibility();
 
         if (!enabled)
         {

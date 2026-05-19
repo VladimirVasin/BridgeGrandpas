@@ -35,6 +35,8 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
 
         string cozy = GainCozy(CozyForBuild(type));
         Notify("Построено: " + building.Name + ". Уют +" + RateF(CozyForBuild(type)) + "." + cozy);
+        QueueObservationLead(NotebookObjectName(type), NotebookBuildPhrase(type) + ". Уют под мостом вырос на " +
+            RateF(CozyForBuild(type)) + ".", building.Root != null ? building.Root.transform : null, building.Position, 0.12f);
         return true;
     }
 
@@ -59,6 +61,9 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         float cozyGain = 1.2f + building.Level * 0.55f;
         string cozy = GainCozy(cozyGain);
         Notify("Улучшено: " + building.Name + " до уровня " + building.Level + ". Уют +" + RateF(cozyGain) + "." + cozy);
+        QueueObservationLead(NotebookObjectName(building.Type), NotebookObjectName(building.Type) +
+            " укреплён до уровня " + building.Level + ". Дедушки делают вид, что так было всегда.",
+            building.Root != null ? building.Root.transform : null, building.Position, 0.18f);
     }
 
     private void TryBudSelected()

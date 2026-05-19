@@ -44,6 +44,9 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         CreateExpeditionModal(canvasObject.transform);
         CreateVictoryModal(canvasObject.transform);
         SetupVhsOverlay();
+        SetupNotebookInterface();
+        SetupStartIrisFade();
+        ApplyLegacyHudVisibility();
     }
 
     private void CreateTopPanel(Transform parent)
@@ -397,7 +400,25 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
 
     private void ShowExpeditionNarrativeModal(Grandpa grandpa)
     {
-        if (grandpa == null || grandpa.ExpeditionNarrativeResolved || expeditionModal == null)
+        if (grandpa == null || grandpa.ExpeditionNarrativeResolved)
+        {
+            return;
+        }
+
+        if (notebookCanvas != null)
+        {
+            selectedGrandpa = grandpa;
+            if (!notebookModeEnabled || currentNotebookPage != NotebookPage.Expeditions)
+            {
+                SetNotebookPage(NotebookPage.Expeditions);
+                SetNotebookMode(true);
+                MarkNotebookDirty();
+            }
+
+            return;
+        }
+
+        if (expeditionModal == null)
         {
             return;
         }

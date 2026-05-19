@@ -33,10 +33,15 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
 
     private void BuildInitialState()
     {
+        ResetNotebookObservations();
         TryBuild(BuildingType.FireBarrel, true);
         CreateStarterCommuneProps();
-        SpawnGrandpa(GrandpaRole.Common, new Vector3(-0.6f, 0f, -1.15f));
+        Grandpa first = SpawnGrandpa(GrandpaRole.Common, new Vector3(-0.6f, 0f, -1.15f));
+        QueueObservationLead("первый дед", first.Name + " замечен первым. Пока это не толпа, а один очень уверенный дед.",
+            first.Root != null ? first.Root.transform : null, first.Target, 0.08f);
         Notify("Первый дедушка обжил сухое пятно под мостом. Государство пока помещается в одном пальто.");
+        QueueObservationLead("первое государство", "Государство пока помещается в одном пальто.",
+            first.Root != null ? first.Root.transform : null, first.Target, 0.05f);
     }
 }
 
