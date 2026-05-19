@@ -15,6 +15,7 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         public Transform Root;
         public Transform[] Wheels;
         public float Speed;
+        public float Direction;
         public float BaseY;
         public float BobSeed;
     }
@@ -38,7 +39,7 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
             return;
         }
 
-        if (Time.time >= nextBridgeCarAt && bridgeCars.Count < 3)
+        if (Time.time >= nextBridgeCarAt && bridgeCars.Count == 0)
         {
             SpawnBridgeCar();
             ScheduleNextBridgeCar(12f, 38f);
@@ -54,12 +55,12 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
             }
 
             Vector3 pos = car.Root.localPosition;
-            pos.x += car.Speed * deltaTime;
+            pos.x += car.Speed * car.Direction * deltaTime;
             pos.y = car.BaseY + Mathf.Sin(Time.time * 5.4f + car.BobSeed) * 0.012f;
             car.Root.localPosition = pos;
             RotateBridgeCarWheels(car, deltaTime);
 
-            if (pos.x > BridgeCarRightX)
+            if ((car.Direction > 0f && pos.x > BridgeCarRightX) || (car.Direction < 0f && pos.x < BridgeCarLeftX))
             {
                 Destroy(car.Root.gameObject);
                 bridgeCars.RemoveAt(i);
@@ -69,12 +70,13 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
 
     private void SpawnBridgeCar()
     {
+        float direction = Random.value > 0.5f ? 1f : -1f;
         float z = Random.value > 0.5f ? 1.0f : 2.05f;
         float y = 3.57f;
         GameObject rootObject = new GameObject("Passing low-poly car");
         rootObject.transform.SetParent(bridgeTrafficRoot, false);
-        rootObject.transform.localPosition = new Vector3(BridgeCarLeftX, y, z);
-        rootObject.transform.localRotation = Quaternion.identity;
+        rootObject.transform.localPosition = new Vector3(direction > 0f ? BridgeCarLeftX : BridgeCarRightX, y, z);
+        rootObject.transform.localRotation = direction > 0f ? Quaternion.identity : Quaternion.Euler(0f, 180f, 0f);
 
         Color bodyColor = BridgeCarBodyColor();
         string bodyKey = "bridge_car_body_" +
@@ -104,6 +106,7 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
             Root = rootObject.transform,
             Wheels = wheels,
             Speed = Random.Range(3.2f, 5.4f),
+            Direction = direction,
             BaseY = y,
             BobSeed = Random.Range(0f, 20f)
         });

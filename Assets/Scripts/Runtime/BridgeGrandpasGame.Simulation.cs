@@ -9,6 +9,8 @@ using UnityEngine.InputSystem.UI;
 using UnityEngine.UI;
 public sealed partial class BridgeGrandpasGame : MonoBehaviour
 {
+    private static readonly bool EventAutoTriggerEnabled = false;
+
     private void SimulateResources(float deltaTime)
     {
         ResourceStock income = CurrentResourceIncomePerSecond();
@@ -57,6 +59,11 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
 
     private void SimulateEvents(float deltaTime)
     {
+        if (!EventAutoTriggerEnabled)
+        {
+            return;
+        }
+
         if (pendingEvent != null)
         {
             return;

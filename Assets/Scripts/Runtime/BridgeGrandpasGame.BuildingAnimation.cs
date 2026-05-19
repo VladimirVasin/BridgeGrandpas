@@ -183,6 +183,7 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         velocity.x = new ParticleSystem.MinMaxCurve(-0.06f, 0.06f);
         velocity.y = new ParticleSystem.MinMaxCurve(0f, 0f);
         velocity.z = new ParticleSystem.MinMaxCurve(-0.035f, 0.035f);
+        RegisterWindParticleSystem(particles, 0.95f);
 
         particles.GetComponent<ParticleSystemRenderer>().material =
             Mat("samovar_cartoon_steam_mat", new Color(0.78f, 0.82f, 0.90f, 0.42f));

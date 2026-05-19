@@ -173,8 +173,10 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
                 break;
             case BuildingType.CarpetCurtain:
                 CreateBox("Carpet Rod", root, new Vector3(0f, 1.1f, 0f), new Vector3(1.7f * levelScale, 0.08f, 0.08f), Mat("rail", new Color(0.10f, 0.11f, 0.12f)));
-                CreateBox("Red Carpet", root, new Vector3(-0.36f, 0.62f, 0f), new Vector3(0.62f, 1.05f, 0.08f), Mat("red_carpet", new Color(0.46f, 0.10f, 0.12f)));
-                CreateBox("Blue Carpet", root, new Vector3(0.36f, 0.58f, 0f), new Vector3(0.62f, 0.98f, 0.08f), Mat("blue_carpet", new Color(0.11f, 0.22f, 0.40f)));
+                GameObject redCarpet = CreateBox("Red Carpet", root, new Vector3(-0.36f, 0.62f, 0f), new Vector3(0.62f, 1.05f, 0.08f), Mat("red_carpet", new Color(0.46f, 0.10f, 0.12f)));
+                GameObject blueCarpet = CreateBox("Blue Carpet", root, new Vector3(0.36f, 0.58f, 0f), new Vector3(0.62f, 0.98f, 0.08f), Mat("blue_carpet", new Color(0.11f, 0.22f, 0.40f)));
+                RegisterWindSway(redCarpet.transform, 2.8f, 0.012f);
+                RegisterWindSway(blueCarpet.transform, 3.4f, 0.014f);
                 break;
             case BuildingType.RadioMayak:
                 CreateBox("Radio Crate", root, new Vector3(0f, 0.38f, 0f), new Vector3(0.92f * levelScale, 0.62f, 0.56f), Mat("radio", new Color(0.08f, 0.11f, 0.10f)));
@@ -330,6 +332,7 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
 
         ParticleSystemRenderer renderer = particleObject.GetComponent<ParticleSystemRenderer>();
         renderer.material = Mat(name + "_mat", color);
+        RegisterWindParticleSystem(particles, 0.88f);
         particles.Play();
     }
 

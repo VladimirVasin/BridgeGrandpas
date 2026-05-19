@@ -65,7 +65,7 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         ClassifyAmbienceClips(clips, city, rain, wind, thunderBeds, thunderAccents);
 
         cityAmbienceLayer = AddAmbienceLayer("City Above", city.ToArray(), 0.13f, 45f, 82f, 8f, 0.14f);
-        AddAmbienceLayer("Rain On Shelter", rain.ToArray(), 0.11f, 34f, 68f, 7f, 0.12f);
+        AddAmbienceLayer("Rain On Shelter", rain.ToArray(), 0.22f, 34f, 68f, 7f, 0.12f);
         AddAmbienceLayer("Wind Under Arch", wind.ToArray(), 0.08f, 80f, 130f, 10f, 0.42f);
         AddAmbienceLayer("Distant Thunder Bed", thunderBeds.ToArray(), 0.055f, 95f, 170f, 12f, 0.20f);
         SetupNatureEssentialsAmbience();
@@ -276,6 +276,11 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         else if (layer.Name.IndexOf("Wind", StringComparison.OrdinalIgnoreCase) >= 0)
         {
             volume *= Mathf.Lerp(0.25f, 1f, Mathf.PerlinNoise(Time.time * 0.026f, layer.Phase));
+            volume *= CurrentUnderpassWindAudioBoost();
+        }
+        else if (layer.Name.IndexOf("Rain", StringComparison.OrdinalIgnoreCase) >= 0)
+        {
+            volume *= 1.25f + Mathf.PerlinNoise(Time.time * 0.065f, layer.Phase) * 0.18f;
         }
 
         float breath = 1f + Mathf.Sin(Time.time * layer.BreathSpeed + layer.Phase) * layer.BreathDepth;

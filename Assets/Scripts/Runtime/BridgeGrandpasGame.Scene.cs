@@ -55,6 +55,7 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         SetupSceneLighting(sun);
 
         CreateBridgeWorld();
+        SetupUnderpassWind();
         selectionMarker = CreateMarker("Selection Marker", new Color(1f, 0.76f, 0.24f, 0.85f));
         hoverMarker = CreateMarker("Hover Marker", new Color(0.55f, 0.85f, 1f, 0.55f));
     }
@@ -167,28 +168,30 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
     {
         GameObject rainObject = new GameObject("Soft Rain");
         rainObject.transform.SetParent(worldRoot, false);
-        rainObject.transform.position = new Vector3(0f, 6.5f, 0f);
+        rainObject.transform.position = new Vector3(0f, 6.5f, -0.35f);
         ParticleSystem particles = rainObject.AddComponent<ParticleSystem>();
         ParticleSystem.MainModule main = particles.main;
         main.loop = true;
-        main.startLifetime = 2.6f;
+        main.startLifetime = new ParticleSystem.MinMaxCurve(2.4f, 3.4f);
         main.startSpeed = 4.8f;
         main.startSize = 0.045f;
-        main.maxParticles = 420;
+        main.maxParticles = 1600;
         main.startColor = new Color(0.55f, 0.68f, 0.85f, 0.42f);
+        main.simulationSpace = ParticleSystemSimulationSpace.World;
 
         ParticleSystem.EmissionModule emission = particles.emission;
-        emission.rateOverTime = 95f;
+        emission.rateOverTime = 330f;
 
         ParticleSystem.ShapeModule shape = particles.shape;
         shape.shapeType = ParticleSystemShapeType.Box;
-        shape.scale = new Vector3(16f, 0.6f, 12f);
+        shape.scale = new Vector3(72f, 0.75f, 17f);
 
         ParticleSystem.VelocityOverLifetimeModule velocity = particles.velocityOverLifetime;
         velocity.enabled = true;
         velocity.space = ParticleSystemSimulationSpace.World;
         velocity.y = -5.4f;
         velocity.x = -0.75f;
+        RegisterRainWind(particles);
 
         ParticleSystemRenderer renderer = rainObject.GetComponent<ParticleSystemRenderer>();
         renderer.material = Mat("rain_mat", new Color(0.55f, 0.68f, 0.85f, 0.42f));

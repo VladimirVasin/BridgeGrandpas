@@ -91,6 +91,13 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         }
 
         stock.Coins -= 1f;
+        if (!EventAutoTriggerEnabled)
+        {
+            TriggerRandomEvent();
+            RefreshAllUi();
+            return;
+        }
+
         nextEventIn = Mathf.Min(nextEventIn, 5f);
         Notify("Радио щёлкнуло. Слух почти пойман.");
         RefreshAllUi();

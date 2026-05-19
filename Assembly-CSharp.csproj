@@ -109,6 +109,7 @@
     <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.TextCatalog.cs" />
     <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.BridgeTrafficAudio.cs" />
     <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.NotebookPages.cs" />
+    <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.Wind.cs" />
     <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.Materials.cs" />
     <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.ImportedGrandpa.cs" />
     <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.CitySkyline.cs" />

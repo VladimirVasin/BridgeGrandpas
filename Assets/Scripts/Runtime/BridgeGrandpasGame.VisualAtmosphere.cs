@@ -297,6 +297,7 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         vel.x = velocity.x;
         vel.y = velocity.y;
         vel.z = velocity.z;
+        RegisterWindParticleSystem(particles, 0.72f);
 
         ParticleSystemRenderer renderer = particleObject.GetComponent<ParticleSystemRenderer>();
         renderer.material = ParticleMat(name + "_mat", color);

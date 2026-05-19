@@ -57,7 +57,7 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
             }
         }
 
-        AddAmbienceLayer("Nature Rain Calm", rain.ToArray(), 0.055f, 58f, 112f, 9f, 0.10f);
+        AddAmbienceLayer("Nature Rain Calm", rain.ToArray(), 0.18f, 58f, 112f, 9f, 0.10f);
         AddAmbienceLayer("Nature Wind Wash", wind.ToArray(), 0.045f, 92f, 158f, 12f, 0.32f);
         SetupFireBarrelAmbience(fireSmall, fireMedium, fireBig);
         Debug.Log("[BridgeGrandpas] Nature ambience clips loaded: " + clips.Length);
