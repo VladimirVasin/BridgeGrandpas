@@ -103,6 +103,7 @@
     <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.Movement.cs" />
     <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.Simulation.cs" />
     <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.ObservationScan.cs" />
+    <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.Cloth.cs" />
     <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasButtonVisual.cs" />
     <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.NotebookVisual.cs" />
     <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.EventsRuntime.cs" />

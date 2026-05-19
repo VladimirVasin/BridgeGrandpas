@@ -41,7 +41,7 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         DecorBox(root, "Radio antenna prop", new Vector3(2.52f, 0.82f, -1.62f), new Vector3(0.028f, 0.78f, 0.028f), metal, -18f);
 
         DecorBox(root, "Cardboard screen back", new Vector3(-0.38f, 0.52f, 1.12f), new Vector3(0.88f, 0.96f, 0.08f), cardboard, -8f);
-        DecorBox(root, "Carpet scrap back", new Vector3(0.62f, 0.58f, 1.16f), new Vector3(0.72f, 1.02f, 0.07f), rug, 8f);
+        CreateClothPanel("Starter carpet scrap cloth", root, new Vector3(0.62f, 1.10f, 1.16f), new Vector2(0.72f, 1.02f), rug, 0.72f);
 
         for (int i = 0; i < 8; i++)
         {

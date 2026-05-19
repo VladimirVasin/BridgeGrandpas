@@ -139,12 +139,17 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         CozyBox("Left pillar tie", new Vector3(-3.18f, 2.08f, 2.68f), new Vector3(0.10f, 0.20f, 0.055f), wire);
         CozyBox("Right pillar tie", new Vector3(3.18f, 2.08f, 2.68f), new Vector3(0.10f, 0.20f, 0.055f), wire);
         Material bulb = EmissiveMat("cozy_bulb", new Color(1f, 0.58f, 0.22f), 1.8f);
+        Material flag = Mat("cozy_garland_cloth_flags", new Color(0.48f, 0.18f, 0.12f));
         for (int i = 0; i < 7; i++)
         {
             float x = -2.52f + i * 0.84f;
             float sag = i == 3 ? -0.10f : Mathf.Abs(i - 3) == 1 ? -0.06f : -0.02f;
             CozyBox("Bulb drop " + i, new Vector3(x, 2.05f + sag, 2.68f), new Vector3(0.025f, 0.16f, 0.025f), wire);
             CozySphere("Warm bulb " + i, new Vector3(x, 1.93f + sag, 2.68f), new Vector3(0.13f, 0.13f, 0.13f), bulb);
+            if (i % 2 == 1)
+            {
+                CreateClothPanel("Garland cloth flag " + i, cozyDecorRoot, new Vector3(x + 0.23f, 2.04f + sag, 2.67f), new Vector2(0.18f, 0.24f), flag, 0.46f);
+            }
         }
 
         AddPointLight(cozyDecorRoot, "Cozy bulbs glow", new Vector3(0f, 1.90f, 2.38f), new Color(1f, 0.54f, 0.22f), 4.8f, 0.55f);
@@ -161,10 +166,8 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
     private void CreateCozyOldPlaid()
     {
         Material plaid = Mat("cozy_old_plaid", new Color(0.30f, 0.12f, 0.20f));
-        CozyBox("Old plaid base", new Vector3(-0.62f, 0.105f, -1.28f), new Vector3(0.78f, 0.075f, 0.52f), plaid);
-        Material stripe = Mat("cozy_plaid_stripes", new Color(0.66f, 0.45f, 0.28f));
-        CozyBox("Old plaid stripe A", new Vector3(-0.62f, 0.15f, -1.28f), new Vector3(0.08f, 0.035f, 0.54f), stripe);
-        CozyBox("Old plaid stripe B", new Vector3(-0.62f, 0.155f, -1.28f), new Vector3(0.80f, 0.035f, 0.06f), stripe);
+        CozyBox("Old plaid support", new Vector3(-0.62f, 0.43f, -1.26f), new Vector3(0.86f, 0.055f, 0.08f), Mat("cozy_plaid_support", new Color(0.20f, 0.12f, 0.08f)));
+        CreateClothPanel("Old plaid cloth", cozyDecorRoot, new Vector3(-0.62f, 0.42f, -1.28f), new Vector2(0.82f, 0.56f), plaid, 0.62f);
     }
 
     private void CreateCozySockLine()
@@ -173,9 +176,9 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         CozyBox("Sock line", new Vector3(-1.35f, 1.08f, 0.9f), new Vector3(2.1f, 0.035f, 0.035f), line);
         Material sockA = Mat("cozy_sock_red", new Color(0.46f, 0.12f, 0.14f));
         Material sockB = Mat("cozy_sock_blue", new Color(0.12f, 0.22f, 0.38f));
-        CozyBox("Sock A", new Vector3(-1.95f, 0.82f, 0.9f), new Vector3(0.16f, 0.34f, 0.035f), sockA);
-        CozyBox("Sock B", new Vector3(-1.28f, 0.80f, 0.9f), new Vector3(0.16f, 0.30f, 0.035f), sockB);
-        CozyBox("Sock C", new Vector3(-0.55f, 0.81f, 0.9f), new Vector3(0.16f, 0.32f, 0.035f), sockA);
+        CreateClothPanel("Sock cloth A", cozyDecorRoot, new Vector3(-1.95f, 1.02f, 0.9f), new Vector2(0.18f, 0.35f), sockA, 0.95f);
+        CreateClothPanel("Sock cloth B", cozyDecorRoot, new Vector3(-1.28f, 1.01f, 0.9f), new Vector2(0.17f, 0.31f), sockB, 1.05f);
+        CreateClothPanel("Sock cloth C", cozyDecorRoot, new Vector3(-0.55f, 1.02f, 0.9f), new Vector2(0.18f, 0.33f), sockA, 0.90f);
     }
 
     private void CreateCozyJarShelf()
@@ -197,7 +200,7 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         Material cloth = Mat("cozy_canopy_cloth", new Color(0.30f, 0.16f, 0.10f));
         CozyBox("Small canopy cloth", new Vector3(-1.62f, 1.76f, -0.72f), new Vector3(1.72f, 0.10f, 1.05f), cloth);
         Material edge = Mat("cozy_canopy_edge", new Color(0.52f, 0.30f, 0.14f));
-        CozyBox("Small canopy front edge", new Vector3(-1.62f, 1.66f, -1.25f), new Vector3(1.76f, 0.12f, 0.06f), edge);
+        CreateClothPanel("Small canopy cloth front edge", cozyDecorRoot, new Vector3(-1.62f, 1.67f, -1.25f), new Vector2(1.76f, 0.42f), edge, 0.58f);
     }
 
     private void CreateCozyWelcomeSign()

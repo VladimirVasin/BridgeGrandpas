@@ -68,6 +68,7 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         UpdateRainWind();
         UpdateWindParticles();
         UpdateWindSway(deltaTime);
+        UpdateWindCloth();
     }
 
     private void RegisterWindParticleSystem(ParticleSystem particles, float multiplier)
