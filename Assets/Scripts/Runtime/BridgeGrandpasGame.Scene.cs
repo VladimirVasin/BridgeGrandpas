@@ -20,7 +20,7 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         RenderSettings.ambientLight = new Color(0.006f, 0.006f, 0.009f);
         RenderSettings.fog = true;
         RenderSettings.fogColor = new Color(0.001f, 0.001f, 0.002f);
-        RenderSettings.fogDensity = 0.078f;
+        RenderSettings.fogDensity = 0.115f;
 
         mainCamera = Camera.main;
         if (mainCamera == null)
@@ -33,10 +33,10 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         mainCamera.orthographic = true;
         mainCamera.clearFlags = CameraClearFlags.SolidColor;
         mainCamera.orthographicSize = 6.2f;
-        mainCamera.transform.position = new Vector3(8.0f, 3.65f, -8.15f);
-        mainCamera.transform.rotation = Quaternion.Euler(31f, -39f, 0f);
+        mainCamera.transform.position = new Vector3(8.2f, 2.05f, -8.85f);
+        mainCamera.transform.rotation = Quaternion.Euler(16.5f, -39f, 0f);
         mainCamera.nearClipPlane = 0.1f;
-        mainCamera.farClipPlane = 80f;
+        mainCamera.farClipPlane = 38f;
         mainCamera.backgroundColor = Color.black;
         EnsureCameraAudioListener();
 
@@ -69,8 +69,8 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
 
     private void CreateDiorama()
     {
-        Material voidMat = Mat("outer_void", new Color(0f, 0f, 0.001f));
-        Material ground = AsphaltMat("wet_asphalt_ground", new Color(0.38f, 0.36f, 0.34f), new Vector2(5.4f, 3.8f), 0.55f);
+        Material voidMat = Mat("outer_void", new Color(0.003f, 0.004f, 0.007f));
+        Material ground = AsphaltMat("wet_asphalt_ground", new Color(0.34f, 0.34f, 0.35f), new Vector2(7.2f, 5.8f), 0.55f);
         Material concrete = Mat("old_concrete", new Color(0.11f, 0.11f, 0.12f));
         Material darkConcrete = Mat("dark_concrete", new Color(0.045f, 0.050f, 0.060f));
         Material rail = Mat("rail", new Color(0.025f, 0.028f, 0.034f));
@@ -80,7 +80,7 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         Material road = AsphaltMat("bridge_asphalt_road", new Color(0.46f, 0.45f, 0.43f), new Vector2(6.0f, 1.15f), 0.42f);
 
         CreateBox("Outer darkness void", worldRoot, new Vector3(0f, -0.18f, 0f), new Vector3(70f, 0.06f, 50f), voidMat);
-        CreateBox("Wet ground", worldRoot, new Vector3(0f, -0.08f, 0f), new Vector3(15f, 0.12f, 10f), ground);
+        CreateBox("Wet ground", worldRoot, new Vector3(0f, -0.08f, -3.8f), new Vector3(34f, 0.12f, 30f), ground);
         CreateBox("Back retaining wall", worldRoot, new Vector3(0f, 1.15f, 3.85f), new Vector3(15f, 2.3f, 0.25f), darkConcrete);
         CreateBox("Bridge deck", worldRoot, new Vector3(0f, 3.15f, 1.55f), new Vector3(15f, 0.52f, 3.15f), concrete);
         CreateBox("Road strip on bridge", worldRoot, new Vector3(0f, 3.45f, 1.55f), new Vector3(14.4f, 0.05f, 2.1f), road);
@@ -108,6 +108,7 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
             }
         }
 
+        CreateCityAmbience();
         CreateRain();
     }
 

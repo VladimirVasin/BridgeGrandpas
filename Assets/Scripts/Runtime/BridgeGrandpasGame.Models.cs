@@ -14,7 +14,8 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         Build,
         Upgrade,
         Events,
-        Grandpas
+        Grandpas,
+        Expeditions
     }
 
     private enum BuildingType
@@ -36,6 +37,27 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         Guard,
         Philosopher,
         RadioReceiver
+    }
+
+    private enum ExpeditionType
+    {
+        CardboardRun,
+        CoinAdvice,
+        TeaSalvage,
+        CityRumors
+    }
+
+    private enum GrandpaIdleAction
+    {
+        Wandering,
+        Warming,
+        DrinkingTea,
+        Grumbling,
+        Resting,
+        WorkingCardboard,
+        Guarding,
+        ListeningRadio,
+        AdmiringCozyDecor
     }
 
     private sealed class Grandpa
@@ -78,12 +100,24 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         public float WalkJitter;
         public bool HasInteraction;
         public BuildingType InteractionType;
+        public GrandpaIdleAction IdleAction;
+        public float IdleActionUntil;
         public float ActionSeed;
         public float FootstepCyclePhase;
         public float NextFootstepAt;
         public float BirthAnimStart;
         public float BirthAnimUntil;
         public float BudBurstUntil;
+        public bool IsOnExpedition;
+        public bool ExpeditionLeaving;
+        public bool ExpeditionNarrativeResolved;
+        public ExpeditionType ExpeditionType;
+        public float ExpeditionUntil;
+        public float ExpeditionDepartureUntil;
+        public float ExpeditionRewardMultiplier;
+        public float ExpeditionRiskMultiplier;
+        public Vector3 ExpeditionExitPosition;
+        public Vector3 ExpeditionReturnPosition;
     }
 
     private sealed class Building
@@ -97,6 +131,13 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         public int Level;
         public GameObject Root;
         public float BlockedUntil;
+        public Transform AnimatedRoot;
+        public Vector3 AnimatedBasePosition;
+        public Quaternion AnimatedBaseRotation;
+        public Vector3 AnimatedBaseScale;
+        public float AnimatedSeed;
+        public ParticleSystem SteamParticles;
+        public Light AccentLight;
 
         public bool IsBlocked
         {

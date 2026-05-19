@@ -48,21 +48,30 @@
     <Analyzer Include="C:\Program Files\Unity\Hub\Editor\6000.4.7f1\Editor\Data\Tools\BuildPipeline\Unity.SourceGenerators\Unity.UIToolkit.SourceGenerator.dll" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.ExpeditionDice.cs" />
     <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.Camera.cs" />
     <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasHudButtonAudio.cs" />
     <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.cs" />
     <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.Ambience.cs" />
     <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.RulesAndText.cs" />
     <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.BuildingsCatalog.cs" />
+    <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.IdleLife.cs" />
     <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.Actions.cs" />
     <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.Models.cs" />
     <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.Visuals.cs" />
     <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.Audio.cs" />
     <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.StartMenu.cs" />
+    <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.BuildingAnimation.cs" />
+    <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.Thoughts.cs" />
     <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.UiRuntime.cs" />
+    <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.Expeditions.cs" />
     <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.GrandpaAnimation.cs" />
     <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.UiSetup.cs" />
+    <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.Production.cs" />
+    <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.Cozy.cs" />
     <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.EventsCatalog.cs" />
+    <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.Trays.cs" />
+    <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.CityAmbience.cs" />
     <Compile Include="Assets\TutorialInfo\Scripts\Readme.cs" />
     <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.Scene.cs" />
     <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.StartMenuAnimation.cs" />

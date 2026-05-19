@@ -17,7 +17,8 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
             return;
         }
 
-        bool close = grandpa.HasInteraction && Vector3.Distance(Flat(grandpa.Root.transform.position), Flat(grandpa.Target)) < 0.28f;
+        bool close = (grandpa.HasInteraction || IdleActionUsesPose(grandpa.IdleAction)) &&
+            Vector3.Distance(Flat(grandpa.Root.transform.position), Flat(grandpa.Target)) < 0.28f;
         float action = close ? (Mathf.Sin((Time.time + grandpa.ActionSeed) * 5f) + 1f) * 0.5f : 0f;
         Vector3 scale = Vector3.one;
 
@@ -35,8 +36,11 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
 
         if (close)
         {
-            scale = Vector3.Scale(scale, InteractionScale(grandpa.InteractionType, action));
-            FaceInteractionBuilding(grandpa);
+            scale = Vector3.Scale(scale, InteractionScale(grandpa, action));
+            if (grandpa.HasInteraction)
+            {
+                FaceInteractionBuilding(grandpa);
+            }
         }
 
         grandpa.Root.transform.localScale = Vector3.Lerp(grandpa.Root.transform.localScale, scale, Time.deltaTime * 12f);
@@ -147,9 +151,28 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         }
     }
 
-    private Vector3 InteractionScale(BuildingType type, float action)
+    private Vector3 InteractionScale(Grandpa grandpa, float action)
     {
-        switch (type)
+        switch (grandpa.IdleAction)
+        {
+            case GrandpaIdleAction.Resting:
+                return new Vector3(1.18f, 0.58f + action * 0.03f, 1.10f);
+            case GrandpaIdleAction.Grumbling:
+                return new Vector3(1.12f, 0.72f + action * 0.04f, 1.16f);
+            case GrandpaIdleAction.Warming:
+                return new Vector3(1f + action * 0.04f, 0.96f, 1f + action * 0.04f);
+            case GrandpaIdleAction.DrinkingTea:
+                return new Vector3(1f, 1f + action * 0.08f, 1f);
+            case GrandpaIdleAction.AdmiringCozyDecor:
+                return new Vector3(1f + action * 0.03f, 0.93f, 1f + action * 0.03f);
+            case GrandpaIdleAction.WorkingCardboard:
+                return new Vector3(1.05f, 0.94f + action * 0.03f, 1.05f);
+            case GrandpaIdleAction.Guarding:
+            case GrandpaIdleAction.ListeningRadio:
+                return new Vector3(1f, 1f + action * 0.035f, 1f);
+        }
+
+        switch (grandpa.InteractionType)
         {
             case BuildingType.GrumbleBench:
                 return new Vector3(1.12f, 0.72f + action * 0.04f, 1.16f);
@@ -166,7 +189,7 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
 
     private void FaceInteractionBuilding(Grandpa grandpa)
     {
-        if (!buildings.ContainsKey(grandpa.InteractionType))
+        if (!buildings.ContainsKey(grandpa.InteractionType) || !buildings[grandpa.InteractionType].Built)
         {
             return;
         }
@@ -195,6 +218,12 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         Color color = new Color(0.95f, 0.78f, 0.36f);
         Vector3 scale = new Vector3(0.16f, 0.16f, 0.16f);
         Vector3 position = new Vector3(0f, 0.62f + action * 0.1f, -0.42f);
+
+        if (TryApplyIdleActionProp(grandpa, action, ref color, ref scale, ref position))
+        {
+            ApplyInteractionPropVisual(grandpa, color, scale, position);
+            return;
+        }
 
         switch (grandpa.InteractionType)
         {
@@ -226,6 +255,38 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
                 break;
         }
 
+        ApplyInteractionPropVisual(grandpa, color, scale, position);
+    }
+
+    private bool TryApplyIdleActionProp(Grandpa grandpa, float action, ref Color color, ref Vector3 scale, ref Vector3 position)
+    {
+        switch (grandpa.IdleAction)
+        {
+            case GrandpaIdleAction.DrinkingTea:
+                color = new Color(0.98f, 0.86f, 0.55f);
+                scale = new Vector3(0.18f, 0.12f, 0.18f);
+                return true;
+            case GrandpaIdleAction.WorkingCardboard:
+                color = new Color(0.58f, 0.40f, 0.22f);
+                scale = new Vector3(0.34f, 0.08f, 0.28f);
+                position = new Vector3(0.12f, 0.50f, -0.38f);
+                return true;
+            case GrandpaIdleAction.Resting:
+                color = new Color(0.30f, 0.12f, 0.20f);
+                scale = new Vector3(0.30f, 0.06f, 0.20f);
+                position = new Vector3(0f, 0.32f, -0.38f);
+                return true;
+            case GrandpaIdleAction.AdmiringCozyDecor:
+                color = new Color(1f, 0.72f, 0.28f);
+                scale = new Vector3(0.10f, 0.20f + action * 0.05f, 0.10f);
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    private void ApplyInteractionPropVisual(Grandpa grandpa, Color color, Vector3 scale, Vector3 position)
+    {
         grandpa.InteractionProp.localPosition = position;
         grandpa.InteractionProp.localScale = scale;
         if (grandpa.InteractionPropRenderer != null)

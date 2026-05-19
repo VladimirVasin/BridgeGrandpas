@@ -10,6 +10,8 @@ using UnityEngine.UI;
 
 public sealed partial class BridgeGrandpasGame : MonoBehaviour
 {
+    private const float BackgroundMusicStartDelay = 10f;
+
     private AudioSource menuMusicSource;
     private AudioSource musicSource;
     private AudioClip[] footstepClips;
@@ -88,8 +90,8 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         echo.wetMix = 0.12f;
         echo.dryMix = 0.88f;
 
-        musicSource.Play();
-        Debug.Log("[BridgeGrandpas] Background music started: " + clip.name);
+        musicSource.PlayDelayed(BackgroundMusicStartDelay);
+        Debug.Log("[BridgeGrandpas] Background music scheduled: " + clip.name);
     }
 
     private AudioClip FindMusicClip(bool menu)

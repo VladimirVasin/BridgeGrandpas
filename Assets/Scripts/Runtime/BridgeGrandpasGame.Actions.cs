@@ -33,7 +33,8 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
             nextEventIn = Mathf.Min(nextEventIn, 8f);
         }
 
-        Notify("Построено: " + building.Name + ".");
+        string cozy = GainCozy(CozyForBuild(type));
+        Notify("Построено: " + building.Name + ". Уют +" + RateF(CozyForBuild(type)) + "." + cozy);
         return true;
     }
 
@@ -55,18 +56,20 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         building.Level++;
         suspicion += building.Type == BuildingType.CarpetCurtain ? 0.5f : 3f;
         RefreshBuildingVisual(building);
-        Notify("Улучшено: " + building.Name + " до уровня " + building.Level + ".");
+        float cozyGain = 1.2f + building.Level * 0.55f;
+        string cozy = GainCozy(cozyGain);
+        Notify("Улучшено: " + building.Name + " до уровня " + building.Level + ". Уют +" + RateF(cozyGain) + "." + cozy);
     }
 
     private void TryBudSelected()
     {
         Grandpa candidate = selectedGrandpa;
-        if (candidate == null || candidate.Budding < BuddingGoal)
+        if (candidate == null || candidate.IsOnExpedition || candidate.Budding < BuddingGoal)
         {
             candidate = null;
             for (int i = 0; i < grandpas.Count; i++)
             {
-                if (grandpas[i].Budding >= BuddingGoal)
+                if (!grandpas[i].IsOnExpedition && grandpas[i].Budding >= BuddingGoal)
                 {
                     candidate = grandpas[i];
                     break;
@@ -76,10 +79,15 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
 
         if (candidate == null)
         {
-            Grandpa closest = grandpas.Count > 0 ? grandpas[0] : null;
-            for (int i = 1; i < grandpas.Count; i++)
+            Grandpa closest = null;
+            for (int i = 0; i < grandpas.Count; i++)
             {
-                if (grandpas[i].Budding > closest.Budding)
+                if (grandpas[i].IsOnExpedition)
+                {
+                    continue;
+                }
+
+                if (closest == null || grandpas[i].Budding > closest.Budding)
                 {
                     closest = grandpas[i];
                 }
@@ -115,7 +123,8 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         ShowThought(candidate, "Почкуется!", 3f);
         ShowThought(child, "Я новый дед", 3.5f);
         SelectGrandpa(child);
-        Notify(candidate.Name + " почковался. Появился " + child.Name + " (" + RoleName(role) + ").");
+        string cozy = GainCozy(0.8f);
+        Notify(candidate.Name + " почковался. Появился " + child.Name + " (" + RoleName(role) + "). Уют +0.8." + cozy);
     }
 
     private Grandpa SpawnGrandpa(GrandpaRole role, Vector3 position)

@@ -15,7 +15,7 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
     private const float CameraWheelZoomStep = 0.72f;
     private const float CameraKeyboardZoomSpeed = 2.4f;
     private const float CameraMinZoom = 2.75f;
-    private const float CameraMaxZoom = 7.8f;
+    private const float CameraMaxZoom = 7.15f;
     private const float CameraMinPanX = -4.4f;
     private const float CameraMaxPanX = 4.4f;
     private const float CameraMinPanY = -3.2f;

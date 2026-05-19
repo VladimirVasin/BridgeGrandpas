@@ -64,7 +64,7 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         int count = 0;
         for (int i = 0; i < grandpas.Count; i++)
         {
-            if (grandpas[i].Role == role)
+            if (!grandpas[i].IsOnExpedition && grandpas[i].Role == role)
             {
                 count++;
             }
@@ -170,6 +170,11 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
 
     private string GrandpaMood(Grandpa grandpa)
     {
+        if (grandpa.IsOnExpedition)
+        {
+            return "где-то наверху";
+        }
+
         if (suspicion > 82f)
         {
             return "делает вид, что он ящик";

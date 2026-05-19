@@ -38,8 +38,10 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         CreateTopPanel(canvasObject.transform);
         CreateRightPanel(canvasObject.transform);
         CreateBottomPanel(canvasObject.transform);
+        CreateLogPanel(canvasObject.transform);
         CreateTray(canvasObject.transform);
         CreateEventModal(canvasObject.transform);
+        CreateExpeditionModal(canvasObject.transform);
         CreateVictoryModal(canvasObject.transform);
     }
 
@@ -57,6 +59,7 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         topStatsText.rectTransform.anchorMax = new Vector2(1f, 1f);
         topStatsText.rectTransform.offsetMin = new Vector2(18f, 0f);
         topStatsText.rectTransform.offsetMax = new Vector2(-360f, 0f);
+        topStatsText.supportRichText = true;
 
         Text suspicionLabel = CreateText("Suspicion Label", panel, 16, FontStyle.Bold, TextAnchor.MiddleLeft, new Color(1f, 0.78f, 0.52f));
         suspicionLabel.text = "Подозрение города";
@@ -80,12 +83,26 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         fillTransform.anchoredPosition = Vector2.zero;
         fillTransform.sizeDelta = new Vector2(80f, 0f);
         suspicionFill = fillTransform.GetComponent<Image>();
+    }
 
-        alertText = CreateText("Alert Text", panel, 15, FontStyle.Italic, TextAnchor.MiddleRight, new Color(0.78f, 0.88f, 1f));
-        alertText.rectTransform.anchorMin = new Vector2(0.48f, 0f);
+    private void CreateLogPanel(Transform parent)
+    {
+        RectTransform panel = CreatePanel("Event Log", parent, new Color(0f, 0f, 0f, 0f));
+        panel.anchorMin = new Vector2(0f, 0f);
+        panel.anchorMax = new Vector2(1f, 0f);
+        panel.pivot = new Vector2(0.5f, 0f);
+        panel.anchoredPosition = new Vector2(0f, 78f);
+        panel.sizeDelta = new Vector2(0f, 30f);
+        panel.GetComponent<Image>().raycastTarget = false;
+
+        alertText = CreateText("Event Log Text", panel, 14, FontStyle.Italic, TextAnchor.MiddleLeft, new Color(0.78f, 0.88f, 1f));
+        alertText.rectTransform.anchorMin = new Vector2(0f, 0f);
         alertText.rectTransform.anchorMax = new Vector2(1f, 1f);
-        alertText.rectTransform.offsetMin = new Vector2(0f, 0f);
-        alertText.rectTransform.offsetMax = new Vector2(-360f, 0f);
+        alertText.rectTransform.offsetMin = new Vector2(18f, 0f);
+        alertText.rectTransform.offsetMax = new Vector2(-18f, 0f);
+        Outline outline = alertText.gameObject.AddComponent<Outline>();
+        outline.effectColor = new Color(0f, 0f, 0f, 0.85f);
+        outline.effectDistance = new Vector2(1.2f, -1.2f);
     }
 
 #if ENABLE_INPUT_SYSTEM
@@ -192,6 +209,10 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         CreateButton("События", panel, delegate
         {
             ToggleTray(UiTab.Events);
+        });
+        CreateButton("Вылазки", panel, delegate
+        {
+            ToggleTray(UiTab.Expeditions);
         });
         CreateButton("Дедушки", panel, delegate
         {
@@ -316,6 +337,91 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         layout.spacing = 8f;
         layout.childForceExpandWidth = true;
         layout.childForceExpandHeight = true;
+    }
+
+    private void CreateExpeditionModal(Transform parent)
+    {
+        expeditionModal = CreatePanel("Expedition Modal", parent, new Color(0.050f, 0.046f, 0.058f, 0.98f));
+        expeditionModal.anchorMin = new Vector2(0.5f, 0.5f);
+        expeditionModal.anchorMax = new Vector2(0.5f, 0.5f);
+        expeditionModal.pivot = new Vector2(0.5f, 0.5f);
+        expeditionModal.anchoredPosition = new Vector2(0f, 18f);
+        expeditionModal.sizeDelta = new Vector2(600f, 340f);
+        expeditionModal.gameObject.SetActive(false);
+
+        expeditionTitleText = CreateText("Expedition Title", expeditionModal, 23, FontStyle.Bold, TextAnchor.UpperLeft, new Color(1f, 0.82f, 0.48f));
+        expeditionTitleText.rectTransform.anchorMin = new Vector2(0f, 1f);
+        expeditionTitleText.rectTransform.anchorMax = new Vector2(1f, 1f);
+        expeditionTitleText.rectTransform.offsetMin = new Vector2(22f, -70f);
+        expeditionTitleText.rectTransform.offsetMax = new Vector2(-22f, -16f);
+
+        expeditionBodyText = CreateText("Expedition Body", expeditionModal, 16, FontStyle.Normal, TextAnchor.UpperLeft, new Color(0.91f, 0.90f, 0.84f));
+        expeditionBodyText.rectTransform.anchorMin = new Vector2(0f, 0f);
+        expeditionBodyText.rectTransform.anchorMax = new Vector2(1f, 1f);
+        expeditionBodyText.rectTransform.offsetMin = new Vector2(22f, 140f);
+        expeditionBodyText.rectTransform.offsetMax = new Vector2(-22f, -78f);
+
+        expeditionDicePanel = CreatePanel("Expedition Dice", expeditionModal, new Color(0.095f, 0.075f, 0.055f, 0.98f));
+        expeditionDicePanel.anchorMin = new Vector2(0.5f, 0.5f);
+        expeditionDicePanel.anchorMax = new Vector2(0.5f, 0.5f);
+        expeditionDicePanel.pivot = new Vector2(0.5f, 0.5f);
+        expeditionDicePanel.anchoredPosition = new Vector2(0f, -22f);
+        expeditionDicePanel.sizeDelta = new Vector2(86f, 86f);
+        expeditionDicePanel.gameObject.SetActive(false);
+
+        expeditionDiceText = CreateText("Expedition Dice Text", expeditionDicePanel, 44, FontStyle.Bold, TextAnchor.MiddleCenter, new Color(1f, 0.86f, 0.52f));
+        expeditionDiceText.rectTransform.anchorMin = Vector2.zero;
+        expeditionDiceText.rectTransform.anchorMax = Vector2.one;
+        expeditionDiceText.rectTransform.offsetMin = Vector2.zero;
+        expeditionDiceText.rectTransform.offsetMax = Vector2.zero;
+
+        expeditionDiceCaptionText = CreateText("Expedition Dice Caption", expeditionModal, 14, FontStyle.Italic, TextAnchor.MiddleCenter, new Color(0.78f, 0.86f, 0.90f));
+        expeditionDiceCaptionText.rectTransform.anchorMin = new Vector2(0.5f, 0.5f);
+        expeditionDiceCaptionText.rectTransform.anchorMax = new Vector2(0.5f, 0.5f);
+        expeditionDiceCaptionText.rectTransform.pivot = new Vector2(0.5f, 0.5f);
+        expeditionDiceCaptionText.rectTransform.anchoredPosition = new Vector2(0f, -78f);
+        expeditionDiceCaptionText.rectTransform.sizeDelta = new Vector2(500f, 28f);
+        expeditionDiceCaptionText.gameObject.SetActive(false);
+
+        expeditionChoicesRoot = CreatePanel("Expedition Choices", expeditionModal, new Color(0f, 0f, 0f, 0f));
+        expeditionChoicesRoot.anchorMin = new Vector2(0f, 0f);
+        expeditionChoicesRoot.anchorMax = new Vector2(1f, 0f);
+        expeditionChoicesRoot.offsetMin = new Vector2(22f, 20f);
+        expeditionChoicesRoot.offsetMax = new Vector2(-22f, 132f);
+        VerticalLayoutGroup layout = expeditionChoicesRoot.gameObject.AddComponent<VerticalLayoutGroup>();
+        layout.spacing = 8f;
+        layout.childForceExpandWidth = true;
+        layout.childForceExpandHeight = true;
+    }
+
+    private void ShowExpeditionNarrativeModal(Grandpa grandpa)
+    {
+        if (grandpa == null || grandpa.ExpeditionNarrativeResolved || expeditionModal == null)
+        {
+            return;
+        }
+
+        if (expeditionModal.gameObject.activeSelf || eventModal.gameObject.activeSelf || victoryModal.gameObject.activeSelf)
+        {
+            return;
+        }
+
+        ResetExpeditionDice();
+        ClearChildren(expeditionChoicesRoot);
+        expeditionTitleText.text = "Вылазка: " + ExpeditionName(grandpa.ExpeditionType);
+        expeditionBodyText.text = grandpa.Name + " поднялся из-под моста. Наверху мокрый свет, чужие ботинки и шанс вернуться не с пустыми руками.\n\nВыбери, как он поведёт себя в городе.";
+        AddExpeditionChoice(grandpa, "Тише под перилами\n<color=#9cff93>меньше подозрения</color>, добычи тоже меньше", 0.82f, 0.45f, "пошёл тихо, почти как тень с авоськой");
+        AddExpeditionChoice(grandpa, "Собрать всё блестящее\n<color=#ffcf7a>больше добычи</color>, город заметит шум", 1.35f, 1.45f, "решил, что осторожность сегодня не главный ресурс");
+        AddExpeditionChoice(grandpa, "Действовать по-дедовски\nсбалансированный путь с ролью и характером", 1.08f, 0.92f, "применил старую тактику: выглядеть так, будто всё так и было");
+        expeditionModal.gameObject.SetActive(true);
+    }
+
+    private void AddExpeditionChoice(Grandpa grandpa, string label, float reward, float risk, string result)
+    {
+        CreateButton(label, expeditionChoicesRoot, delegate
+        {
+            StartExpeditionDiceRoll(grandpa, reward, risk, result);
+        });
     }
 
     private void CreateVictoryModal(Transform parent)

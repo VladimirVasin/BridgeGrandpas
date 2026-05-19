@@ -24,6 +24,7 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
 
     private Transform worldRoot;
     private Transform settlementRoot;
+    private Transform cozyDecorRoot;
     private Camera mainCamera;
     private Font uiFont;
     private System.Random random;
@@ -40,6 +41,8 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
     private int nextGrandpaId = 1;
     private int inspectionsSurvived;
     private int mutationsSinceRare;
+    private int cozyDecorTier;
+    private float cozyScore;
     private bool rareMutationSeen;
     private bool victoryShown;
     private string lastAlert = "Первый дедушка обживает пространство под мостом.";
@@ -64,6 +67,13 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
     private Text eventTitleText;
     private Text eventBodyText;
     private RectTransform eventChoicesRoot;
+    private RectTransform expeditionModal;
+    private Text expeditionTitleText;
+    private Text expeditionBodyText;
+    private RectTransform expeditionChoicesRoot;
+    private RectTransform expeditionDicePanel;
+    private Text expeditionDiceText;
+    private Text expeditionDiceCaptionText;
     private RectTransform victoryModal;
     private Image suspicionFill;
     private GameObject selectionMarker;
@@ -78,6 +88,16 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
     private string microHudTitle;
     private string microHudBody;
     private float microHudUntil;
+    private bool expeditionDiceRolling;
+    private bool expeditionDiceResultVisible;
+    private float expeditionDiceStart;
+    private float expeditionDiceUntil;
+    private float expeditionDiceCloseAt;
+    private int expeditionDiceResult;
+    private Grandpa expeditionDiceGrandpa;
+    private float expeditionDiceRewardMultiplier;
+    private float expeditionDiceRiskMultiplier;
+    private string expeditionDiceResultText;
     private Canvas startMenuCanvas;
     private bool gameStarted;
 
@@ -154,10 +174,13 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         UpdateCameraControls(deltaTime);
         HandlePointer();
         UpdateMicroHudPanel(deltaTime);
+        UpdateExpeditionDice(deltaTime);
         UpdateMarkers();
         UpdateBillboards();
         UpdateFireBarrelLighting();
+        UpdateBuildingAnimations(deltaTime);
         UpdateAmbience(deltaTime);
+        UpdateCityAmbience(deltaTime);
         UpdateAmbientUi();
     }
 

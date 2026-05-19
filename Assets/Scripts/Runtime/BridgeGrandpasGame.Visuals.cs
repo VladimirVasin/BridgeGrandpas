@@ -137,6 +137,7 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
 
     private void BuildBuildingParts(Building building, Transform root)
     {
+        ResetBuildingAnimationState(building);
         float levelScale = 1f + (building.Level - 1) * 0.12f;
         switch (building.Type)
         {
@@ -150,10 +151,14 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
                 AddSmokeOrSteam(root, "Fire Sparks", new Color(1f, 0.38f, 0.05f, 0.82f), 46f, 1.05f);
                 break;
             case BuildingType.Samovar:
-                CreateCylinder("Samovar Body", root, new Vector3(0f, 0.46f, 0f), new Vector3(0.55f * levelScale, 0.55f * levelScale, 0.7f * levelScale), Mat("samovar_gold", new Color(0.86f, 0.62f, 0.24f)));
-                CreateSphere("Samovar Lid", root, new Vector3(0f, 0.86f * levelScale, 0f), new Vector3(0.38f, 0.14f, 0.38f), Mat("samovar_lid", new Color(0.95f, 0.78f, 0.36f)));
                 CreateBox("Samovar Table", root, new Vector3(0f, 0.18f, 0f), new Vector3(1.1f, 0.16f, 0.82f), Mat("wood", new Color(0.42f, 0.26f, 0.13f)));
-                AddSmokeOrSteam(root, "Samovar Steam", new Color(0.84f, 0.88f, 0.92f, 0.5f), 14f + building.Level * 4f, 1.8f);
+                if (!TryCreateImportedSamovarVisual(building, root, levelScale))
+                {
+                    CreateCylinder("Samovar Body", root, new Vector3(0f, 0.46f, 0f), new Vector3(0.55f * levelScale, 0.55f * levelScale, 0.7f * levelScale), Mat("samovar_gold", new Color(0.86f, 0.62f, 0.24f)));
+                    CreateSphere("Samovar Lid", root, new Vector3(0f, 0.86f * levelScale, 0f), new Vector3(0.38f, 0.14f, 0.38f), Mat("samovar_lid", new Color(0.95f, 0.78f, 0.36f)));
+                }
+
+                CreateSamovarCartoonEffects(building, root, levelScale);
                 break;
             case BuildingType.Bedroom:
                 CreateBox("Cardboard Bed Base", root, new Vector3(0f, 0.14f, 0f), new Vector3(1.45f * levelScale, 0.22f, 1.0f * levelScale), Mat("cardboard", new Color(0.58f, 0.40f, 0.22f)));

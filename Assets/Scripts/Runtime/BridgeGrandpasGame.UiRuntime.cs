@@ -48,11 +48,14 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
     {
         if (selectionMarker != null)
         {
-            bool hasSelection = selectedGrandpa != null || selectedBuilding != null;
+            bool selectedGrandpaVisible = selectedGrandpa != null &&
+                (!selectedGrandpa.IsOnExpedition || selectedGrandpa.ExpeditionLeaving) &&
+                selectedGrandpa.Root != null && selectedGrandpa.Root.activeSelf;
+            bool hasSelection = selectedGrandpaVisible || selectedBuilding != null;
             selectionMarker.SetActive(hasSelection);
             if (hasSelection)
             {
-                Vector3 position = selectedGrandpa != null ? selectedGrandpa.Root.transform.position : selectedBuilding.Position;
+                Vector3 position = selectedGrandpaVisible ? selectedGrandpa.Root.transform.position : selectedBuilding.Position;
                 selectionMarker.transform.position = new Vector3(position.x, 0.035f, position.z);
             }
         }
@@ -77,7 +80,12 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         for (int i = 0; i < grandpas.Count; i++)
         {
             Grandpa grandpa = grandpas[i];
-            if (grandpa.ThoughtText == null)
+            if (grandpa.IsOnExpedition && !grandpa.ExpeditionLeaving)
+            {
+                continue;
+            }
+
+            if (grandpa.ThoughtText == null || grandpa.Root == null)
             {
                 continue;
             }
@@ -195,17 +203,11 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
 
     private void RefreshTopStats()
     {
-        int cap = PopulationCap();
-        topStatsText.text =
-            "Чай " + F(stock.Tea) +
-            "   Тепло " + F(stock.Heat) +
-            "   Картон " + F(stock.Cardboard) +
-            "   Ворчание " + F(stock.Grumble) +
-            "   Монетки " + F(stock.Coins) +
-            "   Дедушки " + grandpas.Count + "/" + cap +
-            "   Проверки " + inspectionsSurvived + "/3";
-
-        alertText.text = Time.time < alertUntil ? lastAlert : "";
+        topStatsText.text = BuildTopResourceStats();
+        if (alertText != null)
+        {
+            alertText.text = Time.time < alertUntil ? lastAlert : "";
+        }
     }
 
     private void RefreshSuspicionBar()
@@ -230,11 +232,17 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
 
         if (selectedGrandpa != null)
         {
+            string expedition = selectedGrandpa.IsOnExpedition
+                ? "\n<color=#ffcf7a>В вылазке: " + ExpeditionName(selectedGrandpa.ExpeditionType) +
+                    ", ещё " + Mathf.CeilToInt(selectedGrandpa.ExpeditionUntil - Time.time) + "с</color>\n"
+                : "";
             detailText.text =
                 "<b>" + selectedGrandpa.Name + "</b>\n" +
                 RoleName(selectedGrandpa.Role) + "\n\n" +
+                expedition +
                 ProductionDescription(selectedGrandpa.Role) + "\n\n" +
                 "Состояние: " + GrandpaMood(selectedGrandpa) + "\n" +
+                "Занятие: " + IdleActionName(selectedGrandpa.IdleAction) + "\n" +
                 "Готовность к почкованию: " + Mathf.FloorToInt(selectedGrandpa.Budding) + "%\n\n" +
                 "Стоимость почкования:\n" + BuddingCost().ColoredCost(stock) + "\n\n" +
                 "Мысль: " + (Time.time < selectedGrandpa.ThoughtUntil ? selectedGrandpa.ThoughtText.text : RandomThought(selectedGrandpa));
@@ -288,6 +296,8 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
                     (pendingEvent != null
                         ? "Есть событие: " + pendingEvent.Title + ". Открой карточку и выбери реакцию коммуны."
                         : "Следующее событие примерно через " + Mathf.CeilToInt(nextEventIn) + "с.\nРадио делает город слышнее.");
+            case UiTab.Expeditions:
+                return BuildExpeditionMicroHudText();
             case UiTab.Grandpas:
                 return "<b>Дедушки</b>\n\n" +
                     "Клик по дедушке в списке выберет его на сцене и откроет персональный microHUD.\n\n" +
@@ -353,6 +363,9 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
             case UiTab.Events:
                 BuildEventsTray();
                 break;
+            case UiTab.Expeditions:
+                BuildExpeditionsTray();
+                break;
             case UiTab.Grandpas:
                 BuildGrandpasTray();
                 break;
@@ -362,149 +375,6 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         {
             Canvas.ForceUpdateCanvases();
             trayScroll.verticalNormalizedPosition = 1f;
-        }
-    }
-
-    private void BuildBuildTray()
-    {
-        trayTitleText.text = "Постройки";
-        foreach (Building building in buildings.Values)
-        {
-            if (building.Type == BuildingType.FireBarrel)
-            {
-                continue;
-            }
-
-            string label = building.Built
-                ? building.Name + "\n<color=#9cff93>Построено, уровень " + building.Level + "</color>"
-                : BuildResourceActionLabel(building.Name, building.BuildCost, "Можно построить");
-
-            RectTransform button = CreateButton(label, trayBody, delegate
-            {
-                TryBuild(building.Type, false);
-                SelectBuilding(building);
-                RefreshAllUi();
-            });
-            button.GetComponent<Button>().interactable = !building.Built && CanAfford(building.BuildCost);
-        }
-
-        if (BuiltCount() >= buildings.Count)
-        {
-            AddTrayNote("Все базовые объекты построены. Теперь цивилизация растёт через улучшения и почкование.");
-        }
-    }
-
-    private void BuildUpgradeTray()
-    {
-        trayTitleText.text = "Улучшения";
-        foreach (Building building in buildings.Values)
-        {
-            if (!building.Built)
-            {
-                continue;
-            }
-
-            ResourceStock cost = UpgradeCost(building);
-            string label = BuildResourceActionLabel(building.Name + " ур. " + building.Level + " -> " + (building.Level + 1), cost, "Можно улучшить");
-            RectTransform button = CreateButton(label, trayBody, delegate
-            {
-                TryUpgrade(building);
-                SelectBuilding(building);
-                RefreshAllUi();
-            });
-            button.GetComponent<Button>().interactable = CanAfford(cost);
-        }
-    }
-
-    private void BuildEventsTray()
-    {
-        trayTitleText.text = "События и слухи";
-        if (pendingEvent != null)
-        {
-            CreateButton("Открыть событие: " + pendingEvent.Title, trayBody, delegate
-            {
-                ShowEventModal(pendingEvent);
-            });
-            return;
-        }
-
-        bool radioBuilt = buildings[BuildingType.RadioMayak].Built;
-        AddTrayNote(radioBuilt
-            ? "Радио работает. Следующее событие примерно через " + Mathf.CeilToInt(nextEventIn) + "с."
-            : "Без радио события редкие. Построй Радио \"Маяк\", чтобы город начал звучать.");
-
-        if (radioBuilt)
-        {
-            RectTransform button = CreateButton("Покрутить ручку радио", trayBody, delegate
-            {
-                if (stock.Coins >= 1f)
-                {
-                    stock.Coins -= 1f;
-                    nextEventIn = Mathf.Min(nextEventIn, 5f);
-                    Notify("Радио щёлкнуло. Слух почти пойман.");
-                    RefreshAllUi();
-                }
-                else
-                {
-                    Notify("Нужна хотя бы 1 монетка на батарейки.");
-                }
-            });
-            button.GetComponent<Button>().interactable = stock.Coins >= 1f;
-        }
-    }
-
-    private void BuildGrandpasTray()
-    {
-        trayTitleText.text = "Дедушки";
-        for (int i = 0; i < grandpas.Count; i++)
-        {
-            Grandpa grandpa = grandpas[i];
-            string label = grandpa.Name + " | " + RoleName(grandpa.Role) + " | почкование " + Mathf.FloorToInt(grandpa.Budding) + "%";
-            CreateButton(label, trayBody, delegate
-            {
-                SelectGrandpa(grandpa);
-                RefreshAllUi();
-            });
-        }
-    }
-
-    private void AddTrayNote(string text)
-    {
-        Text note = CreateText("Tray Note", trayBody, 16, FontStyle.Normal, TextAnchor.MiddleLeft, new Color(0.86f, 0.88f, 0.88f));
-        note.text = text;
-        note.rectTransform.sizeDelta = new Vector2(0f, 44f);
-        LayoutElement layout = note.gameObject.AddComponent<LayoutElement>();
-        layout.minHeight = 44f;
-        layout.preferredHeight = 52f;
-    }
-
-    private string BuildResourceActionLabel(string title, ResourceStock cost, string availableText)
-    {
-        if (CanAfford(cost))
-        {
-            return title + "\n<color=#9cff93>" + availableText + "</color>  <color=#d7c08a>" + cost.ShortText() + "</color>";
-        }
-
-        return title + "\n<color=#ff8f7a>Не хватает: " + MissingResourceText(cost) + "</color>";
-    }
-
-    private string MissingResourceText(ResourceStock cost)
-    {
-        List<string> missing = new List<string>();
-        AddMissingResource(missing, "чай", cost.Tea, stock.Tea);
-        AddMissingResource(missing, "тепло", cost.Heat, stock.Heat);
-        AddMissingResource(missing, "картон", cost.Cardboard, stock.Cardboard);
-        AddMissingResource(missing, "ворчание", cost.Grumble, stock.Grumble);
-        AddMissingResource(missing, "монетки", cost.Coins, stock.Coins);
-        return missing.Count == 0 ? "ничего" : string.Join(", ", missing.ToArray());
-    }
-
-    private void AddMissingResource(List<string> missing, string label, float need, float have)
-    {
-        float deficit = Mathf.Ceil(need - have);
-        if (deficit > 0f)
-        {
-            missing.Add(label + " " + Mathf.CeilToInt(deficit));
         }
     }
 
