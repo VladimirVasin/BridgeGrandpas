@@ -2,7 +2,6 @@ using UnityEngine;
 
 public sealed partial class BridgeGrandpasGame : MonoBehaviour
 {
-    private const string SamovarResourcePath = "Buildable Objects/Samovar";
     private const float SamovarTableTopY = 0.27f;
     private const float SamovarTargetFootprint = 0.86f;
     private const float SamovarTargetHeight = 1.02f;
@@ -18,7 +17,7 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
     private bool TryCreateImportedSamovarVisual(Building building, Transform root, float levelScale)
     {
         GameObject asset = Resources.Load<GameObject>(SamovarResourcePath) ??
-            Resources.Load<GameObject>("Buildable Objects/samovar");
+            Resources.Load<GameObject>(SamovarLegacyResourcePath);
         if (asset == null)
         {
             return false;

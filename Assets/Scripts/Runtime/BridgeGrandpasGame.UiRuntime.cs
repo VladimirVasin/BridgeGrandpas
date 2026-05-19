@@ -11,13 +11,8 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
 {
     private void HandlePointer()
     {
-        if (notebookModeEnabled)
-        {
-            hoveredTarget = null;
-            return;
-        }
-
-        if (vhsModeEnabled)
+        RefreshInteractionMode();
+        if (interactionMode != GameInteractionMode.Normal)
         {
             hoveredTarget = null;
             return;
@@ -58,11 +53,11 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
             }
             else if (target.Kind == SelectionKind.Grandpa)
             {
-                SelectGrandpa(target.Grandpa as Grandpa);
+                SelectGrandpa(GrandpaFromTarget(target));
             }
             else if (target.Kind == SelectionKind.Building)
             {
-                SelectBuilding(target.Building as Building);
+                SelectBuilding(BuildingFromTarget(target));
             }
         }
     }
@@ -88,8 +83,8 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
             hoverMarker.SetActive(hoveredTarget != null);
             if (hoveredTarget != null)
             {
-                Grandpa hoveredGrandpa = hoveredTarget.Grandpa as Grandpa;
-                Building hoveredBuilding = hoveredTarget.Building as Building;
+                Grandpa hoveredGrandpa = GrandpaFromTarget(hoveredTarget);
+                Building hoveredBuilding = BuildingFromTarget(hoveredTarget);
                 Vector3 position = hoveredTarget.Kind == SelectionKind.Grandpa && hoveredGrandpa != null
                     ? hoveredGrandpa.Root.transform.position
                     : hoveredBuilding != null ? hoveredBuilding.Position : Vector3.zero;
@@ -113,7 +108,7 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
                 continue;
             }
 
-            bool visible = !vhsModeEnabled && Time.time < grandpa.ThoughtUntil;
+            bool visible = Time.time < grandpa.ThoughtUntil;
             grandpa.ThoughtText.gameObject.SetActive(visible);
             if (!visible)
             {
@@ -142,6 +137,7 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
     {
         RefreshTopStats();
         RefreshDetails();
+        trayDirty = true;
         RefreshTray();
         RefreshSuspicionBar();
         MarkNotebookDirty();
@@ -157,6 +153,7 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
 
         currentTab = tab;
         trayOpen = true;
+        trayDirty = true;
         microHudUntil = 0f;
         RefreshDetails();
         RefreshTray();
@@ -361,6 +358,7 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         if (!trayOpen)
         {
             ClearChildren(trayBody);
+            trayDirty = true;
             if (trayPanel != null)
             {
                 trayPanel.gameObject.SetActive(false);
@@ -372,6 +370,11 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         if (trayPanel != null)
         {
             trayPanel.gameObject.SetActive(true);
+        }
+
+        if (!trayDirty && renderedTrayTab == currentTab)
+        {
+            return;
         }
 
         ClearChildren(trayBody);
@@ -400,6 +403,9 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
             Canvas.ForceUpdateCanvases();
             trayScroll.verticalNormalizedPosition = 1f;
         }
+
+        renderedTrayTab = currentTab;
+        trayDirty = false;
     }
 
 }

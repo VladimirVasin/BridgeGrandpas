@@ -3,10 +3,13 @@ using UnityEngine;
 
 public sealed partial class BridgeGrandpasGame : MonoBehaviour
 {
+    private const int CityAmbienceSeed = 23101998;
+    private const float CityWindowUpdateInterval = 0.12f;
     private readonly List<CityWindowGlow> cityWindows = new List<CityWindowGlow>();
     private readonly List<CityTrafficGlow> cityTraffic = new List<CityTrafficGlow>();
     private readonly List<CityLampGlow> cityLamps = new List<CityLampGlow>();
     private Transform cityAmbienceRoot;
+    private float nextCityWindowUpdateAt;
 
     private sealed class CityWindowGlow
     {
@@ -47,12 +50,15 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         cityTraffic.Clear();
         cityLamps.Clear();
 
+        Random.State randomState = Random.state;
+        Random.InitState(CityAmbienceSeed);
         CreateCityGroundBands();
         CreateCitySkyline();
         CreateCityPrefabRing();
         CreateCityWindowField();
         CreateCityTraffic();
         CreateCitySmoke();
+        Random.state = randomState;
     }
 
     private void CreateCityGroundBands()
@@ -275,6 +281,12 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
 
     private void UpdateCityWindows()
     {
+        if (Time.time < nextCityWindowUpdateAt)
+        {
+            return;
+        }
+
+        nextCityWindowUpdateAt = Time.time + CityWindowUpdateInterval;
         for (int i = 0; i < cityWindows.Count; i++)
         {
             CityWindowGlow window = cityWindows[i];

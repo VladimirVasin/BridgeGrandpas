@@ -60,6 +60,7 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         }
 
         ApplyLegacyHudVisibility();
+        RefreshInteractionMode();
     }
 
     private void SetNotebookPage(NotebookPage page)

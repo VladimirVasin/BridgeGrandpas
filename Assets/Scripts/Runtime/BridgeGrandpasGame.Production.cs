@@ -50,11 +50,11 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
     private string BuildTopResourceStats()
     {
         ResourceStock income = CurrentResourceIncomePerSecond();
-        return ResourceStat("Чай", stock.Tea, income.Tea) +
-            "   " + ResourceStat("Тепло", stock.Heat, income.Heat) +
-            "   " + ResourceStat("Картон", stock.Cardboard, income.Cardboard) +
-            "   " + ResourceStat("Ворчание", stock.Grumble, income.Grumble) +
-            "   " + ResourceStat("Монетки", stock.Coins, income.Coins) +
+        return ResourceStat(TextTea, stock.Tea, income.Tea) +
+            "   " + ResourceStat(TextHeat, stock.Heat, income.Heat) +
+            "   " + ResourceStat(TextCardboard, stock.Cardboard, income.Cardboard) +
+            "   " + ResourceStat(TextGrumble, stock.Grumble, income.Grumble) +
+            "   " + ResourceStat(TextCoins, stock.Coins, income.Coins) +
             "   " + CozyStat();
     }
 
@@ -62,7 +62,7 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
     {
         float perMinute = perSecond * 60f;
         string color = Mathf.Abs(perMinute) < 0.05f ? "#6f7a86" : "#9cff93";
-        return label + " " + F(amount) + " <color=" + color + ">+" + RateF(perMinute) + "/м</color>";
+        return label + " " + F(amount) + " <color=" + color + ">+" + RateF(perMinute) + TextPerMinute + "</color>";
     }
 
     private string RateF(float perMinute)

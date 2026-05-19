@@ -89,6 +89,7 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         source.spatialBlend = 0f;
         source.volume = CameraBreathingVolume;
         source.priority = priority;
+        RouteAudioSource(source, BridgeAudioBus.Vhs);
     }
 
     private IEnumerator LoadCameraBreathingFromFile()
@@ -123,13 +124,13 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
 
     private AudioClip FindCameraBreathingResourceClip()
     {
-        AudioClip clip = Resources.Load<AudioClip>("Sfx/CameraBreathing");
+        AudioClip clip = Resources.Load<AudioClip>(CameraBreathingResourcePath);
         if (clip != null)
         {
             return clip;
         }
 
-        AudioClip[] clips = Resources.LoadAll<AudioClip>("Sfx");
+        AudioClip[] clips = Resources.LoadAll<AudioClip>(CameraBreathingFolderPath);
         for (int i = 0; i < clips.Length; i++)
         {
             if (clips[i].name.Equals("CameraBreathing", System.StringComparison.OrdinalIgnoreCase))

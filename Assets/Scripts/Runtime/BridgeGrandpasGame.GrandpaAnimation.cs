@@ -25,13 +25,12 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         if (Time.time < grandpa.BirthAnimUntil)
         {
             float t = Mathf.InverseLerp(grandpa.BirthAnimStart, grandpa.BirthAnimUntil, Time.time);
-            float bounce = Mathf.Sin(t * Mathf.PI * 3f) * (1f - t);
-            scale *= Mathf.Lerp(0.08f, 1f, SmoothOutBack(t)) + bounce * 0.18f;
+            scale = Vector3.Scale(scale, BirthDramaScale(t));
         }
         else if (Time.time < grandpa.BudBurstUntil)
         {
-            float t = 1f - Mathf.InverseLerp(grandpa.BudBurstUntil - 0.75f, grandpa.BudBurstUntil, Time.time);
-            scale = new Vector3(1f + t * 0.28f, 1f - t * 0.16f, 1f + t * 0.28f);
+            float t = Mathf.InverseLerp(grandpa.BudBurstUntil - BuddingAnimationSeconds, grandpa.BudBurstUntil, Time.time);
+            scale = Vector3.Scale(scale, BuddingParentDramaScale(t));
         }
 
         if (close)
@@ -62,6 +61,12 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         if (grandpa.UsesImportedModel && grandpa.ImportedModelRoot != null)
         {
             float lift = walking ? Mathf.Abs(stride) * 0.006f : Mathf.Sin((Time.time + grandpa.ActionSeed) * 1.8f) * 0.006f;
+            if (Time.time < grandpa.BirthAnimUntil)
+            {
+                float birthT = Mathf.InverseLerp(grandpa.BirthAnimStart, grandpa.BirthAnimUntil, Time.time);
+                lift += BirthDramaLift(birthT);
+            }
+
             grandpa.ImportedModelRoot.localPosition = grandpa.ImportedModelBasePosition + Vector3.up * lift;
             grandpa.ImportedModelRoot.localScale = grandpa.ImportedModelBaseScale;
         }
@@ -301,24 +306,101 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         burst.transform.SetParent(worldRoot, false);
         burst.transform.position = Flat(position) + Vector3.up * 0.65f;
         ParticleSystem particles = burst.AddComponent<ParticleSystem>();
+        particles.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
+
         ParticleSystem.MainModule main = particles.main;
-        main.startLifetime = 0.75f;
-        main.startSpeed = 1.9f;
-        main.startSize = 0.16f;
+        main.playOnAwake = false;
+        main.duration = BuddingAnimationSeconds;
+        main.loop = false;
+        main.startLifetime = new ParticleSystem.MinMaxCurve(1.05f, 2.35f);
+        main.startSpeed = new ParticleSystem.MinMaxCurve(0.65f, 2.65f);
+        main.startSize = new ParticleSystem.MinMaxCurve(0.10f, 0.26f);
         main.startColor = new Color(1f, 0.78f, 0.32f, 0.92f);
-        main.maxParticles = 32;
+        main.maxParticles = 96;
 
         ParticleSystem.EmissionModule emission = particles.emission;
-        emission.SetBursts(new[] { new ParticleSystem.Burst(0f, 28) });
+        emission.SetBursts(new[]
+        {
+            new ParticleSystem.Burst(0f, 18),
+            new ParticleSystem.Burst(0.70f, 24),
+            new ParticleSystem.Burst(1.65f, 30),
+            new ParticleSystem.Burst(2.45f, 18)
+        });
 
         ParticleSystem.ShapeModule shape = particles.shape;
         shape.shapeType = ParticleSystemShapeType.Sphere;
-        shape.radius = 0.28f;
+        shape.radius = 0.36f;
 
         ParticleSystemRenderer renderer = burst.GetComponent<ParticleSystemRenderer>();
         renderer.material = Mat("budding_burst", new Color(1f, 0.72f, 0.26f, 0.95f));
         particles.Play();
-        Destroy(burst, 1.4f);
+        Destroy(burst, BuddingAnimationSeconds + 1.2f);
+    }
+
+    private Vector3 BirthDramaScale(float t)
+    {
+        t = Mathf.Clamp01(t);
+        if (t < 0.18f)
+        {
+            float charge = Mathf.InverseLerp(0f, 0.18f, t);
+            float pulse = Mathf.Sin(charge * Mathf.PI * 4f) * 0.035f;
+            float xz = Mathf.Lerp(0.07f, 0.28f, Mathf.SmoothStep(0f, 1f, charge)) + pulse;
+            float y = Mathf.Lerp(0.04f, 0.18f, charge);
+            return new Vector3(xz, y, xz);
+        }
+
+        if (t < 0.68f)
+        {
+            float pop = Mathf.InverseLerp(0.18f, 0.68f, t);
+            float grow = Mathf.Lerp(0.24f, 1.08f, SmoothOutBack(pop));
+            float wobble = Mathf.Sin(pop * Mathf.PI * 5f) * (1f - pop) * 0.13f;
+            return new Vector3(grow + wobble * 0.65f, grow - wobble, grow + wobble * 0.65f);
+        }
+
+        float settle = Mathf.InverseLerp(0.68f, 1f, t);
+        float squash = Mathf.Sin(settle * Mathf.PI * 4f) * (1f - settle) * 0.055f;
+        return new Vector3(1f + squash, 1f - squash * 0.55f, 1f + squash);
+    }
+
+    private Vector3 BuddingParentDramaScale(float t)
+    {
+        t = Mathf.Clamp01(t);
+        if (t < 0.30f)
+        {
+            float charge = Mathf.InverseLerp(0f, 0.30f, t);
+            float pulse = Mathf.Sin(charge * Mathf.PI * 3f) * 0.045f;
+            return new Vector3(1.02f + charge * 0.13f + pulse, 1f - charge * 0.13f, 1.02f + charge * 0.13f + pulse);
+        }
+
+        if (t < 0.76f)
+        {
+            float burst = Mathf.InverseLerp(0.30f, 0.76f, t);
+            float pulse = Mathf.Sin(burst * Mathf.PI * 5f) * (1f - burst) * 0.10f;
+            return new Vector3(1.17f + pulse, 0.87f - pulse * 0.4f, 1.17f + pulse);
+        }
+
+        float settle = Mathf.InverseLerp(0.76f, 1f, t);
+        float wobble = Mathf.Sin(settle * Mathf.PI * 3f) * (1f - settle) * 0.06f;
+        return new Vector3(1f + wobble, 1f - wobble * 0.6f, 1f + wobble);
+    }
+
+    private float BirthDramaLift(float t)
+    {
+        t = Mathf.Clamp01(t);
+        if (t < 0.18f)
+        {
+            float charge = Mathf.InverseLerp(0f, 0.18f, t);
+            return Mathf.Sin(charge * Mathf.PI * 3f) * 0.018f;
+        }
+
+        if (t < 0.68f)
+        {
+            float pop = Mathf.InverseLerp(0.18f, 0.68f, t);
+            return Mathf.Sin(pop * Mathf.PI) * 0.22f + Mathf.Sin(pop * Mathf.PI * 6f) * (1f - pop) * 0.026f;
+        }
+
+        float settle = Mathf.InverseLerp(0.68f, 1f, t);
+        return Mathf.Sin(settle * Mathf.PI * 2f) * (1f - settle) * 0.018f;
     }
 
     private float SmoothOutBack(float t)

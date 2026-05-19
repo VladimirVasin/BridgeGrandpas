@@ -22,6 +22,10 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
     private const float CameraMaxPanX = 7.2f;
     private const float CameraMinPanY = -0.55f;
     private const float CameraMaxPanY = 1.15f;
+    private const float CameraVhsMinPanY = -0.40f;
+    private const float CameraVhsMaxPanY = 4.65f;
+    private const float CameraVhsVerticalPanScale = 0.92f;
+    private const float CameraVhsDragVerticalPanScale = 0.58f;
     private const float CameraCloseZoomPanBonus = 1.55f;
     private const float CameraVerticalPanScale = 0.28f;
 
@@ -63,13 +67,22 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
             return;
         }
 
+        RefreshInteractionMode();
+        if (interactionMode == GameInteractionMode.Dialog || interactionMode == GameInteractionMode.Notebook)
+        {
+            cameraDragActive = false;
+            cameraPanVelocity = Vector2.zero;
+            ApplyCameraPose(false);
+            return;
+        }
+
         Vector2 input = ReadCameraKeyboardInput();
         if (input.sqrMagnitude > 1f)
         {
             input.Normalize();
         }
 
-        input.y *= CameraVerticalPanScale;
+        input.y *= vhsModeEnabled ? CameraVhsVerticalPanScale : CameraVerticalPanScale;
         float zoomFactor = Mathf.Lerp(0.85f, 1.25f, Mathf.InverseLerp(CameraMinZoom, CameraMaxZoom, cameraZoomTarget));
         cameraPanVelocity = Vector2.Lerp(cameraPanVelocity, input * CameraKeyboardPanSpeed * zoomFactor, deltaTime * 10f);
         cameraPanOffset += cameraPanVelocity * deltaTime;
@@ -155,7 +168,8 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         if (cameraDragActive)
         {
             Vector2 delta = pointer - cameraDragPointer;
-            cameraPanOffset -= new Vector2(delta.x, delta.y * CameraVerticalPanScale) * CameraDragPanSpeed * (cameraZoomTarget / CameraDefaultZoom);
+            float dragVerticalScale = vhsModeEnabled ? CameraVhsDragVerticalPanScale : CameraVerticalPanScale;
+            cameraPanOffset -= new Vector2(delta.x, delta.y * dragVerticalScale) * CameraDragPanSpeed * (cameraZoomTarget / CameraDefaultZoom);
             cameraDragPointer = pointer;
         }
     }
@@ -369,15 +383,18 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
     {
         float closeZoom = 1f - Mathf.InverseLerp(CameraMinZoom, CameraMaxZoom, cameraZoomTarget);
         float bonus = closeZoom * CameraCloseZoomPanBonus;
+        float minY = vhsModeEnabled ? CameraVhsMinPanY : CameraMinPanY;
+        float maxY = vhsModeEnabled ? CameraVhsMaxPanY : CameraMaxPanY;
         cameraPanOffset.x = Mathf.Clamp(cameraPanOffset.x, CameraMinPanX - bonus, CameraMaxPanX + bonus);
-        cameraPanOffset.y = Mathf.Clamp(cameraPanOffset.y, CameraMinPanY - bonus * 0.65f, CameraMaxPanY + bonus);
+        cameraPanOffset.y = Mathf.Clamp(cameraPanOffset.y, minY - bonus * 0.65f, maxY + bonus);
     }
 
     private void ApplyCameraPose(bool instant)
     {
+        Vector3 verticalPanAxis = vhsModeEnabled ? Vector3.up : cameraGroundForward;
         Vector3 targetPosition = cameraHomePosition +
             cameraGroundRight * cameraPanOffset.x +
-            cameraGroundForward * cameraPanOffset.y;
+            verticalPanAxis * cameraPanOffset.y;
 
         float positionLerp = instant ? 1f : 1f - Mathf.Exp(-Time.deltaTime * 12f);
         float zoomSpeed = vhsModeEnabled ? 5.2f : 12f;

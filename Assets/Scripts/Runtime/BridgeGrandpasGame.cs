@@ -80,6 +80,8 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
     private GameObject hoverMarker;
     private BridgeGrandpasSelectionTarget hoveredTarget;
     private bool trayOpen;
+    private bool trayDirty = true;
+    private UiTab renderedTrayTab;
     private Vector2 detailPanelShownOffsetMin;
     private Vector2 detailPanelShownOffsetMax;
     private Vector2 detailPanelHiddenOffsetMin;
@@ -124,6 +126,7 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
 
     private void Start()
     {
+        SetupAudioRouting();
         SetupScene();
         SetupCameraControls();
         SetupStartMenu();
@@ -147,11 +150,16 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         SetupUi();
         SetupBackgroundMusic();
         SetupAmbience();
-        BuildInitialState();
+        if (!TryLoadGame())
+        {
+            BuildInitialState();
+        }
+
         BeginStartIrisFade();
         SelectOverview();
         RefreshAllUi();
         gameStarted = true;
+        nextAutoSaveAt = Time.time + AutoSaveInterval;
     }
 
     private void Update()
@@ -187,6 +195,7 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         UpdateAmbience(deltaTime);
         UpdateCityAmbience(deltaTime);
         UpdateAmbientUi();
+        UpdateAutoSave();
     }
 
 }

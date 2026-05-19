@@ -173,6 +173,7 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         }
     }
 
+    [Serializable]
     private struct ResourceStock
     {
         public float Tea;
@@ -263,7 +264,7 @@ public enum SelectionKind
 public sealed class BridgeGrandpasSelectionTarget : MonoBehaviour
 {
     public SelectionKind Kind;
-    public object Grandpa;
-    public object Building;
+    public int GrandpaId = -1;
+    public int BuildingTypeValue = -1;
 }
 

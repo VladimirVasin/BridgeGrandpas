@@ -3,8 +3,10 @@ using UnityEngine;
 public sealed partial class BridgeGrandpasGame : MonoBehaviour
 {
     private const float AutoBuddingCheckInterval = 1.25f;
-    private const float AutoBuddingSuccessDelay = 2.2f;
+    private const float AutoBuddingSuccessDelay = 3.25f;
     private const float AutoBuddingThoughtInterval = 9f;
+    private const float BuddingAnimationSeconds = 3f;
+    private const float BuddingSettleSeconds = 0.35f;
 
     private float nextAutoBuddingAt;
     private float nextAutoBuddingThoughtAt;
@@ -111,9 +113,9 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         Grandpa child = SpawnGrandpa(role, Jitter(candidate.Root.transform.position, 0.75f));
         child.Budding = UnityEngine.Random.Range(0f, 18f);
         child.BirthAnimStart = Time.time;
-        child.BirthAnimUntil = Time.time + 1.35f;
-        child.BudBurstUntil = Time.time + 0.9f;
-        candidate.BudBurstUntil = Time.time + 0.75f;
+        child.BirthAnimUntil = Time.time + BuddingAnimationSeconds;
+        child.BudBurstUntil = Time.time + BuddingAnimationSeconds + BuddingSettleSeconds;
+        candidate.BudBurstUntil = Time.time + BuddingAnimationSeconds;
         CreateBuddingBurst(candidate.Root.transform.position);
         suspicion += 7f;
         ShowThought(candidate, automatic ? "Сам почкуюсь!" : "Почкуется!", 3f);

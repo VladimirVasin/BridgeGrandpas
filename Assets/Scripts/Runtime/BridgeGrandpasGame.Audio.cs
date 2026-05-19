@@ -41,6 +41,7 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         menuMusicSource.spatialBlend = 0f;
         menuMusicSource.volume = 0.34f;
         menuMusicSource.priority = 150;
+        RouteAudioSource(menuMusicSource, BridgeAudioBus.Music);
         menuMusicSource.Play();
         Debug.Log("[BridgeGrandpas] Menu music started: " + clip.name);
     }
@@ -77,6 +78,7 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         musicSource.volume = 0.16f;
         musicSource.pitch = 1f;
         musicSource.priority = 160;
+        RouteAudioSource(musicSource, BridgeAudioBus.Music);
 
         AudioReverbFilter reverb = audioObject.AddComponent<AudioReverbFilter>();
         reverb.reverbPreset = AudioReverbPreset.User;
@@ -151,7 +153,7 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
 
     private AudioClip[] FindIngameMusicClips()
     {
-        AudioClip[] clips = Resources.LoadAll<AudioClip>("Music");
+        AudioClip[] clips = Resources.LoadAll<AudioClip>(MusicResourcesPath);
         if (clips == null || clips.Length == 0)
         {
             return Array.Empty<AudioClip>();
@@ -183,7 +185,7 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
 
     private AudioClip FindMusicClip(bool menu)
     {
-        AudioClip[] clips = Resources.LoadAll<AudioClip>("Music");
+        AudioClip[] clips = Resources.LoadAll<AudioClip>(MusicResourcesPath);
         if (clips == null || clips.Length == 0)
         {
             return null;
@@ -228,10 +230,10 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
 
     private void SetupFootstepClips()
     {
-        footstepClips = Resources.LoadAll<AudioClip>("Footsteps - Essentials/Footsteps_Grass/Footsteps_Grass_Walk");
+        footstepClips = Resources.LoadAll<AudioClip>(FootstepsWalkResourcesPath);
         if (footstepClips == null || footstepClips.Length == 0)
         {
-            footstepClips = Resources.LoadAll<AudioClip>("Footsteps - Essentials");
+            footstepClips = Resources.LoadAll<AudioClip>(FootstepsRootResourcesPath);
         }
 
         if (footstepClips == null || footstepClips.Length == 0)
@@ -268,6 +270,7 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         source.priority = 96;
         source.dopplerLevel = 0f;
         source.reverbZoneMix = 0.42f;
+        RouteAudioSource(source, BridgeAudioBus.Footsteps);
         AddFootstepEffects(audioObject);
         grandpa.FootstepSource = source;
     }

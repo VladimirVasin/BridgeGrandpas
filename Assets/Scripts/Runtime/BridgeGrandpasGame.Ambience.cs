@@ -49,8 +49,8 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         AudioClip[] clips = LoadAmbienceClips();
         if (clips.Length == 0)
         {
-            Debug.LogWarning("[BridgeGrandpas] No ambience clips found.");
-            return;
+            clips = CreateProceduralAmbienceFallbackClips();
+            Debug.LogWarning("[BridgeGrandpas] No ambience clips found. Using procedural ambience fallback.");
         }
 
         ambienceRoot = new GameObject("Under Bridge Ambience");
@@ -193,6 +193,7 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         source.pitch = 1f;
         source.priority = priority;
         source.dopplerLevel = 0f;
+        RouteAudioSource(source, BridgeAudioBus.Ambience);
         AddAmbienceEffects(sourceObject);
         return source;
     }

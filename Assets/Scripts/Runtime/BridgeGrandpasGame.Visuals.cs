@@ -55,7 +55,7 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
 
         BridgeGrandpasSelectionTarget target = root.AddComponent<BridgeGrandpasSelectionTarget>();
         target.Kind = SelectionKind.Grandpa;
-        target.Grandpa = grandpa;
+        target.GrandpaId = grandpa.Id;
 
         BoxCollider collider = root.AddComponent<BoxCollider>();
         collider.center = new Vector3(0f, 0.65f, 0f);
@@ -114,7 +114,7 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
 
         BridgeGrandpasSelectionTarget target = root.AddComponent<BridgeGrandpasSelectionTarget>();
         target.Kind = SelectionKind.Building;
-        target.Building = building;
+        target.BuildingTypeValue = (int)building.Type;
 
         BoxCollider collider = root.AddComponent<BoxCollider>();
         collider.center = new Vector3(0f, 0.45f, 0f);

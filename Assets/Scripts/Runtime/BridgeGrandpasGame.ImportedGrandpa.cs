@@ -48,29 +48,6 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         return true;
     }
 
-    private string ImportedGrandpaResourcePath(GrandpaRole role)
-    {
-        switch (role)
-        {
-            case GrandpaRole.Common:
-                return "Grandpas/Common";
-            case GrandpaRole.SamovarKeeper:
-                return "Grandpas/Teapot";
-            case GrandpaRole.Cardboarder:
-                return "Grandpas/Cardboard";
-            case GrandpaRole.Mutterer:
-                return "Grandpas/Grumpy";
-            case GrandpaRole.Guard:
-                return "Grandpas/Guard";
-            case GrandpaRole.Philosopher:
-                return "Grandpas/Philosopher";
-            case GrandpaRole.RadioReceiver:
-                return "Grandpas/Radio";
-            default:
-                return null;
-        }
-    }
-
     private void DisableImportedRuntimeComponents(GameObject model)
     {
         Collider[] colliders = model.GetComponentsInChildren<Collider>(true);
