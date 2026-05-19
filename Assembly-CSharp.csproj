@@ -99,6 +99,7 @@
     <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.NotebookPages.cs" />
     <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.Materials.cs" />
     <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.ImportedGrandpa.cs" />
+    <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.CitySkyline.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">

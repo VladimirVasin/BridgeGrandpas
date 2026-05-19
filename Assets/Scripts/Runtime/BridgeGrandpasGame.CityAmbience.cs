@@ -48,6 +48,7 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         cityLamps.Clear();
 
         CreateCityGroundBands();
+        CreateCitySkyline();
         CreateCityPrefabRing();
         CreateCityWindowField();
         CreateCityTraffic();
