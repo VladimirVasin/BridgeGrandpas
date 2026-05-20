@@ -5,8 +5,8 @@ using UnityEngine.UI;
 public sealed partial class BridgeGrandpasGame : MonoBehaviour
 {
     private const int MaxNotebookObservations = 48;
-    private const int CurrentObservationDay = 2;
-    private const int ArchiveObservationDay = 1;
+    private const int CurrentObservationDay = 4;
+    private const int FirstArchiveObservationDay = 1;
     private const float ObservationWritingSpeed = 15f;
     private const float ObservationWritingPause = 0.55f;
     private readonly List<NotebookObservation> notebookObservations = new List<NotebookObservation>();
@@ -34,7 +34,8 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         notebookObservations.Clear();
         ResetObservationLeads();
         ClearObservationCards();
-        EnsureDayOneArchiveObservation();
+        observationSpreadStartDay = 0;
+        EnsureArchiveObservations();
     }
 
     private void AddNotebookObservation(string text)
@@ -52,13 +53,21 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
     {
         for (int i = notebookObservations.Count - 1; i >= 0; i--)
         {
+            if (notebookObservations[i].Day == CurrentObservationDay && notebookObservations[i].HasClock)
+            {
+                return notebookObservations[i].Text;
+            }
+        }
+
+        for (int i = notebookObservations.Count - 1; i >= 0; i--)
+        {
             if (notebookObservations[i].Day == CurrentObservationDay)
             {
                 return notebookObservations[i].Text;
             }
         }
 
-        return Time.time < alertUntil ? lastAlert : "День 2 пока пуст: карточки наблюдений ещё ждут вклейки.";
+        return Time.time < alertUntil ? lastAlert : "День 4 пока пуст: карточки наблюдений ещё ждут вклейки.";
     }
 
     private bool NotebookObservationAlreadyWritten(string text)
@@ -84,14 +93,20 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
 
     private void BuildNotebookObservationsSpread()
     {
-        EnsureDayOneArchiveObservation();
+        EnsureArchiveObservations();
+        EnsureObservationSpreadStartDay();
         float writingDelay = 0f;
-        int previousDay = Mathf.Max(ArchiveObservationDay, CurrentObservationDay - 1);
+        int leftDay = observationSpreadStartDay;
+        int rightDay = observationSpreadStartDay + 1;
+        int lastDay = LastNotebookObservationDay();
 
-        notebookTitleText.text = "День " + previousDay;
-        BuildNotebookObservationDay(notebookLeftPageContent, previousDay, false, ref writingDelay);
-        AddNotebookText("<b>День " + CurrentObservationDay + "</b>", 18, FontStyle.Bold, 34f);
-        BuildNotebookObservationDay(notebookPageContent, CurrentObservationDay, true, ref writingDelay);
+        notebookTitleText.text = "День " + leftDay;
+        BuildNotebookObservationDay(notebookLeftPageContent, leftDay, leftDay == CurrentObservationDay, ref writingDelay);
+        if (rightDay <= lastDay)
+        {
+            AddNotebookText("<b>День " + rightDay + "</b>", 18, FontStyle.Bold, 34f);
+            BuildNotebookObservationDay(notebookPageContent, rightDay, rightDay == CurrentObservationDay, ref writingDelay);
+        }
     }
 
     private void BuildNotebookObservationDay(Transform parent, int day, bool animateNew, ref float writingDelay)
@@ -104,30 +119,49 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
             return;
         }
 
+        for (int i = 0; i < notebookObservations.Count; i++)
+        {
+            NotebookObservation note = notebookObservations[i];
+            if (note.Day == day && !note.HasClock)
+            {
+                AddNotebookObservationText(parent, note, i, false, ref writingDelay);
+            }
+        }
+
         for (int i = notebookObservations.Count - 1; i >= 0; i--)
         {
             NotebookObservation note = notebookObservations[i];
-            if (note.Day != day)
+            if (note.Day != day || !note.HasClock)
             {
                 continue;
             }
 
-            string line = note.HasClock ? ObservationTime(note.Time) + " — " + note.Text : note.Text;
-            Text noteText = AddNotebookTextTo(parent, line, 15, FontStyle.Normal, note.HasClock ? 52f : 320f);
-            if (note.Written || !animateNew)
-            {
-                continue;
-            }
-
-            BridgeGrandpasNotebookWritingText writing = noteText.gameObject.AddComponent<BridgeGrandpasNotebookWritingText>();
-            int observationIndex = i;
-            string observedText = note.Text;
-            writing.Play(noteText, line, writingDelay, ObservationWritingSpeed, delegate
-            {
-                MarkNotebookObservationWritten(observationIndex, observedText);
-            });
-            writingDelay += Mathf.Max(1.4f, line.Length / ObservationWritingSpeed) + ObservationWritingPause;
+            AddNotebookObservationText(parent, note, i, animateNew, ref writingDelay);
         }
+    }
+
+    private void AddNotebookObservationText(Transform parent, NotebookObservation note, int index, bool animateNew, ref float writingDelay)
+    {
+        if (!note.HasClock && note.Day == 3 && note.Text == DayThreeArchiveObservationText())
+        {
+            AddDayThreeArchiveObservationWithLinks(parent);
+            return;
+        }
+
+        string line = note.HasClock ? ObservationTime(note.Time) + " — " + note.Text : note.Text;
+        Text noteText = AddNotebookTextTo(parent, line, 15, FontStyle.Normal, note.HasClock ? 52f : 320f);
+        if (note.Written || !animateNew)
+        {
+            return;
+        }
+
+        BridgeGrandpasNotebookWritingText writing = noteText.gameObject.AddComponent<BridgeGrandpasNotebookWritingText>();
+        string observedText = note.Text;
+        writing.Play(noteText, line, writingDelay, ObservationWritingSpeed, delegate
+        {
+            MarkNotebookObservationWritten(index, observedText);
+        });
+        writingDelay += Mathf.Max(1.4f, line.Length / ObservationWritingSpeed) + ObservationWritingPause;
     }
 
     private int NotebookObservationCountForDay(int day)
@@ -144,15 +178,27 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         return count;
     }
 
-    private void EnsureDayOneArchiveObservation()
+    private void EnsureArchiveObservations()
     {
-        string text = DayOneArchiveObservationText();
+        EnsureArchiveObservation(1, DayOneArchiveObservationText());
+        EnsureArchiveObservation(2, DayTwoArchiveObservationText());
+        EnsureArchiveObservation(3, DayThreeArchiveObservationText());
+    }
+
+    private void EnsureArchiveObservation(int day, string text)
+    {
         if (NotebookObservationAlreadyWritten(text))
         {
             return;
         }
 
-        notebookObservations.Insert(0, new NotebookObservation(ArchiveObservationDay, 0f, text, true, false));
+        int insertIndex = 0;
+        while (insertIndex < notebookObservations.Count && notebookObservations[insertIndex].Day <= day)
+        {
+            insertIndex++;
+        }
+
+        notebookObservations.Insert(insertIndex, new NotebookObservation(day, 0f, text, true, false));
     }
 
     private string DayOneArchiveObservationText()
@@ -166,6 +212,27 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
             "Отныне, что бы ни случилось, я должен наблюдать, чтобы раскрыть их тайну.";
     }
 
+    private string DayTwoArchiveObservationText()
+    {
+        return "На следующий день я продолжил наблюдение. Нет, я не обезумел: под мостом всё ещё находились два одинаковых дедушки, а воздух вокруг был пропитан смутной, нарастающей тревогой.\n\n" +
+            "Я взял старую видеокамеру и блокнот, чтобы зафиксировать происходящее.\n\n" +
+            "Дедушки неторопливо обустраивали свой быт под мостом. Они перетаскивали доски, грели чай и обменивались короткими, недовольными фразами.\n\n" +
+            "Казалось, они не просто живут там.\n" +
+            "Казалось, они что-то готовят.\n\n" +
+            "А над всем этим возвышался город — спокойный, сонный и совершенно не подозревающий о том, что происходит у него под брюхом.";
+    }
+
+    private string DayThreeArchiveObservationText()
+    {
+        return "Чем дольше я за ними наблюдаю, тем больше деталей начинаю подмечать.\n\n" +
+            "Теперь я отчётливо вижу: они копят ресурсы и продолжают обустраивать свой лагерь. Доски, тряпьё, жестяные кружки, чай — всё у них, кажется, имеет назначение. Думаю, мне удастся это подсчитать.\n\n" +
+            "Ветер доносит до меня обрывки их разговоров. Я уже могу различить отдельные имена, характерное ворчание и... кажется, степень готовности к дальнейшему почкованию. Какая мерзость.\n\n" +
+            "Кроме того, судя по всему, они готовятся к вылазкам в город.\n\n" +
+            "Я обязан всё просчитать и задокументировать самым подробным образом.\n" +
+            "Всё яснее становится: под мостом зарождается не просто лагерь.\n\n" +
+            "Они строят своё подпольное государство.";
+    }
+
     private void TrimNotebookObservations()
     {
         while (notebookObservations.Count > MaxNotebookObservations)
@@ -173,7 +240,7 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
             int removeIndex = -1;
             for (int i = 0; i < notebookObservations.Count; i++)
             {
-                if (notebookObservations[i].Day != ArchiveObservationDay)
+                if (!IsPinnedArchiveObservation(notebookObservations[i]))
                 {
                     removeIndex = i;
                     break;
@@ -187,6 +254,11 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
 
             notebookObservations.RemoveAt(removeIndex);
         }
+    }
+
+    private bool IsPinnedArchiveObservation(NotebookObservation note)
+    {
+        return note.Day >= FirstArchiveObservationDay && note.Day <= CurrentObservationDay && !note.HasClock;
     }
 
     private void MarkNotebookObservationWritten(int index, string text)

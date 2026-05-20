@@ -5,18 +5,6 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
 {
     private void BuildNotebookSummaryRightPage()
     {
-        AddNotebookText("<b>Признаки устойчивой коммуны</b>\n" +
-            "20 дедушек замечены одновременно\n5 объектов прижились под мостом\n3 городские проверки пережиты\n1 редкая мутация записана\n\n" +
-            "<b>Служебная пометка</b>\n" +
-            "N закрывает блокнот\nF включает VHS-наблюдение\nКлик вне страниц прерывает записи", 16, FontStyle.Normal, 210f);
-
-        CreateNotebookButton("Перечитать журнал наблюдений", notebookPageContent, delegate { SetNotebookPage(NotebookPage.Observations); });
-        CreateNotebookButton("Проверить следы строительства", notebookPageContent, delegate { SetNotebookPage(NotebookPage.Build); });
-        CreateNotebookButton("Сверить замеченных дедушек", notebookPageContent, delegate { SetNotebookPage(NotebookPage.Grandpas); });
-        CreateNotebookButton("Открыть записи о вылазках", notebookPageContent, delegate { SetNotebookPage(NotebookPage.Expeditions); });
-        CreateNotebookButton("Сохранить текущие записи", notebookPageContent, SaveGameFromMenu);
-        RectTransform load = CreateNotebookButton("Загрузить старые записи", notebookPageContent, LoadGameFromMenu);
-        load.GetComponent<Button>().interactable = HasSavedGame();
     }
 
     private void BuildNotebookBuildPage()

@@ -7,8 +7,8 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
 {
     private enum NotebookPage
     {
-        Summary,
         Observations,
+        Summary,
         Build,
         Grandpas,
         Events,
@@ -19,7 +19,9 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
     private float notebookOpenAmount;
     private float notebookTargetOpen;
     private float notebookPageFlip;
-    private NotebookPage currentNotebookPage = NotebookPage.Summary;
+    private int notebookPageFlipDirection = 1;
+    private int observationSpreadStartDay;
+    private NotebookPage currentNotebookPage = NotebookPage.Observations;
 
     private void UpdateNotebookMode(float deltaTime)
     {
@@ -69,9 +71,15 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         if (pageChanged && notebookModeEnabled)
         {
             notebookPageFlip = 1f;
+            notebookPageFlipDirection = 1;
         }
 
         currentNotebookPage = page;
+        if (pageChanged && page == NotebookPage.Observations)
+        {
+            ResetObservationSpreadToLatest();
+        }
+
         if (notebookModeEnabled && pageChanged)
         {
             RefreshNotebookUi();
@@ -79,6 +87,14 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         }
 
         MarkNotebookDirty();
+    }
+
+    private bool IsNotebookTabAvailableByDefault(NotebookPage page)
+    {
+        return page == NotebookPage.Observations ||
+            page == NotebookPage.Summary ||
+            page == NotebookPage.Build ||
+            page == NotebookPage.Grandpas;
     }
 
     private void MarkNotebookDirty()

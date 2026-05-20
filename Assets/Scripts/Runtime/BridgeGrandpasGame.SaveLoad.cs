@@ -235,7 +235,7 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         ResetObservationLeads();
         if (observations == null)
         {
-            EnsureDayOneArchiveObservation();
+            EnsureArchiveObservations();
             return;
         }
 
@@ -253,7 +253,7 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
             notebookObservations.Add(note);
         }
 
-        EnsureDayOneArchiveObservation();
+        EnsureArchiveObservations();
         TrimNotebookObservations();
     }
 

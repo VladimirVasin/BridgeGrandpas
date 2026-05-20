@@ -3,6 +3,9 @@ using UnityEngine.UI;
 
 public sealed partial class BridgeGrandpasGame : MonoBehaviour
 {
+    private const int NotebookBodyFontBoost = 2;
+    private const float NotebookBodyHeightScale = 1.12f;
+
     private void ApplyNotebookUiPose()
     {
         if (notebookRoot == null)
@@ -75,7 +78,14 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         else
         {
             notebookTitleText.text = NotebookPageTitle(currentNotebookPage);
-            AddNotebookTextTo(notebookLeftPageContent, NotebookPageBody(currentNotebookPage), 17, FontStyle.Normal, 340f);
+            if (currentNotebookPage == NotebookPage.Summary)
+            {
+                BuildNotebookSummaryLeftPage();
+            }
+            else
+            {
+                AddNotebookTextTo(notebookLeftPageContent, NotebookPageBody(currentNotebookPage), 17, FontStyle.Normal, 340f);
+            }
 
             switch (currentNotebookPage)
             {
@@ -96,6 +106,8 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
                     break;
             }
         }
+
+        RefreshObservationPageCorners();
 
         if (notebookScroll != null)
         {
@@ -139,7 +151,7 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
     {
         if (page == NotebookPage.Summary)
         {
-            return BuildNotebookSummary();
+            return "";
         }
 
         if (page == NotebookPage.Observations)
@@ -177,18 +189,161 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
             "  ворч. " + F(stock.Grumble) + "  мон. " + F(stock.Coins);
     }
 
-    private string BuildNotebookSummary()
+    private void BuildNotebookSummaryLeftPage()
     {
-        string victory = victoryShown
-            ? "<b>Под мостом образовалась устойчивая дедовская цивилизация.</b>\nEndless-режим продолжается.\n\n"
-            : "";
-        return victory + BuildTopResourceStats() + "\n\n" +
-            "Дедушки: " + grandpas.Count + "/" + PopulationCap() +
-            "    проверки: " + inspectionsSurvived + "/" + VictoryInspections +
-            "    " + CozyStat() + "\n" +
-            "Постройки: " + BuiltCount() + "/" + buildings.Count +
-            "    подозрение города: " + Mathf.RoundToInt(suspicion) + "%\n\n" +
-            "Последняя запись: " + LatestNotebookObservation();
+        if (victoryShown)
+        {
+            AddNotebookTextTo(notebookLeftPageContent,
+                "<b>Под мостом образовалась устойчивая дедовская цивилизация.</b>\nEndless-режим продолжается.",
+                15, FontStyle.Normal, 48f);
+        }
+
+        AddNotebookSummarySectionTitle("Запасы под мостом");
+        AddNotebookSummaryResourceGrid();
+        AddNotebookSummarySectionTitle("Состояние коммуны");
+        AddNotebookSummaryStateGrid();
+        AddNotebookSummaryServiceNote();
+    }
+
+    private void AddNotebookSummarySectionTitle(string title)
+    {
+        Text text = AddNotebookTextTo(notebookLeftPageContent, "<b>" + title + "</b>", 16, FontStyle.Bold, 22f);
+        text.color = new Color(0.18f, 0.095f, 0.04f);
+    }
+
+    private void AddNotebookSummaryResourceGrid()
+    {
+        ResourceStock income = CurrentResourceIncomePerSecond();
+        RectTransform grid = CreateNotebookSummaryBlock("Summary Resource Grid", 112f);
+        VerticalLayoutGroup vertical = grid.gameObject.AddComponent<VerticalLayoutGroup>();
+        vertical.spacing = 5f;
+        vertical.childControlWidth = true;
+        vertical.childControlHeight = true;
+        vertical.childForceExpandWidth = true;
+        vertical.childForceExpandHeight = false;
+
+        RectTransform rowA = CreateNotebookSummaryRow(grid);
+        AddNotebookSummaryResourceCell(rowA, TextTea, stock.Tea, income.Tea);
+        AddNotebookSummaryResourceCell(rowA, TextHeat, stock.Heat, income.Heat);
+
+        RectTransform rowB = CreateNotebookSummaryRow(grid);
+        AddNotebookSummaryResourceCell(rowB, TextCardboard, stock.Cardboard, income.Cardboard);
+        AddNotebookSummaryResourceCell(rowB, TextGrumble, stock.Grumble, income.Grumble);
+
+        RectTransform rowC = CreateNotebookSummaryRow(grid);
+        AddNotebookSummaryResourceCell(rowC, TextCoins, stock.Coins, income.Coins);
+        AddNotebookSummaryStateCell(rowC, "Уют", CozyStat().Replace("Уют ", ""));
+    }
+
+    private void AddNotebookSummaryStateGrid()
+    {
+        RectTransform grid = CreateNotebookSummaryBlock("Summary State Grid", 76f);
+        VerticalLayoutGroup vertical = grid.gameObject.AddComponent<VerticalLayoutGroup>();
+        vertical.spacing = 5f;
+        vertical.childControlWidth = true;
+        vertical.childControlHeight = true;
+        vertical.childForceExpandWidth = true;
+        vertical.childForceExpandHeight = false;
+
+        RectTransform rowA = CreateNotebookSummaryRow(grid);
+        AddNotebookSummaryStateCell(rowA, "Дедушки", grandpas.Count + "/" + PopulationCap());
+        AddNotebookSummaryStateCell(rowA, "Проверки", inspectionsSurvived + "/" + VictoryInspections);
+
+        RectTransform rowB = CreateNotebookSummaryRow(grid);
+        AddNotebookSummaryStateCell(rowB, "Постройки", BuiltCount() + "/" + buildings.Count);
+        AddNotebookSummaryStateCell(rowB, "Подозрение", Mathf.RoundToInt(suspicion) + "%");
+    }
+
+    private void AddNotebookSummaryServiceNote()
+    {
+        RectTransform block = CreateNotebookSummaryBlock("Summary Service Note", 104f);
+        Text text = CreateText("Summary Service Note Text", block, 16, FontStyle.Normal, TextAnchor.UpperLeft, new Color(0.13f, 0.075f, 0.04f));
+        text.supportRichText = true;
+        text.text = "<b>Служебная пометка</b>\n" +
+            "N закрывает блокнот\n" +
+            "F включает VHS-наблюдение\n" +
+            "Клик вне страниц прерывает записи";
+        text.rectTransform.anchorMin = Vector2.zero;
+        text.rectTransform.anchorMax = Vector2.one;
+        text.rectTransform.offsetMin = new Vector2(10f, 5f);
+        text.rectTransform.offsetMax = new Vector2(-10f, -5f);
+        text.raycastTarget = false;
+    }
+
+    private RectTransform CreateNotebookSummaryBlock(string name, float height)
+    {
+        RectTransform block = CreatePanel(name, notebookLeftPageContent, new Color(0.54f, 0.38f, 0.18f, 0.12f));
+        block.GetComponent<Image>().raycastTarget = false;
+        LayoutElement layout = block.gameObject.AddComponent<LayoutElement>();
+        layout.minHeight = height;
+        layout.preferredHeight = height;
+        layout.flexibleWidth = 1f;
+        return block;
+    }
+
+    private RectTransform CreateNotebookSummaryRow(Transform parent)
+    {
+        RectTransform row = CreatePanel("Summary Row", parent, new Color(0f, 0f, 0f, 0f));
+        row.GetComponent<Image>().raycastTarget = false;
+        LayoutElement layout = row.gameObject.AddComponent<LayoutElement>();
+        layout.minHeight = 32f;
+        layout.preferredHeight = 32f;
+        layout.flexibleWidth = 1f;
+
+        HorizontalLayoutGroup horizontal = row.gameObject.AddComponent<HorizontalLayoutGroup>();
+        horizontal.spacing = 6f;
+        horizontal.childControlWidth = true;
+        horizontal.childControlHeight = true;
+        horizontal.childForceExpandWidth = true;
+        horizontal.childForceExpandHeight = true;
+        return row;
+    }
+
+    private void AddNotebookSummaryResourceCell(Transform parent, string label, float amount, float perSecond)
+    {
+        float perMinute = perSecond * 60f;
+        string color = Mathf.Abs(perMinute) < 0.05f ? "#6f7a86" : "#226b23";
+        AddNotebookSummaryCell(parent, label, F(amount), "<color=" + color + ">+" + RateF(perMinute) + TextPerMinute + "</color>");
+    }
+
+    private void AddNotebookSummaryStateCell(Transform parent, string label, string value)
+    {
+        AddNotebookSummaryCell(parent, label, value, "");
+    }
+
+    private void AddNotebookSummaryCell(Transform parent, string label, string value, string suffix)
+    {
+        RectTransform cell = CreatePanel("Summary Cell - " + label, parent, new Color(0.78f, 0.65f, 0.43f, 0.18f));
+        cell.GetComponent<Image>().raycastTarget = false;
+        LayoutElement layout = cell.gameObject.AddComponent<LayoutElement>();
+        layout.minHeight = 32f;
+        layout.preferredHeight = 32f;
+        layout.flexibleWidth = 1f;
+
+        Text text = CreateText("Summary Cell Text", cell, 15, FontStyle.Bold, TextAnchor.MiddleLeft, new Color(0.13f, 0.075f, 0.04f));
+        text.supportRichText = true;
+        text.text = label + " <b>" + value + "</b>" + (string.IsNullOrEmpty(suffix) ? "" : "  " + suffix);
+        text.rectTransform.anchorMin = Vector2.zero;
+        text.rectTransform.anchorMax = Vector2.one;
+        text.rectTransform.offsetMin = new Vector2(8f, 1f);
+        text.rectTransform.offsetMax = new Vector2(-8f, -1f);
+        text.raycastTarget = false;
+    }
+
+    private string NotebookSummaryPreview(string text, int maxLength)
+    {
+        string plain = PlainNotebookText(text).Replace("\n", " ");
+        while (plain.Contains("  "))
+        {
+            plain = plain.Replace("  ", " ");
+        }
+
+        if (plain.Length <= maxLength)
+        {
+            return plain;
+        }
+
+        return plain.Substring(0, maxLength - 3).TrimEnd() + "...";
     }
 
     private Text AddNotebookText(string text, int size, FontStyle style, float minHeight)
@@ -198,13 +353,14 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
 
     private Text AddNotebookTextTo(Transform parent, string text, int size, FontStyle style, float minHeight)
     {
-        Text note = CreateText("Notebook Text", parent, size, style, TextAnchor.UpperLeft, new Color(0.13f, 0.075f, 0.04f));
+        float adjustedHeight = Mathf.Ceil(minHeight * NotebookBodyHeightScale);
+        Text note = CreateText("Notebook Text", parent, size + NotebookBodyFontBoost, style, TextAnchor.UpperLeft, new Color(0.13f, 0.075f, 0.04f));
         note.supportRichText = true;
         note.verticalOverflow = VerticalWrapMode.Overflow;
         note.text = text;
         LayoutElement layout = note.gameObject.AddComponent<LayoutElement>();
-        layout.minHeight = minHeight;
-        layout.preferredHeight = minHeight;
+        layout.minHeight = adjustedHeight;
+        layout.preferredHeight = adjustedHeight;
         return note;
     }
 
@@ -222,10 +378,17 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
             return;
         }
 
+        bool forward = notebookPageFlipDirection >= 0;
+        notebookFlipPage.anchorMin = forward ? new Vector2(0.5f, 0f) : new Vector2(0f, 0f);
+        notebookFlipPage.anchorMax = forward ? new Vector2(1f, 1f) : new Vector2(0.5f, 1f);
+        notebookFlipPage.pivot = forward ? new Vector2(0f, 0.5f) : new Vector2(1f, 0.5f);
+        notebookFlipPage.offsetMin = forward ? new Vector2(4f, 0f) : Vector2.zero;
+        notebookFlipPage.offsetMax = forward ? Vector2.zero : new Vector2(-4f, 0f);
+
         float t = 1f - notebookPageFlip;
         float width = Mathf.Lerp(1.0f, 0.05f, Mathf.Sin(t * Mathf.PI));
         notebookFlipPage.localScale = new Vector3(width, 1f, 1f);
-        notebookFlipPage.localRotation = Quaternion.Euler(0f, 0f, Mathf.Sin(t * Mathf.PI) * -3.8f);
+        notebookFlipPage.localRotation = Quaternion.Euler(0f, 0f, Mathf.Sin(t * Mathf.PI) * (forward ? -3.8f : 3.8f));
         Image image = notebookFlipPage.GetComponent<Image>();
         if (image != null)
         {

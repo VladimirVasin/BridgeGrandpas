@@ -160,10 +160,9 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         }
 
         startMenuLoadSavedGame = false;
-        BeginStartIrisFade();
         SelectOverview();
         RefreshAllUi();
-        gameStarted = true;
+        BeginStartDayIntro();
     }
 
     private void Update()
@@ -176,6 +175,11 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
 
         if (!gameStarted)
         {
+            if (UpdateStartDayIntro(deltaTime))
+            {
+                return;
+            }
+
             UpdateStartMenuAnimation(deltaTime);
             return;
         }

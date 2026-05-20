@@ -22,7 +22,7 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         colors.disabledColor = new Color(0.30f, 0.24f, 0.18f, 0.24f);
         button.colors = colors;
 
-        Text text = CreateText("Notebook Button Label", rect, 15, FontStyle.Bold, TextAnchor.MiddleLeft, new Color(0.12f, 0.07f, 0.035f));
+        Text text = CreateText("Notebook Button Label", rect, 16, FontStyle.Bold, TextAnchor.MiddleLeft, new Color(0.12f, 0.07f, 0.035f));
         text.supportRichText = true;
         text.rectTransform.anchorMin = Vector2.zero;
         text.rectTransform.anchorMax = Vector2.one;

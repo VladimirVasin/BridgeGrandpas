@@ -16,6 +16,8 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
     private RectTransform notebookTabRoot;
     private RectTransform notebookPageContent;
     private RectTransform notebookFlipPage;
+    private RectTransform notebookPreviousObservationCorner;
+    private RectTransform notebookNextObservationCorner;
     private ScrollRect notebookScroll;
     private Text notebookPeekText;
     private Text notebookLegendText;
@@ -126,7 +128,7 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         spine.pivot = new Vector2(0.5f, 0.5f);
         spine.sizeDelta = new Vector2(12f, 0f);
 
-        notebookTitleText = CreateText("Notebook Title", notebookLeftPage, 25, FontStyle.Bold, TextAnchor.MiddleLeft, new Color(0.16f, 0.09f, 0.045f));
+        notebookTitleText = CreateText("Notebook Title", notebookLeftPage, 29, FontStyle.Bold, TextAnchor.MiddleLeft, new Color(0.16f, 0.09f, 0.045f));
         notebookTitleText.rectTransform.anchorMin = new Vector2(0f, 1f);
         notebookTitleText.rectTransform.anchorMax = new Vector2(1f, 1f);
         notebookTitleText.rectTransform.pivot = new Vector2(0.5f, 1f);
@@ -149,6 +151,7 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         CreateNotebookTabs(pages);
         CreateNotebookFlipPage(pages);
         CreateNotebookDice(notebookRightPage);
+        CreateNotebookObservationPageCorners();
     }
 
     private RectTransform CreateNotebookPage(string name, Transform parent, Vector2 anchorMin, Vector2 anchorMax, Vector2 offsetMin, Vector2 offsetMax)
@@ -223,17 +226,17 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         notebookTabGroup = notebookTabRoot.gameObject.AddComponent<CanvasGroup>();
         HorizontalLayoutGroup tabs = notebookTabRoot.gameObject.AddComponent<HorizontalLayoutGroup>();
         tabs.spacing = 9f;
-        tabs.childAlignment = TextAnchor.LowerCenter;
+        tabs.childAlignment = TextAnchor.LowerLeft;
         tabs.childControlWidth = false;
         tabs.childControlHeight = false;
         tabs.childForceExpandWidth = false;
         tabs.childForceExpandHeight = false;
-        CreateNotebookTab("Сводка", NotebookPage.Summary, new Color(0.82f, 0.56f, 0.27f, 0.98f));
-        CreateNotebookTab("Наблюдения", NotebookPage.Observations, new Color(0.80f, 0.52f, 0.25f, 0.98f));
-        CreateNotebookTab("Постройки", NotebookPage.Build, new Color(0.77f, 0.49f, 0.23f, 0.98f));
-        CreateNotebookTab("Деды", NotebookPage.Grandpas, new Color(0.72f, 0.44f, 0.21f, 0.98f));
-        CreateNotebookTab("События", NotebookPage.Events, new Color(0.67f, 0.40f, 0.19f, 0.98f));
-        CreateNotebookTab("Вылазки", NotebookPage.Expeditions, new Color(0.62f, 0.36f, 0.18f, 0.98f));
+        CreateNotebookTabIfAvailable("Наблюдения", NotebookPage.Observations, new Color(0.80f, 0.52f, 0.25f, 0.98f));
+        CreateNotebookTabIfAvailable("Сводка", NotebookPage.Summary, new Color(0.82f, 0.56f, 0.27f, 0.98f));
+        CreateNotebookTabIfAvailable("Строительство", NotebookPage.Build, new Color(0.77f, 0.49f, 0.23f, 0.98f));
+        CreateNotebookTabIfAvailable("Деды", NotebookPage.Grandpas, new Color(0.72f, 0.44f, 0.21f, 0.98f));
+        CreateNotebookTabIfAvailable("События", NotebookPage.Events, new Color(0.67f, 0.40f, 0.19f, 0.98f));
+        CreateNotebookTabIfAvailable("Вылазки", NotebookPage.Expeditions, new Color(0.62f, 0.36f, 0.18f, 0.98f));
     }
 
     private void CreateNotebookFlipPage(RectTransform pages)
@@ -278,5 +281,13 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         RectTransform button = CreateNotebookBookmark(label, notebookTabRoot, color, delegate { SetNotebookPage(page); });
         LayoutElement layout = button.GetComponent<LayoutElement>();
         layout.preferredHeight = 48f;
+    }
+
+    private void CreateNotebookTabIfAvailable(string label, NotebookPage page, Color color)
+    {
+        if (IsNotebookTabAvailableByDefault(page))
+        {
+            CreateNotebookTab(label, page, color);
+        }
     }
 }

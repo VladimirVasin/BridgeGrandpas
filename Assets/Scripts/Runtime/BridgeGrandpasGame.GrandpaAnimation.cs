@@ -214,8 +214,9 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
             return;
         }
 
-        grandpa.InteractionProp.gameObject.SetActive(close);
-        if (!close)
+        bool visible = close && ShouldShowInteractionProp(grandpa);
+        grandpa.InteractionProp.gameObject.SetActive(visible);
+        if (!visible)
         {
             return;
         }
@@ -261,6 +262,16 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         }
 
         ApplyInteractionPropVisual(grandpa, color, scale, position);
+    }
+
+    private bool ShouldShowInteractionProp(Grandpa grandpa)
+    {
+        if (grandpa.IdleAction == GrandpaIdleAction.DrinkingTea)
+        {
+            return true;
+        }
+
+        return grandpa.HasInteraction && grandpa.IdleAction == GrandpaIdleAction.Wandering;
     }
 
     private bool TryApplyIdleActionProp(Grandpa grandpa, float action, ref Color color, ref Vector3 scale, ref Vector3 position)

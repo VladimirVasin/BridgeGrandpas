@@ -56,6 +56,7 @@
     <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.ExpeditionDice.cs" />
     <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.Camera.cs" />
     <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.NotebookUiRuntime.cs" />
+    <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.StartDayIntro.cs" />
     <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasHudButtonAudio.cs" />
     <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.AutoBudding.cs" />
     <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.cs" />
@@ -102,13 +103,16 @@
     <Compile Include="Assets\TutorialInfo\Scripts\Readme.cs" />
     <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.NotebookUiSetup.cs" />
     <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.Scene.cs" />
+    <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.NotebookObservationLinks.cs" />
     <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.StartMenuAnimation.cs" />
     <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.InteractionMode.cs" />
     <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.Movement.cs" />
     <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.Simulation.cs" />
+    <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.StartDayIntroGlitch.cs" />
     <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.ObservationScan.cs" />
     <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.Cloth.cs" />
     <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasButtonVisual.cs" />
+    <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.NotebookObservationPaging.cs" />
     <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.NotebookVisual.cs" />
     <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.EventsRuntime.cs" />
     <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.ObservationHighlights.cs" />
