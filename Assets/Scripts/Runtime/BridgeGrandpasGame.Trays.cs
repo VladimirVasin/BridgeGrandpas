@@ -106,18 +106,28 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
     private void BuildGrandpasTray()
     {
         trayTitleText.text = "Дедушки";
+        AddTrayNote("Собиратели идут к ближайшему хламу, ковыряются там и несут добычу к центральной куче.");
         for (int i = 0; i < grandpas.Count; i++)
         {
             Grandpa grandpa = grandpas[i];
             string state = grandpa.IsOnExpedition
                 ? "в вылазке " + Mathf.CeilToInt(grandpa.ExpeditionUntil - Time.time) + "с"
                 : "почкование " + Mathf.FloorToInt(grandpa.Budding) + "%";
-            string label = grandpa.Name + " | " + RoleName(grandpa.Role) + " | " + state;
+            string label = grandpa.Name + " | " + RoleName(grandpa.Role) + " | " + state + "\nРабота: " + GrandpaWorkText(grandpa);
             CreateButton(label, trayBody, delegate
             {
                 SelectGrandpa(grandpa);
                 RefreshAllUi();
             });
+            bool collector = grandpa.WorkMode == GrandpaWorkMode.JunkCollector;
+            RectTransform workButton = CreateButton(collector ? "Собирает хлам до конца дня: " + grandpa.Name : "Назначить сборщиком: " + grandpa.Name, trayBody, delegate
+            {
+                if (!collector)
+                {
+                    SetGrandpaWorkMode(grandpa, GrandpaWorkMode.JunkCollector);
+                }
+            });
+            workButton.GetComponent<Button>().interactable = !grandpa.IsOnExpedition && !collector;
         }
     }
 
@@ -149,6 +159,7 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         AddMissingResource(missing, "картон", cost.Cardboard, stock.Cardboard);
         AddMissingResource(missing, "ворчание", cost.Grumble, stock.Grumble);
         AddMissingResource(missing, "монетки", cost.Coins, stock.Coins);
+        AddMissingResource(missing, "хлам", cost.Junk, stock.Junk);
         return missing.Count == 0 ? "ничего" : string.Join(", ", missing.ToArray());
     }
 

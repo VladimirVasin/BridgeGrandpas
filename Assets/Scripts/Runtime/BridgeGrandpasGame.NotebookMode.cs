@@ -44,6 +44,11 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
             SetVhsMode(false);
         }
 
+        if (enabled && watchModeEnabled)
+        {
+            SetWatchMode(false);
+        }
+
         if (notebookModeEnabled == enabled)
         {
             ApplyLegacyHudVisibility();

@@ -141,6 +141,12 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
                 return "слушает радио";
             case GrandpaIdleAction.AdmiringCozyDecor:
                 return "поправляет уют";
+            case GrandpaIdleAction.CollectingJunk:
+                return "роется в хламе";
+            case GrandpaIdleAction.CarryingJunk:
+                return "несёт хлам";
+            case GrandpaIdleAction.DepositingJunk:
+                return "складывает хлам";
             default:
                 return "бродит под мостом";
         }

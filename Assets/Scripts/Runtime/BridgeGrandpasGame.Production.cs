@@ -55,6 +55,7 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
             "   " + ResourceStat(TextCardboard, stock.Cardboard, income.Cardboard) +
             "   " + ResourceStat(TextGrumble, stock.Grumble, income.Grumble) +
             "   " + ResourceStat(TextCoins, stock.Coins, income.Coins) +
+            "   " + ResourceStat(TextJunk, stock.Junk, 0f) +
             "   " + CozyStat();
     }
 

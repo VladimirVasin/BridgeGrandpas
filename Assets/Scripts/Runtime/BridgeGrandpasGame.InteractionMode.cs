@@ -5,7 +5,8 @@ public sealed partial class BridgeGrandpasGame
         Normal,
         Dialog,
         Notebook,
-        VhsCamera
+        VhsCamera,
+        Watch
     }
 
     private GameInteractionMode interactionMode;
@@ -25,6 +26,11 @@ public sealed partial class BridgeGrandpasGame
         if (notebookModeEnabled)
         {
             return GameInteractionMode.Notebook;
+        }
+
+        if (watchModeEnabled)
+        {
+            return GameInteractionMode.Watch;
         }
 
         if (IsAnyDialogOpen())

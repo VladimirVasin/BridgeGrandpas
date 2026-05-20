@@ -99,7 +99,9 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         stock.Cardboard -= cost.Cardboard;
         stock.Grumble -= cost.Grumble;
         stock.Coins -= cost.Coins;
+        stock.Junk -= cost.Junk;
         stock.ClampNonNegative();
+        RefreshJunkDepotVisual();
         return true;
     }
 
@@ -109,7 +111,8 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
                stock.Heat >= cost.Heat &&
                stock.Cardboard >= cost.Cardboard &&
                stock.Grumble >= cost.Grumble &&
-               stock.Coins >= cost.Coins;
+               stock.Coins >= cost.Coins &&
+               stock.Junk >= cost.Junk;
     }
 
     private ResourceStock BuddingCost()
@@ -215,6 +218,7 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
 
     private void Notify(string message)
     {
+        message = UserFacingGrandpaText(message);
         lastAlert = message;
         alertUntil = Time.time + 7f;
         Debug.Log("[BridgeGrandpas] " + message);
@@ -258,7 +262,47 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         };
 
         string baseName = names[random.Next(names.Length)];
-        return baseName + " #" + nextGrandpaId;
+        return baseName;
+    }
+
+    private string GrandpaTechnicalName(Grandpa grandpa)
+    {
+        if (grandpa == null)
+        {
+            return "Дед #?";
+        }
+
+        return grandpa.Name + " #" + grandpa.Id;
+    }
+
+    private string UserFacingGrandpaText(string text)
+    {
+        if (string.IsNullOrEmpty(text))
+        {
+            return "";
+        }
+
+        int marker = text.IndexOf(" #", StringComparison.Ordinal);
+        while (marker >= 0)
+        {
+            int digitStart = marker + 2;
+            int digitEnd = digitStart;
+            while (digitEnd < text.Length && char.IsDigit(text[digitEnd]))
+            {
+                digitEnd++;
+            }
+
+            if (digitEnd > digitStart)
+            {
+                text = text.Remove(marker, digitEnd - marker);
+                marker = text.IndexOf(" #", marker, StringComparison.Ordinal);
+                continue;
+            }
+
+            marker = text.IndexOf(" #", marker + 2, StringComparison.Ordinal);
+        }
+
+        return text;
     }
 
     private string RoleName(GrandpaRole role)

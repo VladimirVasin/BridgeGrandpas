@@ -5,6 +5,7 @@ public sealed partial class BridgeGrandpasGame
     private const string TextCardboard = "Картон";
     private const string TextGrumble = "Ворчание";
     private const string TextCoins = "Монетки";
+    private const string TextJunk = "Хлам";
     private const string TextPerMinute = "/м";
     private const string TextCitySuspicion = "Подозрение города";
 }

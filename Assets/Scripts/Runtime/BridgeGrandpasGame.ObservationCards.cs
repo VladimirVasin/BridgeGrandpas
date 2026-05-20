@@ -99,6 +99,8 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
 
     private void CreateSavedObservationCard(string label, string text, float createdAt)
     {
+        label = UserFacingGrandpaText(label);
+        text = UserFacingGrandpaText(text);
         if (string.IsNullOrWhiteSpace(text) || ObservationCardAlreadyExists(text))
         {
             return;
@@ -235,7 +237,7 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
 
     private void ApplyObservationCardDockVisibility()
     {
-        bool hasCards = observationCards.Count > 0;
+        bool hasCards = observationCards.Count > 0 && !watchModeEnabled;
         if (observationCardCanvasGroup != null)
         {
             observationCardCanvasGroup.alpha = hasCards ? 1f : 0f;

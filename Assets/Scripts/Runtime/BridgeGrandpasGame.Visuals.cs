@@ -11,7 +11,7 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
 {
     private GameObject CreateGrandpaVisual(Grandpa grandpa, Vector3 position)
     {
-        GameObject root = new GameObject(grandpa.Name);
+        GameObject root = new GameObject(GrandpaTechnicalName(grandpa));
         root.transform.SetParent(settlementRoot, false);
         root.transform.position = position;
 

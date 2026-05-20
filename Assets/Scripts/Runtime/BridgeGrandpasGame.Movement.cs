@@ -161,7 +161,7 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
 
     private Vector3 ClampToCommune(Vector3 value)
     {
-        value.x = Mathf.Clamp(value.x, -5.45f, 5.45f);
+        value.x = Mathf.Clamp(value.x, -18.45f, 18.45f);
         value.z = Mathf.Clamp(value.z, -3.35f, 1.35f);
         value.y = 0f;
         return value;

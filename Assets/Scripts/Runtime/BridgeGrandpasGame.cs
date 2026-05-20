@@ -156,6 +156,7 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         }
         else
         {
+            ResetDayClock();
             BuildInitialState();
         }
 
@@ -185,11 +186,13 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         }
 
         SimulateResources(deltaTime);
+        UpdateDayClock(deltaTime);
         SimulateSuspicion(deltaTime);
         SimulateEvents(deltaTime);
         SimulateGrandpas(deltaTime);
         UpdateStartIrisFade(deltaTime);
         UpdateNotebookMode(deltaTime);
+        UpdateWatchMode(deltaTime);
         UpdateCameraControls(deltaTime);
         UpdateVhsOverlay(deltaTime);
         UpdateObservationCards(deltaTime);
@@ -203,6 +206,7 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         UpdateGroundLitter(deltaTime);
         UpdateCameraForeground();
         UpdateBuildingAnimations(deltaTime);
+        UpdateJunkScene(deltaTime);
         UpdateBackgroundMusic();
         UpdateAmbience(deltaTime);
         UpdateCityAmbience(deltaTime);

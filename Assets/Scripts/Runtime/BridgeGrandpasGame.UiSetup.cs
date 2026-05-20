@@ -46,6 +46,7 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         SetupVhsOverlay();
         SetupNotebookInterface();
         SetupObservationCardInterface();
+        SetupWatchInterface();
         SetupStartIrisFade();
         ApplyLegacyHudVisibility();
     }

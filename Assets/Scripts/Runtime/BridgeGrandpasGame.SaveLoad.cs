@@ -18,8 +18,12 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         public int MutationsSinceRare;
         public bool RareMutationSeen;
         public bool VictoryShown;
+        public float DayClockElapsedSeconds;
+        public bool PlansOldMenFollowupResolved;
+        public int PlansOldMenCollectorGrandpaId;
         public List<BuildingSaveData> Buildings = new List<BuildingSaveData>();
         public List<GrandpaSaveData> Grandpas = new List<GrandpaSaveData>();
+        public List<JunkPileSaveData> JunkPiles = new List<JunkPileSaveData>();
         public List<ObservationSaveData> Observations = new List<ObservationSaveData>();
         public List<ObservationCardSaveData> PendingObservationCards = new List<ObservationCardSaveData>();
     }
@@ -39,9 +43,20 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         public int Id;
         public string Name;
         public int Role;
+        public int WorkMode;
         public float Budding;
         public Vector3 Position;
         public Vector3 Target;
+    }
+
+    [Serializable]
+    private sealed class JunkPileSaveData
+    {
+        public int Id;
+        public Vector3 Position;
+        public float RemainingJunk;
+        public float MaxJunk;
+        public int Variant;
     }
 
     [Serializable]
@@ -139,6 +154,8 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         trayOpen = false;
         trayDirty = true;
         microHudUntil = 0f;
+        SetWatchMode(false);
+        ResetDayClock();
 
         if (settlementRoot != null)
         {
@@ -146,6 +163,7 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         }
 
         cozyDecorRoot = null;
+        ClearJunkScene();
         grandpas.Clear();
         buildings.Clear();
         SetupBuildings();
@@ -170,11 +188,17 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         mutationsSinceRare = Mathf.Max(0, data.MutationsSinceRare);
         rareMutationSeen = data.RareMutationSeen;
         victoryShown = data.VictoryShown;
+        dayClockElapsedSeconds = Mathf.Max(0f, data.DayClockElapsedSeconds);
+        UpdateWatchTimeText();
 
         ResetNotebookObservations();
         RestoreBuildings(data.Buildings);
+        RestoreJunkPiles(data.JunkPiles);
         RestoreGrandpas(data.Grandpas);
         RestoreNotebookObservations(data.Observations);
+        plansOldMenFollowupResolved = data.PlansOldMenFollowupResolved || PlansOldMenFollowupAlreadyResolved();
+        plansOldMenCollectorGrandpaId = data.PlansOldMenCollectorGrandpaId > 0 ? data.PlansOldMenCollectorGrandpaId : -1;
+        plansOldMenFollowupOpen = false;
         RestorePendingObservationCards(data.PendingObservationCards);
         CreateStarterCommuneProps();
         RefreshCozyDecor();
@@ -219,10 +243,14 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
             GrandpaSaveData saved = savedGrandpas[i];
             nextGrandpaId = Mathf.Max(1, saved.Id);
             Grandpa grandpa = SpawnGrandpa((GrandpaRole)saved.Role, saved.Position);
-            grandpa.Name = string.IsNullOrEmpty(saved.Name) ? grandpa.Name : saved.Name;
+            grandpa.Name = string.IsNullOrEmpty(saved.Name) ? grandpa.Name : UserFacingGrandpaText(saved.Name);
             grandpa.Budding = Mathf.Clamp(saved.Budding, 0f, BuddingGoal);
             grandpa.Target = saved.Target;
-            grandpa.Root.name = grandpa.Name;
+            grandpa.WorkMode = (GrandpaWorkMode)Mathf.Clamp(saved.WorkMode, 0, 1);
+            grandpa.JunkState = JunkCollectorState.Idle;
+            grandpa.JunkPileId = -1;
+            grandpa.CarryingJunk = 0f;
+            grandpa.Root.name = GrandpaTechnicalName(grandpa);
             maxId = Mathf.Max(maxId, grandpa.Id);
         }
 
@@ -249,7 +277,7 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
 
             int day = saved.Day <= 0 ? CurrentObservationDay : saved.Day;
             bool hasClock = saved.Day <= 0 ? true : saved.HasClock;
-            NotebookObservation note = new NotebookObservation(day, saved.Time, saved.Text, saved.Written, hasClock);
+            NotebookObservation note = new NotebookObservation(day, saved.Time, UserFacingGrandpaText(saved.Text), saved.Written, hasClock);
             notebookObservations.Add(note);
         }
 
@@ -281,7 +309,10 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
             InspectionsSurvived = inspectionsSurvived,
             MutationsSinceRare = mutationsSinceRare,
             RareMutationSeen = rareMutationSeen,
-            VictoryShown = victoryShown
+            VictoryShown = victoryShown,
+            DayClockElapsedSeconds = dayClockElapsedSeconds,
+            PlansOldMenFollowupResolved = PlansOldMenFollowupAlreadyResolved(),
+            PlansOldMenCollectorGrandpaId = plansOldMenCollectorGrandpaId
         };
 
         foreach (KeyValuePair<BuildingType, Building> pair in buildings)
@@ -308,9 +339,23 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
                 Id = grandpa.Id,
                 Name = grandpa.Name,
                 Role = (int)grandpa.Role,
+                WorkMode = (int)grandpa.WorkMode,
                 Budding = grandpa.Budding,
                 Position = grandpa.Root != null ? grandpa.Root.transform.position : grandpa.Target,
                 Target = grandpa.Target
+            });
+        }
+
+        for (int i = 0; i < junkPiles.Count; i++)
+        {
+            JunkPile pile = junkPiles[i];
+            data.JunkPiles.Add(new JunkPileSaveData
+            {
+                Id = pile.Id,
+                Position = pile.Position,
+                RemainingJunk = pile.RemainingJunk,
+                MaxJunk = pile.MaxJunk,
+                Variant = (int)pile.Variant
             });
         }
 

@@ -236,6 +236,11 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
                 SetNotebookMode(false);
             }
 
+            if (watchModeEnabled)
+            {
+                SetWatchMode(false);
+            }
+
             vhsModeEnabled = true;
             RestoreVhsCameraZoom();
         }

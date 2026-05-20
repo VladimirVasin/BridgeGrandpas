@@ -172,6 +172,12 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
                 return new Vector3(1f + action * 0.03f, 0.93f, 1f + action * 0.03f);
             case GrandpaIdleAction.WorkingCardboard:
                 return new Vector3(1.05f, 0.94f + action * 0.03f, 1.05f);
+            case GrandpaIdleAction.CollectingJunk:
+                return new Vector3(1.10f, 0.78f + action * 0.05f, 1.08f);
+            case GrandpaIdleAction.CarryingJunk:
+                return new Vector3(1.04f, 0.98f + action * 0.02f, 1.04f);
+            case GrandpaIdleAction.DepositingJunk:
+                return new Vector3(1.10f, 0.86f + action * 0.04f, 1.06f);
             case GrandpaIdleAction.Guarding:
             case GrandpaIdleAction.ListeningRadio:
                 return new Vector3(1f, 1f + action * 0.035f, 1f);
@@ -214,7 +220,7 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
             return;
         }
 
-        bool visible = close && ShouldShowInteractionProp(grandpa);
+        bool visible = (close || grandpa.IdleAction == GrandpaIdleAction.CarryingJunk) && ShouldShowInteractionProp(grandpa);
         grandpa.InteractionProp.gameObject.SetActive(visible);
         if (!visible)
         {
@@ -271,6 +277,13 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
             return true;
         }
 
+        if (grandpa.IdleAction == GrandpaIdleAction.CollectingJunk ||
+            grandpa.IdleAction == GrandpaIdleAction.CarryingJunk ||
+            grandpa.IdleAction == GrandpaIdleAction.DepositingJunk)
+        {
+            return true;
+        }
+
         return grandpa.HasInteraction && grandpa.IdleAction == GrandpaIdleAction.Wandering;
     }
 
@@ -286,6 +299,21 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
                 color = new Color(0.58f, 0.40f, 0.22f);
                 scale = new Vector3(0.34f, 0.08f, 0.28f);
                 position = new Vector3(0.12f, 0.50f, -0.38f);
+                return true;
+            case GrandpaIdleAction.CollectingJunk:
+                color = new Color(0.30f, 0.25f, 0.18f);
+                scale = new Vector3(0.20f + action * 0.10f, 0.12f, 0.22f);
+                position = new Vector3(0.12f, 0.38f, -0.42f);
+                return true;
+            case GrandpaIdleAction.CarryingJunk:
+                color = new Color(0.30f, 0.23f, 0.15f);
+                scale = new Vector3(0.38f, 0.26f, 0.30f);
+                position = new Vector3(0.05f, 0.58f + Mathf.Sin(Time.time * 7f) * 0.03f, -0.44f);
+                return true;
+            case GrandpaIdleAction.DepositingJunk:
+                color = new Color(0.36f, 0.27f, 0.18f);
+                scale = new Vector3(0.34f, 0.16f, 0.28f);
+                position = new Vector3(0.08f, 0.34f + action * 0.08f, -0.42f);
                 return true;
             case GrandpaIdleAction.Resting:
                 color = new Color(0.30f, 0.12f, 0.20f);
@@ -307,7 +335,7 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         grandpa.InteractionProp.localScale = scale;
         if (grandpa.InteractionPropRenderer != null)
         {
-            grandpa.InteractionPropRenderer.sharedMaterial = Mat("interaction_" + grandpa.InteractionType, color);
+            grandpa.InteractionPropRenderer.sharedMaterial = Mat("interaction_" + grandpa.InteractionType + "_" + grandpa.IdleAction, color);
         }
     }
 

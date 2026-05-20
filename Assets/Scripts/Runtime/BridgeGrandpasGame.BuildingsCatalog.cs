@@ -42,13 +42,14 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         QueueObservationLead("сухое пятно", "Под мостом обнаружено сухое пятно. Оно уже выглядит подозрительно пригодным для жизни.",
             fireTarget, DefaultObservationPosition(), 0f);
         CreateStarterCommuneProps();
+        ResetJunkPilesForNewGame();
         Grandpa first = SpawnGrandpa(GrandpaRole.Common, new Vector3(-0.6f, 0f, -1.15f));
         Grandpa second = SpawnGrandpa(GrandpaRole.Common, new Vector3(0.55f, 0f, -1.05f));
-        QueueObservationLead("первые деды", first.Name + " и " + second.Name +
-            " уже сидят у бочки. Наблюдатель явно опоздал к началу самого странного.",
+        QueueObservationLead("Первые деды", first.Name + " и " + second.Name +
+            " уже сидят у бочки. Но почему же они так подозрительно похожи?",
             first.Root != null ? first.Root.transform : null, first.Target, 0.08f);
         Notify("Два дедушки обжили сухое пятно под мостом. Государство уже помещается в двух пальто.");
-        QueueObservationLead("первое государство", "Государство пока помещается в двух пальто и одной кружке чая.",
+        QueueObservationLead(PlansOldMenObservationLabel, PlansOldMenObservationText,
             second.Root != null ? second.Root.transform : null, second.Target, 0.05f);
     }
 }

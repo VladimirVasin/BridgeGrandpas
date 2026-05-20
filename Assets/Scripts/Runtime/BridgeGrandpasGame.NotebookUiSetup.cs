@@ -103,7 +103,7 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         panel.GetComponent<Image>().raycastTarget = false;
 
         notebookLegendText = CreateText("Notebook Legend Text", panel, 16, FontStyle.Bold, TextAnchor.MiddleLeft, new Color(0.94f, 0.82f, 0.58f));
-        notebookLegendText.text = "F  камера\nN  блокнот";
+        notebookLegendText.text = "F  камера\nN  блокнот\nT  часы";
         notebookLegendText.rectTransform.anchorMin = Vector2.zero;
         notebookLegendText.rectTransform.anchorMax = Vector2.one;
         notebookLegendText.rectTransform.offsetMin = new Vector2(16f, 5f);

@@ -22,16 +22,17 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
 
         if (notebookCanvasGroup != null)
         {
-            notebookCanvasGroup.alpha = vhsModeEnabled ? 0f : 1f;
-            notebookCanvasGroup.blocksRaycasts = !vhsModeEnabled;
-            notebookCanvasGroup.interactable = !vhsModeEnabled;
+            bool blockedByHeldObject = vhsModeEnabled || watchModeEnabled;
+            notebookCanvasGroup.alpha = blockedByHeldObject ? 0f : 1f;
+            notebookCanvasGroup.blocksRaycasts = !blockedByHeldObject;
+            notebookCanvasGroup.interactable = !blockedByHeldObject;
         }
 
         if (notebookBackdropGroup != null)
         {
             notebookBackdropGroup.alpha = 0f;
-            notebookBackdropGroup.blocksRaycasts = !vhsModeEnabled && t > 0.42f;
-            notebookBackdropGroup.interactable = !vhsModeEnabled && t > 0.42f;
+            notebookBackdropGroup.blocksRaycasts = !vhsModeEnabled && !watchModeEnabled && t > 0.42f;
+            notebookBackdropGroup.interactable = !vhsModeEnabled && !watchModeEnabled && t > 0.42f;
         }
 
         if (notebookContentGroup != null)
@@ -44,20 +45,20 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         if (notebookPeekGroup != null)
         {
             notebookPeekGroup.alpha = 1f - t;
-            notebookPeekGroup.blocksRaycasts = !vhsModeEnabled && t < 0.25f;
-            notebookPeekGroup.interactable = !vhsModeEnabled && t < 0.25f;
+            notebookPeekGroup.blocksRaycasts = !vhsModeEnabled && !watchModeEnabled && t < 0.25f;
+            notebookPeekGroup.interactable = !vhsModeEnabled && !watchModeEnabled && t < 0.25f;
         }
 
         if (notebookTabGroup != null)
         {
             notebookTabGroup.alpha = t;
-            notebookTabGroup.blocksRaycasts = !vhsModeEnabled && t > 0.35f;
-            notebookTabGroup.interactable = !vhsModeEnabled && t > 0.35f;
+            notebookTabGroup.blocksRaycasts = !vhsModeEnabled && !watchModeEnabled && t > 0.35f;
+            notebookTabGroup.interactable = !vhsModeEnabled && !watchModeEnabled && t > 0.35f;
         }
 
         if (notebookLegendText != null)
         {
-            notebookLegendText.transform.parent.gameObject.SetActive(!vhsModeEnabled && t < 0.25f);
+            notebookLegendText.transform.parent.gameObject.SetActive(!vhsModeEnabled && !watchModeEnabled && t < 0.25f);
         }
     }
 
@@ -214,7 +215,7 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
     private void AddNotebookSummaryResourceGrid()
     {
         ResourceStock income = CurrentResourceIncomePerSecond();
-        RectTransform grid = CreateNotebookSummaryBlock("Summary Resource Grid", 112f);
+        RectTransform grid = CreateNotebookSummaryBlock("Summary Resource Grid", 148f);
         VerticalLayoutGroup vertical = grid.gameObject.AddComponent<VerticalLayoutGroup>();
         vertical.spacing = 5f;
         vertical.childControlWidth = true;
@@ -232,7 +233,10 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
 
         RectTransform rowC = CreateNotebookSummaryRow(grid);
         AddNotebookSummaryResourceCell(rowC, TextCoins, stock.Coins, income.Coins);
-        AddNotebookSummaryStateCell(rowC, "Уют", CozyStat().Replace("Уют ", ""));
+        AddNotebookSummaryResourceCell(rowC, TextJunk, stock.Junk, 0f);
+
+        RectTransform rowD = CreateNotebookSummaryRow(grid);
+        AddNotebookSummaryStateCell(rowD, "Уют", CozyStat().Replace("Уют ", ""));
     }
 
     private void AddNotebookSummaryStateGrid()
@@ -262,6 +266,7 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         text.text = "<b>Служебная пометка</b>\n" +
             "N закрывает блокнот\n" +
             "F включает VHS-наблюдение\n" +
+            "T поднимает часы\n" +
             "Клик вне страниц прерывает записи";
         text.rectTransform.anchorMin = Vector2.zero;
         text.rectTransform.anchorMax = Vector2.one;

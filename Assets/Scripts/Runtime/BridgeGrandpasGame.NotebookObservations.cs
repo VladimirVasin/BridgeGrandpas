@@ -32,6 +32,7 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
     private void ResetNotebookObservations()
     {
         notebookObservations.Clear();
+        ResetPlansOldMenJournalAction();
         ResetObservationLeads();
         ClearObservationCards();
         observationSpreadStartDay = 0;
@@ -40,12 +41,13 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
 
     private void AddNotebookObservation(string text)
     {
+        text = UserFacingGrandpaText(text);
         if (string.IsNullOrWhiteSpace(text) || NotebookObservationAlreadyWritten(text))
         {
             return;
         }
 
-        notebookObservations.Add(new NotebookObservation(CurrentObservationDay, Time.time, text, false, true));
+        notebookObservations.Add(new NotebookObservation(CurrentObservationDay, CurrentDayClockElapsedSeconds(), text, false, true));
         TrimNotebookObservations();
     }
 
@@ -150,6 +152,11 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
 
         string line = note.HasClock ? ObservationTime(note.Time) + " — " + note.Text : note.Text;
         Text noteText = AddNotebookTextTo(parent, line, 15, FontStyle.Normal, note.HasClock ? 52f : 320f);
+        if (CanShowPlansOldMenFollowup(note, animateNew))
+        {
+            AddPlansOldMenFollowupControls(parent);
+        }
+
         if (note.Written || !animateNew)
         {
             return;
@@ -274,14 +281,15 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         }
 
         notebookObservations[index].Written = true;
+        if (IsPlansOldMenObservationText(text) && notebookModeEnabled && currentNotebookPage == NotebookPage.Observations)
+        {
+            RefreshNotebookUi();
+        }
     }
 
     private string ObservationTime(float time)
     {
-        int seconds = Mathf.Max(0, Mathf.FloorToInt(time));
-        int minutes = seconds / 60;
-        seconds %= 60;
-        return minutes.ToString("00") + ":" + seconds.ToString("00");
+        return FormatDayClockElapsedSeconds(time);
     }
 
     private string NotebookBuildPhrase(BuildingType type)

@@ -62,8 +62,10 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
                 : "готовность к почкованию " + Mathf.FloorToInt(selectedGrandpa.Budding) + "%";
             AddNotebookText("<b>Подробное наблюдение: " + selectedGrandpa.Name + "</b>\n" +
                 RoleName(selectedGrandpa.Role) + ". " + NotebookRoleObservation(selectedGrandpa.Role) + "\n" +
-                "Текущее состояние: " + expedition + ". Настроение: " + GrandpaMood(selectedGrandpa),
-                15, FontStyle.Normal, 88f);
+                "Текущее состояние: " + expedition + ". Настроение: " + GrandpaMood(selectedGrandpa) + "\n" +
+                "Работа: " + GrandpaWorkText(selectedGrandpa),
+                15, FontStyle.Normal, 108f);
+            AddGrandpaWorkNotebookButton(selectedGrandpa);
         }
 
         for (int i = 0; i < grandpas.Count; i++)
@@ -73,13 +75,30 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
                 ? "в вылазке, " + Mathf.CeilToInt(grandpa.ExpeditionUntil - Time.time) + "с"
                 : "почкование " + Mathf.FloorToInt(grandpa.Budding) + "%";
             CreateNotebookButton(NotebookGrandpaObservation(grandpa) + "\n" +
-                state + " | " + GrandpaMood(grandpa), notebookPageContent, delegate
+                state + " | " + GrandpaMood(grandpa) + " | " + GrandpaWorkText(grandpa), notebookPageContent, delegate
             {
                 SelectGrandpa(grandpa);
                 MarkNotebookDirty();
                 RefreshAllUi();
             });
         }
+    }
+
+    private void AddGrandpaWorkNotebookButton(Grandpa grandpa)
+    {
+        bool collector = grandpa.WorkMode == GrandpaWorkMode.JunkCollector;
+        RectTransform button = CreateNotebookButton(
+            collector ? "Собирает хлам до конца дня" : "Назначить сборщиком хлама",
+            notebookPageContent,
+            delegate
+            {
+                if (!collector)
+                {
+                    SetGrandpaWorkMode(grandpa, GrandpaWorkMode.JunkCollector);
+                    MarkNotebookDirty();
+                }
+            });
+        button.GetComponent<Button>().interactable = !grandpa.IsOnExpedition && !collector;
     }
 
     private void BuildNotebookEventsPage()

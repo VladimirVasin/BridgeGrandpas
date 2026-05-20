@@ -19,6 +19,7 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         stock.Cardboard += deltaTime * income.Cardboard;
         stock.Grumble += deltaTime * income.Grumble;
         stock.Coins += deltaTime * income.Coins;
+        stock.Junk += deltaTime * income.Junk;
         stock.ClampNonNegative();
     }
 
@@ -101,7 +102,11 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
             }
 
             UpdateGrandpaBudding(grandpa, deltaTime);
-            UpdateGrandpaMovement(grandpa, deltaTime);
+            if (!UpdateGrandpaJunkCollector(grandpa, deltaTime))
+            {
+                UpdateGrandpaMovement(grandpa, deltaTime);
+            }
+
             UpdateGrandpaThought(grandpa);
         }
 

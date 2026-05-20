@@ -33,6 +33,7 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         public int Id;
         public string Label;
         public string Text;
+        public int Sequence;
         public Transform Target;
         public Vector3 FallbackPosition;
         public float RequiredZoom;
@@ -58,6 +59,8 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
 
     private void QueueObservationLead(string label, string text, Transform target, Vector3 fallback, float requiredZoom)
     {
+        label = UserFacingGrandpaText(label);
+        text = UserFacingGrandpaText(text);
         if (string.IsNullOrWhiteSpace(text) || ObservationAlreadyQueuedOrWritten(text))
         {
             return;
@@ -68,6 +71,7 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
             Id = nextObservationLeadId++,
             Label = string.IsNullOrWhiteSpace(label) ? "наблюдение" : label,
             Text = text,
+            Sequence = nextObservationLeadId - 1,
             Target = target != null ? target : DefaultObservationTarget(),
             FallbackPosition = fallback,
             RequiredZoom = Mathf.Clamp01(requiredZoom),
@@ -197,10 +201,16 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         zoom01 = Mathf.InverseLerp(CameraMaxZoom, CameraMinZoom, mainCamera.orthographicSize);
         ObservationLead best = null;
         float bestScore = -1f;
+        ObservationLead orderedLead = NextOrderedObservationLead();
+        if (orderedLead == null)
+        {
+            return null;
+        }
+
         for (int i = 0; i < observationLeads.Count; i++)
         {
             ObservationLead lead = observationLeads[i];
-            if (lead.State != ObservationLeadState.Queued)
+            if (lead != orderedLead)
             {
                 continue;
             }
@@ -226,6 +236,26 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         }
 
         centerScore = Mathf.Clamp01(bestScore);
+        return best;
+    }
+
+    private ObservationLead NextOrderedObservationLead()
+    {
+        ObservationLead best = null;
+        for (int i = 0; i < observationLeads.Count; i++)
+        {
+            ObservationLead lead = observationLeads[i];
+            if (lead.State != ObservationLeadState.Queued)
+            {
+                continue;
+            }
+
+            if (best == null || lead.Sequence < best.Sequence)
+            {
+                best = lead;
+            }
+        }
+
         return best;
     }
 

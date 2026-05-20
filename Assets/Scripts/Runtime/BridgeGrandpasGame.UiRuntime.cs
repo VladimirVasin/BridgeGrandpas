@@ -263,6 +263,7 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
                 expedition +
                 ProductionDescription(selectedGrandpa.Role) + "\n\n" +
                 "Состояние: " + GrandpaMood(selectedGrandpa) + "\n" +
+                "Работа: " + GrandpaWorkText(selectedGrandpa) + "\n" +
                 "Занятие: " + IdleActionName(selectedGrandpa.IdleAction) + "\n" +
                 "Готовность к почкованию: " + Mathf.FloorToInt(selectedGrandpa.Budding) + "%\n\n" +
                 "Стоимость почкования:\n" + BuddingCost().ColoredCost(stock) + "\n\n" +

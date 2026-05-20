@@ -68,7 +68,9 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         }
 
         RefreshInteractionMode();
-        if (interactionMode == GameInteractionMode.Dialog || interactionMode == GameInteractionMode.Notebook)
+        if (interactionMode == GameInteractionMode.Dialog ||
+            interactionMode == GameInteractionMode.Notebook ||
+            interactionMode == GameInteractionMode.Watch)
         {
             cameraDragActive = false;
             cameraPanVelocity = Vector2.zero;

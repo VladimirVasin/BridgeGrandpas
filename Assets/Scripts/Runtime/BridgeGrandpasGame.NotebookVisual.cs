@@ -63,7 +63,7 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
             return;
         }
 
-        bool visible = !vhsModeEnabled;
+        bool visible = !vhsModeEnabled && !watchModeEnabled;
         notebookWorldRoot.gameObject.SetActive(visible);
         float t = Mathf.SmoothStep(0f, 1f, notebookOpenAmount);
         float y = -mainCamera.orthographicSize + Mathf.Lerp(0.85f, 3.15f, t);
@@ -80,7 +80,7 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
 
     private void ApplyNotebookCameraPose(ref Vector3 position, ref Quaternion rotation)
     {
-        if (vhsModeEnabled || notebookOpenAmount <= 0.001f)
+        if (vhsModeEnabled || watchModeEnabled || notebookOpenAmount <= 0.001f)
         {
             return;
         }

@@ -69,32 +69,19 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
             return activeObservationLead;
         }
 
-        ObservationLead best = null;
-        float bestScore = -1f;
-        for (int i = 0; i < observationLeads.Count; i++)
+        ObservationLead orderedLead = NextOrderedObservationLead();
+        if (orderedLead == null)
         {
-            ObservationLead lead = observationLeads[i];
-            if (lead.State != ObservationLeadState.Queued)
-            {
-                continue;
-            }
-
-            Vector3 viewport = mainCamera.WorldToViewportPoint(ObservationLeadPosition(lead));
-            if (viewport.z <= 0f || viewport.x < 0f || viewport.x > 1f || viewport.y < 0f || viewport.y > 1f)
-            {
-                continue;
-            }
-
-            float distance = Vector2.Distance(new Vector2(viewport.x, viewport.y), new Vector2(0.5f, 0.5f));
-            float score = 1f - distance;
-            if (score > bestScore)
-            {
-                bestScore = score;
-                best = lead;
-            }
+            return null;
         }
 
-        return best;
+        Vector3 viewport = mainCamera.WorldToViewportPoint(ObservationLeadPosition(orderedLead));
+        if (viewport.z <= 0f || viewport.x < 0f || viewport.x > 1f || viewport.y < 0f || viewport.y > 1f)
+        {
+            return null;
+        }
+
+        return orderedLead;
     }
 
     private void EnsureObservationHighlight(ObservationLead lead)

@@ -57,7 +57,10 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         WorkingCardboard,
         Guarding,
         ListeningRadio,
-        AdmiringCozyDecor
+        AdmiringCozyDecor,
+        CollectingJunk,
+        CarryingJunk,
+        DepositingJunk
     }
 
     private sealed class Grandpa
@@ -100,6 +103,11 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         public float WalkJitter;
         public bool HasInteraction;
         public BuildingType InteractionType;
+        public GrandpaWorkMode WorkMode;
+        public JunkCollectorState JunkState;
+        public int JunkPileId = -1;
+        public float JunkWorkUntil;
+        public float CarryingJunk;
         public GrandpaIdleAction IdleAction;
         public float IdleActionUntil;
         public float ActionSeed;
@@ -181,14 +189,16 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         public float Cardboard;
         public float Grumble;
         public float Coins;
+        public float Junk;
 
-        public ResourceStock(float tea, float heat, float cardboard, float grumble, float coins)
+        public ResourceStock(float tea, float heat, float cardboard, float grumble, float coins, float junk = 0f)
         {
             Tea = tea;
             Heat = heat;
             Cardboard = cardboard;
             Grumble = grumble;
             Coins = coins;
+            Junk = junk;
         }
 
         public void ClampNonNegative()
@@ -198,6 +208,7 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
             Cardboard = Mathf.Max(0f, Cardboard);
             Grumble = Mathf.Max(0f, Grumble);
             Coins = Mathf.Max(0f, Coins);
+            Junk = Mathf.Max(0f, Junk);
         }
 
         public string ShortText()
@@ -228,6 +239,11 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
                 pieces.Add("монетки " + Mathf.CeilToInt(Coins));
             }
 
+            if (Junk > 0f)
+            {
+                pieces.Add("хлам " + Mathf.CeilToInt(Junk));
+            }
+
             return pieces.Count == 0 ? "бесплатно" : string.Join(", ", pieces.ToArray());
         }
 
@@ -239,6 +255,7 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
             AddCost(pieces, "Картон", Cardboard, stock.Cardboard);
             AddCost(pieces, "Ворчание", Grumble, stock.Grumble);
             AddCost(pieces, "Монетки", Coins, stock.Coins);
+            AddCost(pieces, "Хлам", Junk, stock.Junk);
             return pieces.Count == 0 ? "Бесплатно" : string.Join("\n", pieces.ToArray());
         }
 
