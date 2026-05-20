@@ -49,6 +49,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.AmbienceFallback.cs" />
+    <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.GroundLitter.cs" />
     <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.NotebookMode.cs" />
     <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.NotebookButtons.cs" />
     <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasNotebookWritingText.cs" />
@@ -77,6 +78,7 @@
     <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.StartMenu.cs" />
     <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.BuildingAnimation.cs" />
     <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.Thoughts.cs" />
+    <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.CameraForeground.cs" />
     <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.BridgeTraffic.cs" />
     <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.UiRuntime.cs" />
     <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.VisualAtmosphere.cs" />

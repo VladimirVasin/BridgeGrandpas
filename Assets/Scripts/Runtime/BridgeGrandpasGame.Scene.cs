@@ -40,6 +40,7 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         mainCamera.backgroundColor = Color.black;
         EnsureCameraAudioListener();
         SetupAtmospherePostProcessing();
+        SetupCameraForeground();
 
         Light sun = FindAnyObjectByType<Light>();
         if (sun == null)
@@ -56,6 +57,7 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
 
         CreateBridgeWorld();
         SetupUnderpassWind();
+        SetupGroundLitter();
         selectionMarker = CreateMarker("Selection Marker", new Color(1f, 0.76f, 0.24f, 0.85f));
         hoverMarker = CreateMarker("Hover Marker", new Color(0.55f, 0.85f, 1f, 0.55f));
     }

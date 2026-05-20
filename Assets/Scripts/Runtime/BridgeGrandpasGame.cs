@@ -195,6 +195,8 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         UpdateBillboards();
         UpdateFireBarrelLighting();
         UpdateUnderpassWind(deltaTime);
+        UpdateGroundLitter(deltaTime);
+        UpdateCameraForeground();
         UpdateBuildingAnimations(deltaTime);
         UpdateBackgroundMusic();
         UpdateAmbience(deltaTime);
