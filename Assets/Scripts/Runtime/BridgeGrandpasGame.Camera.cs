@@ -364,10 +364,12 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
 #if ENABLE_INPUT_SYSTEM
         if (Mouse.current != null)
         {
-            return Mouse.current.middleButton.isPressed || Mouse.current.rightButton.isPressed;
+            return vhsModeEnabled
+                ? Mouse.current.middleButton.isPressed
+                : Mouse.current.middleButton.isPressed || Mouse.current.rightButton.isPressed;
         }
 #endif
-        return Input.GetMouseButton(1) || Input.GetMouseButton(2);
+        return vhsModeEnabled ? Input.GetMouseButton(2) : Input.GetMouseButton(1) || Input.GetMouseButton(2);
     }
 
     private bool WasCameraResetPressed()

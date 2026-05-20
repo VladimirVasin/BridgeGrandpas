@@ -188,6 +188,7 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         UpdateNotebookMode(deltaTime);
         UpdateCameraControls(deltaTime);
         UpdateVhsOverlay(deltaTime);
+        UpdateObservationCards(deltaTime);
         HandlePointer();
         UpdateMicroHudPanel(deltaTime);
         UpdateExpeditionDice(deltaTime);

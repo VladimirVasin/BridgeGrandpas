@@ -87,6 +87,7 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         CreateCorner(vhsFrameRoot, "Top Right", new Vector2(1f, 1f), new Vector2(-1f, -1f));
         CreateCorner(vhsFrameRoot, "Bottom Left", new Vector2(0f, 0f), new Vector2(1f, 1f));
         CreateCorner(vhsFrameRoot, "Bottom Right", new Vector2(1f, 0f), new Vector2(-1f, 1f));
+        CreateVhsObservationHighlightLayer();
     }
 
     private void CreateVhsReadouts()
@@ -208,6 +209,7 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         UpdateObservationScan(deltaTime);
         ApplyVhsCameraViewport(true);
         UpdateVhsFrame();
+        UpdateVhsObservationHighlights();
         UpdateVhsReadouts();
         UpdateVhsMotion();
         ApplyVhsPostEffects(true, vhsZoomPulse, vhsTrackingPulse);
@@ -260,6 +262,7 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
 
         if (!enabled)
         {
+            HideAllObservationHighlights();
             ApplyVhsPostEffects(false, 0f, 0f);
         }
     }

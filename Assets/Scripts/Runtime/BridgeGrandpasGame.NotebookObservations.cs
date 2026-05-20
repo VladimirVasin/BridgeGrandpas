@@ -5,21 +5,27 @@ using UnityEngine.UI;
 public sealed partial class BridgeGrandpasGame : MonoBehaviour
 {
     private const int MaxNotebookObservations = 48;
+    private const int CurrentObservationDay = 2;
+    private const int ArchiveObservationDay = 1;
     private const float ObservationWritingSpeed = 15f;
     private const float ObservationWritingPause = 0.55f;
     private readonly List<NotebookObservation> notebookObservations = new List<NotebookObservation>();
 
     private sealed class NotebookObservation
     {
+        public int Day;
         public float Time;
         public string Text;
         public bool Written;
+        public bool HasClock;
 
-        public NotebookObservation(float time, string text)
+        public NotebookObservation(int day, float time, string text, bool written, bool hasClock)
         {
+            Day = day;
             Time = time;
             Text = text;
-            Written = false;
+            Written = written;
+            HasClock = hasClock;
         }
     }
 
@@ -27,38 +33,45 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
     {
         notebookObservations.Clear();
         ResetObservationLeads();
-        QueueObservationLead("сухое пятно", "Под мостом обнаружено сухое пятно. Оно уже выглядит подозрительно пригодным для жизни.",
-            null, DefaultObservationPosition(), 0f);
+        ClearObservationCards();
+        EnsureDayOneArchiveObservation();
     }
 
     private void AddNotebookObservation(string text)
     {
-        if (string.IsNullOrWhiteSpace(text))
+        if (string.IsNullOrWhiteSpace(text) || NotebookObservationAlreadyWritten(text))
         {
             return;
         }
 
-        notebookObservations.Add(new NotebookObservation(Time.time, text));
-        while (notebookObservations.Count > MaxNotebookObservations)
-        {
-            notebookObservations.RemoveAt(0);
-        }
+        notebookObservations.Add(new NotebookObservation(CurrentObservationDay, Time.time, text, false, true));
+        TrimNotebookObservations();
     }
 
     private string LatestNotebookObservation()
     {
-        if (notebookObservations.Count == 0)
+        for (int i = notebookObservations.Count - 1; i >= 0; i--)
         {
-            return Time.time < alertUntil ? lastAlert : "Под мостом пока только мокрый воздух и терпение.";
+            if (notebookObservations[i].Day == CurrentObservationDay)
+            {
+                return notebookObservations[i].Text;
+            }
         }
 
-        return notebookObservations[notebookObservations.Count - 1].Text;
+        return Time.time < alertUntil ? lastAlert : "День 2 пока пуст: карточки наблюдений ещё ждут вклейки.";
     }
 
-    private string BuildNotebookObservationsIntro()
+    private bool NotebookObservationAlreadyWritten(string text)
     {
-        return "Это не меню приказов. Это блокнот человека, который делает вид, что просто записывает факты.\n\n" +
-            "Новые записи появляются только после VHS-наблюдения: включи камеру, поймай цель в центре кадра и удерживай ЛКМ или Space.";
+        for (int i = 0; i < notebookObservations.Count; i++)
+        {
+            if (notebookObservations[i].Text == text)
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private string BuildNotebookExpeditionIntro()
@@ -69,31 +82,110 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
             "Картонщики лучше возвращаются с коробками, радиодеды слышат больше слухов, сторожа оставляют меньше следов.";
     }
 
-    private void BuildNotebookObservationsPage()
+    private void BuildNotebookObservationsSpread()
     {
-        if (notebookObservations.Count == 0)
+        EnsureDayOneArchiveObservation();
+        float writingDelay = 0f;
+        int previousDay = Mathf.Max(ArchiveObservationDay, CurrentObservationDay - 1);
+
+        notebookTitleText.text = "День " + previousDay;
+        BuildNotebookObservationDay(notebookLeftPageContent, previousDay, false, ref writingDelay);
+        AddNotebookText("<b>День " + CurrentObservationDay + "</b>", 18, FontStyle.Bold, 34f);
+        BuildNotebookObservationDay(notebookPageContent, CurrentObservationDay, true, ref writingDelay);
+    }
+
+    private void BuildNotebookObservationDay(Transform parent, int day, bool animateNew, ref float writingDelay)
+    {
+        int count = NotebookObservationCountForDay(day);
+        if (count == 0)
         {
-            AddNotebookText("Пока записей нет. Наблюдатель ещё выбирает, чем пахнет мокрый асфальт.", 16, FontStyle.Italic, 60f);
+            AddNotebookTextTo(parent, "Пока записей нет. Наблюдатель держит чистую страницу для новых карточек.",
+                16, FontStyle.Italic, 56f);
             return;
         }
 
-        float writingDelay = 0f;
         for (int i = notebookObservations.Count - 1; i >= 0; i--)
         {
             NotebookObservation note = notebookObservations[i];
-            string line = ObservationTime(note.Time) + " — " + note.Text;
-            Text noteText = AddNotebookText(line, 15, FontStyle.Normal, 46f);
-            if (!note.Written)
+            if (note.Day != day)
             {
-                BridgeGrandpasNotebookWritingText writing = noteText.gameObject.AddComponent<BridgeGrandpasNotebookWritingText>();
-                int observationIndex = i;
-                string observedText = note.Text;
-                writing.Play(noteText, line, writingDelay, ObservationWritingSpeed, delegate
-                {
-                    MarkNotebookObservationWritten(observationIndex, observedText);
-                });
-                writingDelay += Mathf.Max(1.4f, line.Length / ObservationWritingSpeed) + ObservationWritingPause;
+                continue;
             }
+
+            string line = note.HasClock ? ObservationTime(note.Time) + " — " + note.Text : note.Text;
+            Text noteText = AddNotebookTextTo(parent, line, 15, FontStyle.Normal, note.HasClock ? 52f : 320f);
+            if (note.Written || !animateNew)
+            {
+                continue;
+            }
+
+            BridgeGrandpasNotebookWritingText writing = noteText.gameObject.AddComponent<BridgeGrandpasNotebookWritingText>();
+            int observationIndex = i;
+            string observedText = note.Text;
+            writing.Play(noteText, line, writingDelay, ObservationWritingSpeed, delegate
+            {
+                MarkNotebookObservationWritten(observationIndex, observedText);
+            });
+            writingDelay += Mathf.Max(1.4f, line.Length / ObservationWritingSpeed) + ObservationWritingPause;
+        }
+    }
+
+    private int NotebookObservationCountForDay(int day)
+    {
+        int count = 0;
+        for (int i = 0; i < notebookObservations.Count; i++)
+        {
+            if (notebookObservations[i].Day == day)
+            {
+                count++;
+            }
+        }
+
+        return count;
+    }
+
+    private void EnsureDayOneArchiveObservation()
+    {
+        string text = DayOneArchiveObservationText();
+        if (NotebookObservationAlreadyWritten(text))
+        {
+            return;
+        }
+
+        notebookObservations.Insert(0, new NotebookObservation(ArchiveObservationDay, 0f, text, true, false));
+    }
+
+    private string DayOneArchiveObservationText()
+    {
+        return "Дождливым и промозглым ноябрьским вечером я возвращался с работы мимо старого моста.\n\n" +
+            "Ветер донёс до меня звук затухающего костра и глухое старческое ворчание. Что-то насторожило меня; я остановился и начал всматриваться.\n\n" +
+            "У бочки сидел дедушка с кружкой чая. Его пальто странно шевелилось в свете огня, который он развёл прямо в ржавой бочке, чтобы согреться.\n\n" +
+            "Он отпил, наклонился — и... не знаю, как это описать, но разделился надвое.\n\n" +
+            "Через мгновение у бочки сидели уже двое одинаковых дедушек. Первый молча налил второму чаю.\n\n" +
+            "Вне всякого сомнения, они размножаются почкованием.\n\n" +
+            "Отныне, что бы ни случилось, я должен наблюдать, чтобы раскрыть их тайну.";
+    }
+
+    private void TrimNotebookObservations()
+    {
+        while (notebookObservations.Count > MaxNotebookObservations)
+        {
+            int removeIndex = -1;
+            for (int i = 0; i < notebookObservations.Count; i++)
+            {
+                if (notebookObservations[i].Day != ArchiveObservationDay)
+                {
+                    removeIndex = i;
+                    break;
+                }
+            }
+
+            if (removeIndex < 0)
+            {
+                return;
+            }
+
+            notebookObservations.RemoveAt(removeIndex);
         }
     }
 

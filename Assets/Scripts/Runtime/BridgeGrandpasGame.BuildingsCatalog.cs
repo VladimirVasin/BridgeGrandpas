@@ -35,13 +35,21 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
     {
         ResetNotebookObservations();
         TryBuild(BuildingType.FireBarrel, true);
+        Building fire;
+        Transform fireTarget = buildings.TryGetValue(BuildingType.FireBarrel, out fire) && fire.Root != null
+            ? fire.Root.transform
+            : null;
+        QueueObservationLead("сухое пятно", "Под мостом обнаружено сухое пятно. Оно уже выглядит подозрительно пригодным для жизни.",
+            fireTarget, DefaultObservationPosition(), 0f);
         CreateStarterCommuneProps();
         Grandpa first = SpawnGrandpa(GrandpaRole.Common, new Vector3(-0.6f, 0f, -1.15f));
-        QueueObservationLead("первый дед", first.Name + " замечен первым. Пока это не толпа, а один очень уверенный дед.",
+        Grandpa second = SpawnGrandpa(GrandpaRole.Common, new Vector3(0.55f, 0f, -1.05f));
+        QueueObservationLead("первые деды", first.Name + " и " + second.Name +
+            " уже сидят у бочки. Наблюдатель явно опоздал к началу самого странного.",
             first.Root != null ? first.Root.transform : null, first.Target, 0.08f);
-        Notify("Первый дедушка обжил сухое пятно под мостом. Государство пока помещается в одном пальто.");
-        QueueObservationLead("первое государство", "Государство пока помещается в одном пальто.",
-            first.Root != null ? first.Root.transform : null, first.Target, 0.05f);
+        Notify("Два дедушки обжили сухое пятно под мостом. Государство уже помещается в двух пальто.");
+        QueueObservationLead("первое государство", "Государство пока помещается в двух пальто и одной кружке чая.",
+            second.Root != null ? second.Root.transform : null, second.Target, 0.05f);
     }
 }
 

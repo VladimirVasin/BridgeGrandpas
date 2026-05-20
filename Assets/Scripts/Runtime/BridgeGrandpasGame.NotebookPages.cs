@@ -151,7 +151,8 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
                 }
 
                 QueueObservationLead("версия события", "Событие \"" + eventSnapshot.Title + "\": записана версия \"" +
-                    choiceSnapshot.Label + "\". " + PlainNotebookText(choiceSnapshot.Preview), null, DefaultObservationPosition(), 0.12f);
+                    choiceSnapshot.Label + "\". " + PlainNotebookText(choiceSnapshot.Preview),
+                    EventObservationTarget(), DefaultObservationPosition(), 0.12f);
                 pendingEvent = null;
                 if (eventModal != null)
                 {

@@ -21,6 +21,7 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         public List<BuildingSaveData> Buildings = new List<BuildingSaveData>();
         public List<GrandpaSaveData> Grandpas = new List<GrandpaSaveData>();
         public List<ObservationSaveData> Observations = new List<ObservationSaveData>();
+        public List<ObservationCardSaveData> PendingObservationCards = new List<ObservationCardSaveData>();
     }
 
     [Serializable]
@@ -46,9 +47,19 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
     [Serializable]
     private sealed class ObservationSaveData
     {
+        public int Day;
         public float Time;
         public string Text;
         public bool Written;
+        public bool HasClock;
+    }
+
+    [Serializable]
+    private sealed class ObservationCardSaveData
+    {
+        public string Label;
+        public string Text;
+        public float CreatedAt;
     }
 
     private bool TryLoadGame()
@@ -164,6 +175,7 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         RestoreBuildings(data.Buildings);
         RestoreGrandpas(data.Grandpas);
         RestoreNotebookObservations(data.Observations);
+        RestorePendingObservationCards(data.PendingObservationCards);
         CreateStarterCommuneProps();
         RefreshCozyDecor();
     }
@@ -223,6 +235,7 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         ResetObservationLeads();
         if (observations == null)
         {
+            EnsureDayOneArchiveObservation();
             return;
         }
 
@@ -234,10 +247,14 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
                 continue;
             }
 
-            NotebookObservation note = new NotebookObservation(saved.Time, saved.Text);
-            note.Written = saved.Written;
+            int day = saved.Day <= 0 ? CurrentObservationDay : saved.Day;
+            bool hasClock = saved.Day <= 0 ? true : saved.HasClock;
+            NotebookObservation note = new NotebookObservation(day, saved.Time, saved.Text, saved.Written, hasClock);
             notebookObservations.Add(note);
         }
+
+        EnsureDayOneArchiveObservation();
+        TrimNotebookObservations();
     }
 
     private void SaveGame()
@@ -302,12 +319,15 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
             NotebookObservation note = notebookObservations[i];
             data.Observations.Add(new ObservationSaveData
             {
+                Day = note.Day,
                 Time = note.Time,
                 Text = note.Text,
-                Written = note.Written
+                Written = note.Written,
+                HasClock = note.HasClock
             });
         }
 
+        SavePendingObservationCards(data.PendingObservationCards);
         return data;
     }
 

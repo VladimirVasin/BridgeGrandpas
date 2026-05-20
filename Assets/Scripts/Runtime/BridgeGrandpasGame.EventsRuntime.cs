@@ -15,11 +15,13 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         suspicion = 28f;
         stock.Cardboard *= 0.82f;
         stock.Tea *= 0.90f;
-        BlockRandomBuilding(UnityEngine.Random.Range(40f, 75f));
+        Building blocked = BlockRandomBuilding(UnityEngine.Random.Range(40f, 75f));
         BoostCityAmbience(55f);
         Notify("Городская комиссия провела проверку. Часть картона забрали, один объект временно опечатан.");
+        Transform target = blocked != null && blocked.Root != null ? blocked.Root.transform : DefaultObservationTarget();
+        Vector3 fallback = blocked != null ? blocked.Position : DefaultObservationPosition();
         QueueObservationLead("следы комиссии", "Городская комиссия заглянула под мост. Картон поредел, один объект временно притих.",
-            null, DefaultObservationPosition(), 0.10f);
+            target, fallback, 0.10f);
         RefreshAllUi();
     }
 
@@ -33,7 +35,7 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         pendingEvent = events[random.Next(events.Count)];
         Notify("Новое событие: " + pendingEvent.Title + ".");
         QueueObservationLead("новый шорох", "Сверху пришёл новый шорох: \"" + pendingEvent.Title + "\".",
-            null, DefaultObservationPosition(), 0.08f);
+            EventObservationTarget(), DefaultObservationPosition(), 0.08f);
         if (!vhsModeEnabled)
         {
             SetNotebookPage(NotebookPage.Events);
@@ -81,7 +83,8 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
                 }
 
                 QueueObservationLead("версия события", "Событие \"" + bridgeEvent.Title + "\": записана версия \"" +
-                    choiceSnapshot.Label + "\". " + PlainNotebookText(choiceSnapshot.Preview), null, DefaultObservationPosition(), 0.12f);
+                    choiceSnapshot.Label + "\". " + PlainNotebookText(choiceSnapshot.Preview),
+                    EventObservationTarget(), DefaultObservationPosition(), 0.12f);
                 pendingEvent = null;
                 eventModal.gameObject.SetActive(false);
                 suspicion = Mathf.Clamp(suspicion, 0f, MaxSuspicion);
@@ -93,7 +96,7 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         eventModal.gameObject.SetActive(true);
     }
 
-    private void BlockRandomBuilding(float seconds)
+    private Building BlockRandomBuilding(float seconds)
     {
         List<Building> candidates = new List<Building>();
         foreach (Building building in buildings.Values)
@@ -106,11 +109,12 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
 
         if (candidates.Count == 0)
         {
-            return;
+            return null;
         }
 
         Building selected = candidates[random.Next(candidates.Count)];
         BlockBuilding(selected.Type, seconds);
+        return selected;
     }
 
     private void BlockBuilding(BuildingType type, float seconds)

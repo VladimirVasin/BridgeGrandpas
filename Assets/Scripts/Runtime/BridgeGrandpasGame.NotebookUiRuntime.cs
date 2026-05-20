@@ -68,29 +68,33 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         RefreshNotebookPeek();
         ClearChildren(notebookLeftPageContent);
         ClearChildren(notebookPageContent);
-        notebookTitleText.text = NotebookPageTitle(currentNotebookPage);
-        AddNotebookTextTo(notebookLeftPageContent, NotebookPageBody(currentNotebookPage), 17, FontStyle.Normal, 340f);
-
-        switch (currentNotebookPage)
+        if (currentNotebookPage == NotebookPage.Observations)
         {
-            case NotebookPage.Summary:
-                BuildNotebookSummaryRightPage();
-                break;
-            case NotebookPage.Observations:
-                BuildNotebookObservationsPage();
-                break;
-            case NotebookPage.Build:
-                BuildNotebookBuildPage();
-                break;
-            case NotebookPage.Grandpas:
-                BuildNotebookGrandpasPage();
-                break;
-            case NotebookPage.Events:
-                BuildNotebookEventsPage();
-                break;
-            case NotebookPage.Expeditions:
-                BuildNotebookExpeditionsPage();
-                break;
+            BuildNotebookObservationsSpread();
+        }
+        else
+        {
+            notebookTitleText.text = NotebookPageTitle(currentNotebookPage);
+            AddNotebookTextTo(notebookLeftPageContent, NotebookPageBody(currentNotebookPage), 17, FontStyle.Normal, 340f);
+
+            switch (currentNotebookPage)
+            {
+                case NotebookPage.Summary:
+                    BuildNotebookSummaryRightPage();
+                    break;
+                case NotebookPage.Build:
+                    BuildNotebookBuildPage();
+                    break;
+                case NotebookPage.Grandpas:
+                    BuildNotebookGrandpasPage();
+                    break;
+                case NotebookPage.Events:
+                    BuildNotebookEventsPage();
+                    break;
+                case NotebookPage.Expeditions:
+                    BuildNotebookExpeditionsPage();
+                    break;
+            }
         }
 
         if (notebookScroll != null)
@@ -140,7 +144,7 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
 
         if (page == NotebookPage.Observations)
         {
-            return BuildNotebookObservationsIntro();
+            return "";
         }
 
         if (page == NotebookPage.Events && pendingEvent != null)
