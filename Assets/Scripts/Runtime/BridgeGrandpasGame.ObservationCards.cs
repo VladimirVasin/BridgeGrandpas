@@ -4,10 +4,10 @@ using UnityEngine.UI;
 
 public sealed partial class BridgeGrandpasGame : MonoBehaviour
 {
-    private const float ObservationCardWidth = 246f;
-    private const float ObservationCardHeight = 78f;
-    private const float ObservationCardSpacing = 10f;
-    private const int ObservationCardsPerRow = 4;
+    private const float ObservationCardWidth = 172f;
+    private const float ObservationCardHeight = 218f;
+    private const float ObservationCardSpacing = 14f;
+    private const int ObservationCardsPerRow = 5;
 
     private readonly List<ObservationCard> observationCards = new List<ObservationCard>();
     private Canvas observationCardCanvas;
@@ -26,9 +26,11 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         public CanvasGroup Group;
         public Button Button;
         public Image Background;
-        public Text LabelText;
         public Text BodyText;
+        public RectTransform ArtFrame;
+        public Image ArtImage;
         public Vector2 SpawnPosition;
+        public float HoverAmount;
         public bool Applying;
         public float ApplyStart;
         public Vector2 ApplyFrom;
@@ -59,7 +61,7 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         observationCardDock.anchorMax = new Vector2(0.5f, 0f);
         observationCardDock.pivot = new Vector2(0.5f, 0f);
         observationCardDock.anchoredPosition = new Vector2(0f, 18f);
-        observationCardDock.sizeDelta = new Vector2(1080f, 116f);
+        observationCardDock.sizeDelta = new Vector2(1120f, 266f);
         observationCardDock.GetComponent<Image>().raycastTarget = false;
 
         observationCardDockText = CreateText("Observation Card Dock Label", observationCardDock, 14, FontStyle.BoldAndItalic,
@@ -93,6 +95,7 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
 
         CreateObservationCardView(card);
         observationCards.Add(card);
+        WriteDebugLog("OBS_CARD", "Created card label=" + card.Label + " text=" + card.Text + " cards=" + observationCards.Count);
         vhsTrackingPulse = Mathf.Max(vhsTrackingPulse, 0.9f);
         ApplyObservationCardDockVisibility();
     }
@@ -116,6 +119,7 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
 
         CreateObservationCardView(card);
         observationCards.Add(card);
+        WriteDebugLog("OBS_CARD_RESTORE", "Restored pending card label=" + card.Label + " text=" + card.Text + " cards=" + observationCards.Count);
         ApplyObservationCardDockVisibility();
     }
 
@@ -149,44 +153,57 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         outline.effectDistance = new Vector2(1.5f, -1.5f);
         rect.gameObject.AddComponent<BridgeGrandpasHudButtonAudio>();
 
-        Text label = CreateText("Card Label", rect, 14, FontStyle.Bold, TextAnchor.UpperLeft, new Color(0.15f, 0.075f, 0.035f));
-        label.text = card.Label;
-        label.rectTransform.anchorMin = new Vector2(0f, 1f);
-        label.rectTransform.anchorMax = new Vector2(1f, 1f);
-        label.rectTransform.offsetMin = new Vector2(12f, -27f);
-        label.rectTransform.offsetMax = new Vector2(-12f, -6f);
-        label.raycastTarget = false;
+        RectTransform artFrame = CreatePanel("Card Pixel Art Frame", rect, new Color(0.11f, 0.075f, 0.045f, 1f));
+        artFrame.anchorMin = Vector2.zero;
+        artFrame.anchorMax = Vector2.one;
+        artFrame.offsetMin = new Vector2(12f, 14f);
+        artFrame.offsetMax = new Vector2(-12f, -58f);
+        artFrame.GetComponent<Image>().raycastTarget = false;
 
-        Text body = CreateText("Card Body", rect, 12, FontStyle.Italic, TextAnchor.UpperLeft, new Color(0.18f, 0.095f, 0.04f));
-        body.text = ShortObservationCardText(card.Text);
-        body.rectTransform.anchorMin = Vector2.zero;
-        body.rectTransform.anchorMax = Vector2.one;
-        body.rectTransform.offsetMin = new Vector2(12f, 9f);
-        body.rectTransform.offsetMax = new Vector2(-12f, -30f);
-        body.raycastTarget = false;
+        Image artImage = CreatePanel("Card Pixel Art", artFrame, new Color(0.20f, 0.16f, 0.11f, 1f)).GetComponent<Image>();
+        RectTransform artRect = artImage.rectTransform;
+        artRect.anchorMin = Vector2.zero;
+        artRect.anchorMax = Vector2.one;
+        artRect.offsetMin = new Vector2(4f, 4f);
+        artRect.offsetMax = new Vector2(-4f, -4f);
+        artImage.raycastTarget = false;
+        artImage.preserveAspect = true;
+        Sprite sprite = ObservationCardArtSprite(card.Label);
+        if (sprite != null)
+        {
+            artImage.sprite = sprite;
+            artImage.color = Color.white;
+        }
+        else
+        {
+            CreateObservationCardPlaceholderArt(artRect, card.Label);
+        }
+
+        Text caption = CreateText("Card Title", rect, 15, FontStyle.Bold, TextAnchor.MiddleCenter, new Color(0.12f, 0.065f, 0.032f));
+        caption.text = ObservationCardCaption(card);
+        caption.rectTransform.anchorMin = new Vector2(0f, 1f);
+        caption.rectTransform.anchorMax = Vector2.one;
+        caption.rectTransform.offsetMin = new Vector2(10f, -52f);
+        caption.rectTransform.offsetMax = new Vector2(-10f, -8f);
+        caption.raycastTarget = false;
+        caption.horizontalOverflow = HorizontalWrapMode.Wrap;
+        caption.verticalOverflow = VerticalWrapMode.Truncate;
 
         card.Root = rect;
         card.Background = image;
-        card.LabelText = label;
-        card.BodyText = body;
+        card.ArtFrame = artFrame;
+        card.ArtImage = artImage;
+        card.BodyText = caption;
         card.Group = rect.gameObject.AddComponent<CanvasGroup>();
         card.Button = button;
-    }
-
-    private string ShortObservationCardText(string text)
-    {
-        if (string.IsNullOrEmpty(text) || text.Length <= 82)
-        {
-            return text;
-        }
-
-        return text.Substring(0, 79) + "...";
     }
 
     private void UpdateObservationCards(float deltaTime)
     {
         UpdateObservationCardDock(deltaTime);
         UpdateObservationCardButtons();
+        ObservationCard hoveredCard = HoveredObservationCard();
+        UpdateObservationCardSiblingOrder(hoveredCard);
 
         for (int i = 0; i < observationCards.Count; i++)
         {
@@ -207,12 +224,16 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
                 continue;
             }
 
-            Vector2 target = ObservationCardDockPosition(i, observationCards.Count);
+            float targetHover = card == hoveredCard ? 1f : 0f;
+            card.HoverAmount = Mathf.Lerp(card.HoverAmount, targetHover, 1f - Mathf.Exp(-deltaTime * 16f));
+            Vector2 target = ObservationCardDockPosition(i, observationCards.Count, card.HoverAmount);
             float age = Mathf.Clamp01((Time.time - card.CreatedAt) / 0.48f);
             float follow = age < 1f ? Mathf.SmoothStep(0f, 1f, age) : 1f - Mathf.Exp(-deltaTime * 12f);
             Vector2 from = age < 1f ? card.SpawnPosition : card.Root.anchoredPosition;
             card.Root.anchoredPosition = Vector2.Lerp(from, target, follow);
-            card.Root.localScale = Vector3.one * Mathf.Lerp(0.86f, 1f, age);
+            float angle = Mathf.LerpAngle(card.Root.localEulerAngles.z, ObservationCardDockRotation(i, observationCards.Count, card.HoverAmount), 1f - Mathf.Exp(-deltaTime * 14f));
+            card.Root.localRotation = Quaternion.Euler(0f, 0f, angle);
+            card.Root.localScale = Vector3.one * Mathf.Lerp(0.86f, ObservationCardDockScale(i, observationCards.Count, card.HoverAmount), age);
             card.Group.alpha = 1f;
             ApplyObservationCardVisualState(card);
         }
@@ -225,12 +246,11 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
             return;
         }
 
-        int rows = Mathf.Max(1, Mathf.CeilToInt(observationCards.Count / (float)ObservationCardsPerRow));
-        float targetHeight = observationCards.Count == 0 ? 0f : 40f + rows * (ObservationCardHeight + ObservationCardSpacing);
-        observationCardDock.sizeDelta = Vector2.Lerp(observationCardDock.sizeDelta, new Vector2(1080f, targetHeight), 1f - Mathf.Exp(-deltaTime * 12f));
+        float targetHeight = observationCards.Count == 0 ? 0f : vhsModeEnabled ? 124f : 94f;
+        observationCardDock.sizeDelta = Vector2.Lerp(observationCardDock.sizeDelta, new Vector2(1120f, targetHeight), 1f - Mathf.Exp(-deltaTime * 12f));
         observationCardDock.anchoredPosition = Vector2.Lerp(
             observationCardDock.anchoredPosition,
-            new Vector2(0f, vhsModeEnabled ? 108f : 18f),
+            new Vector2(0f, vhsModeEnabled ? 68f : 0f),
             1f - Mathf.Exp(-deltaTime * 10f));
         ApplyObservationCardDockVisibility();
     }
@@ -267,18 +287,6 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         }
     }
 
-    private Vector2 ObservationCardDockPosition(int index, int count)
-    {
-        int row = index / ObservationCardsPerRow;
-        int column = index % ObservationCardsPerRow;
-        int rowStart = row * ObservationCardsPerRow;
-        int rowCount = Mathf.Min(ObservationCardsPerRow, Mathf.Max(1, count - rowStart));
-        float step = ObservationCardWidth + ObservationCardSpacing;
-        float x = (column - (rowCount - 1) * 0.5f) * step;
-        float y = (vhsModeEnabled ? 70f : 64f) + row * (ObservationCardHeight + ObservationCardSpacing);
-        return new Vector2(x, y);
-    }
-
     private void ApplyObservationCardVisualState(ObservationCard card)
     {
         if (card == null || card.Applying)
@@ -293,18 +301,16 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
                 card.Background.color = new Color(0.92f, 0.75f, 0.42f, 0.98f);
             }
 
-            if (card.LabelText != null)
-            {
-                card.LabelText.color = new Color(0.07f, 0.045f, 0.025f, 1f);
-                card.LabelText.fontSize = 15;
-                card.LabelText.fontStyle = FontStyle.Bold;
-            }
-
             if (card.BodyText != null)
             {
                 card.BodyText.color = new Color(0.09f, 0.055f, 0.025f, 1f);
-                card.BodyText.fontSize = 13;
+                card.BodyText.fontSize = 16;
                 card.BodyText.fontStyle = FontStyle.Bold;
+            }
+
+            if (card.ArtImage != null && card.ArtImage.sprite != null)
+            {
+                card.ArtImage.color = Color.white;
             }
 
             return;
@@ -315,18 +321,16 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
             card.Background.color = new Color(0.78f, 0.67f, 0.48f, 0.98f);
         }
 
-        if (card.LabelText != null)
-        {
-            card.LabelText.color = new Color(0.15f, 0.075f, 0.035f);
-            card.LabelText.fontSize = 14;
-            card.LabelText.fontStyle = FontStyle.Bold;
-        }
-
         if (card.BodyText != null)
         {
             card.BodyText.color = new Color(0.18f, 0.095f, 0.04f);
-            card.BodyText.fontSize = 12;
-            card.BodyText.fontStyle = FontStyle.Italic;
+            card.BodyText.fontSize = 15;
+            card.BodyText.fontStyle = FontStyle.Bold;
+        }
+
+        if (card.ArtImage != null && card.ArtImage.sprite != null)
+        {
+            card.ArtImage.color = Color.white;
         }
     }
 
@@ -414,15 +418,26 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         if (card.Lead != null)
         {
             card.Lead.State = ObservationLeadState.Written;
+            WriteDebugLog("OBS_APPLY", "Card applied and lead written id=" + card.Lead.Id + " label=" + card.Label +
+                " text=" + card.Text);
             if (card.Lead.HighlightRoot != null)
             {
                 card.Lead.HighlightRoot.gameObject.SetActive(false);
             }
         }
+        else
+        {
+            WriteDebugLog("OBS_APPLY", "Saved card applied label=" + card.Label + " text=" + card.Text);
+        }
 
         if (card.Root != null)
         {
             Destroy(card.Root.gameObject);
+        }
+
+        if (hoveredObservationCard == card)
+        {
+            hoveredObservationCard = null;
         }
 
         observationCards.Remove(card);
@@ -463,6 +478,7 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
             }
         }
 
+        hoveredObservationCard = null;
         observationCards.Clear();
         ApplyObservationCardDockVisibility();
     }

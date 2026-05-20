@@ -43,6 +43,8 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         grandpa.Target = JunkPileWorkPoint(pile);
         grandpa.IdleAction = GrandpaIdleAction.Wandering;
         grandpa.HasInteraction = false;
+        WriteDebugLog("JUNK_TASK", "Collector heading to pile. " + DebugGrandpaSnapshot(grandpa) +
+            " pile=" + pile.Id + " remaining=" + RateF(pile.RemainingJunk));
         return MoveGrandpaForCollector(grandpa, 0.62f, deltaTime);
     }
 
@@ -143,6 +145,8 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
             grandpa.CarryingJunk = 0f;
             junkDepotPulse = 1f;
             RefreshJunkDepotVisual();
+            WriteDebugLog("JUNK_DELIVERY", DebugGrandpaSnapshot(grandpa) + " delivered=" + RateF(delivered) +
+                " stockJunk=" + RateF(stock.Junk));
             Notify(grandpa.Name + " притащил хлам к центральной куче. +" + Mathf.CeilToInt(delivered) + " хлама.");
         }
 
@@ -172,6 +176,7 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         }
 
         ApplyGrandpaWorkModeState(grandpa, mode);
+        WriteDebugLog("WORK_MODE", "Changed work mode: " + DebugGrandpaSnapshot(grandpa));
         Notify(mode == GrandpaWorkMode.JunkCollector
             ? grandpa.Name + " назначен собирать хлам до конца дня."
             : grandpa.Name + " возвращён к обычному дедовскому быту.");
@@ -213,6 +218,7 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         }
 
         Notify("Полночь: сборщики хлама вернулись к обычному дедовскому быту.");
+        WriteDebugLog("WORK_MODE", "Day ended: collector work modes cleared. " + DebugStateSnapshot());
         MarkNotebookDirty();
         RefreshAllUi();
     }

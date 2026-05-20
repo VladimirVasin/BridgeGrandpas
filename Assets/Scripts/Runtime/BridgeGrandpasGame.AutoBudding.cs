@@ -130,6 +130,8 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         Notify(prefix + candidate.Name + " почковался. Появился " + child.Name + " (" + RoleName(role) + "). Уют +0.8." + cozy);
         QueueObservationLead("новый дед", "Зафиксировано почкование: от " + candidate.Name + " появился " +
             child.Name + " (" + RoleName(role) + ").", child.Root != null ? child.Root.transform : null, child.Target, 0.20f);
+        WriteDebugLog("BUDDING", "Success automatic=" + automatic + " parent=" + DebugGrandpaSnapshot(candidate) +
+            " child=" + DebugGrandpaSnapshot(child) + " " + DebugStateSnapshot());
         return true;
     }
 

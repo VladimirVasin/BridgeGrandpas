@@ -27,6 +27,7 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
     private RectTransform startDayIntroSubtitleLettersRoot;
     private Text[] startDayIntroSubtitleLetters;
     private RectTransform[] startDayIntroSubtitleLetterRects;
+    private Vector2[] startDayIntroSubtitleLetterBasePositions;
     private AudioSource startDayIntroMusicSource;
     private bool startDayIntroActive;
     private bool startDayIntroMusicStarted;
@@ -98,6 +99,7 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
             86f,
             out startDayIntroSubtitleLetters,
             out startDayIntroSubtitleLetterRects);
+        startDayIntroSubtitleLetterBasePositions = CaptureStartDayIntroLetterPositions(startDayIntroSubtitleLetterRects);
 
         SetupStartDayIntroMusic(canvasObject.transform);
 
@@ -182,6 +184,7 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
     private void BeginStartDayIntro()
     {
         SetupStartDayIntro();
+        WriteDebugLog("INTRO", "Start day intro began. day=" + CurrentObservationDay + " style=" + ActiveStartDayIntroStyle);
         startDayIntroElapsed = 0f;
         startDayIntroActive = true;
         startDayIntroMusicStarted = false;
@@ -357,6 +360,7 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         StopStartDayIntroMusic();
         BeginStartIrisFade();
         gameStarted = true;
+        WriteDebugLog("INTRO", "Start day intro completed. gameStarted=" + gameStarted + " " + DebugStateSnapshot());
     }
 
     private void PlayStartDayIntroMusic()

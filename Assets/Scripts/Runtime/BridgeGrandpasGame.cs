@@ -122,6 +122,8 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         suspicion = 8f;
         nextEventIn = 45f;
         nextRadioWhisperIn = 30f;
+        InitializeDebugLog();
+        WriteDebugLog("BOOT", "Awake completed. " + DebugStateSnapshot());
     }
 
     private void Start()
@@ -139,6 +141,7 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
             return;
         }
 
+        WriteDebugLog("SESSION", "StartNewGame requested. loadSaved=" + startMenuLoadSavedGame);
         StopMenuMusic();
         if (startMenuCanvas != null)
         {
@@ -153,11 +156,13 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         if (startMenuLoadSavedGame && TryLoadGame())
         {
             Notify("Старые записи подняты из-под мокрой обложки.");
+            WriteDebugLog("SESSION", "Saved game started. " + DebugStateSnapshot());
         }
         else
         {
             ResetDayClock();
             BuildInitialState();
+            WriteDebugLog("SESSION", "New game initial state created. " + DebugStateSnapshot());
         }
 
         startMenuLoadSavedGame = false;
@@ -169,10 +174,7 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
     private void Update()
     {
         float deltaTime = Time.deltaTime;
-        if (deltaTime <= 0f)
-        {
-            return;
-        }
+        float unscaledDeltaTime = Time.unscaledDeltaTime;
 
         if (!gameStarted)
         {
@@ -182,6 +184,16 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
             }
 
             UpdateStartMenuAnimation(deltaTime);
+            return;
+        }
+
+        if (UpdateEscapeMenuFlow(unscaledDeltaTime))
+        {
+            return;
+        }
+
+        if (deltaTime <= 0f)
+        {
             return;
         }
 

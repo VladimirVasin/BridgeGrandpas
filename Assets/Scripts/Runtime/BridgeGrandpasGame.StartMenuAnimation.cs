@@ -127,10 +127,38 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         float t = Time.unscaledTime;
         UpdateMenuCursorParallax(deltaTime);
         AnimateMenuBackground(t);
-        AnimateMenuFire(t);
-        AnimateMenuParticles(deltaTime, t);
+        bool menuFireVisible = !escapeMenuOpen;
+        SetStartMenuFireLayersVisible(menuFireVisible);
+        if (menuFireVisible)
+        {
+            AnimateMenuFire(t);
+            AnimateMenuParticles(deltaTime, t);
+        }
+
         AnimateMenuContent(t);
         UpdateStartMenuLoading(t);
+    }
+
+    private void SetStartMenuFireLayersVisible(bool visible)
+    {
+        if (startMenuFireGlowRect != null && startMenuFireGlowRect.gameObject.activeSelf != visible)
+        {
+            startMenuFireGlowRect.gameObject.SetActive(visible);
+        }
+
+        if (startMenuFireCoreRect != null && startMenuFireCoreRect.gameObject.activeSelf != visible)
+        {
+            startMenuFireCoreRect.gameObject.SetActive(visible);
+        }
+
+        for (int i = 0; i < menuParticles.Count; i++)
+        {
+            MenuParticle particle = menuParticles[i];
+            if (particle != null && particle.Rect != null && particle.Rect.gameObject.activeSelf != visible)
+            {
+                particle.Rect.gameObject.SetActive(visible);
+            }
+        }
     }
 
     private void UpdateMenuCursorParallax(float deltaTime)
@@ -237,7 +265,7 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
 
         if (startMenuButtonsGroup != null)
         {
-            float targetAlpha = startMenuLoading ? 0.36f : 1f;
+            float targetAlpha = saveSlotScreenOpen ? 0f : startMenuLoading ? 0.36f : 1f;
             startMenuButtonsGroup.alpha = Mathf.Lerp(startMenuButtonsGroup.alpha, targetAlpha, Time.unscaledDeltaTime * 9f);
         }
 

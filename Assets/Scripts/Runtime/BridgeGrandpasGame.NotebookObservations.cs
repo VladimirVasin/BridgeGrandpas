@@ -48,6 +48,8 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         }
 
         notebookObservations.Add(new NotebookObservation(CurrentObservationDay, CurrentDayClockElapsedSeconds(), text, false, true));
+        WriteDebugLog("NOTEBOOK_OBS", "Added observation day=" + CurrentObservationDay + " time=" + FormatWatchTime() +
+            " text=" + text + " total=" + notebookObservations.Count);
         TrimNotebookObservations();
     }
 

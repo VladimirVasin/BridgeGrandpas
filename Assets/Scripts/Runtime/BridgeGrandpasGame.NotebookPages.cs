@@ -157,6 +157,8 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
                     choiceSnapshot.Apply(this);
                 }
 
+                WriteDebugLog("EVENT_CHOICE", "Notebook event choice applied title=" + eventSnapshot.Title +
+                    " choice=" + choiceSnapshot.Label + " " + DebugStateSnapshot());
                 QueueObservationLead("версия события", "Событие \"" + eventSnapshot.Title + "\": записана версия \"" +
                     choiceSnapshot.Label + "\". " + PlainNotebookText(choiceSnapshot.Preview),
                     EventObservationTarget(), DefaultObservationPosition(), 0.12f);

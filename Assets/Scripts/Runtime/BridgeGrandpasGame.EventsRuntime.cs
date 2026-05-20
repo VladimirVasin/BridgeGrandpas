@@ -17,6 +17,8 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         stock.Tea *= 0.90f;
         Building blocked = BlockRandomBuilding(UnityEngine.Random.Range(40f, 75f));
         BoostCityAmbience(55f);
+        WriteDebugLog("INSPECTION", "Inspection triggered. survived=" + inspectionsSurvived +
+            " blocked=" + (blocked == null ? "none" : blocked.Type.ToString()) + " " + DebugStateSnapshot());
         Notify("Городская комиссия провела проверку. Часть картона забрали, один объект временно опечатан.");
         Transform target = blocked != null && blocked.Root != null ? blocked.Root.transform : DefaultObservationTarget();
         Vector3 fallback = blocked != null ? blocked.Position : DefaultObservationPosition();
@@ -33,6 +35,8 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         }
 
         pendingEvent = events[random.Next(events.Count)];
+        WriteDebugLog("EVENT", "Random event triggered title=" + pendingEvent.Title + " choices=" +
+            (pendingEvent.Choices == null ? 0 : pendingEvent.Choices.Length));
         Notify("Новое событие: " + pendingEvent.Title + ".");
         QueueObservationLead("новый шорох", "Сверху пришёл новый шорох: \"" + pendingEvent.Title + "\".",
             EventObservationTarget(), DefaultObservationPosition(), 0.08f);
@@ -82,6 +86,8 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
                     choiceSnapshot.Apply(this);
                 }
 
+                WriteDebugLog("EVENT_CHOICE", "Event choice applied title=" + bridgeEvent.Title +
+                    " choice=" + choiceSnapshot.Label + " " + DebugStateSnapshot());
                 QueueObservationLead("версия события", "Событие \"" + bridgeEvent.Title + "\": записана версия \"" +
                     choiceSnapshot.Label + "\". " + PlainNotebookText(choiceSnapshot.Preview),
                     EventObservationTarget(), DefaultObservationPosition(), 0.12f);
@@ -171,6 +177,7 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         if (grandpas.Count >= VictoryGrandpas && BuiltCount() >= VictoryBuildings && inspectionsSurvived >= VictoryInspections && rareMutationSeen)
         {
             victoryShown = true;
+            WriteDebugLog("VICTORY", "MVP victory condition reached. " + DebugStateSnapshot());
             if (victoryModal != null)
             {
                 victoryModal.gameObject.SetActive(false);

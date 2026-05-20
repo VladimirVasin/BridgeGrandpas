@@ -79,9 +79,17 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
 
     private bool TryLoadGame()
     {
-        string json = PlayerPrefs.GetString(SaveKey, "");
+        return TryLoadGameFromSlot(startMenuSelectedSaveSlot);
+    }
+
+    private bool TryLoadGameFromSlot(int slotIndex)
+    {
+        int normalizedSlot = NormalizeSaveSlotIndex(slotIndex);
+        string key = SaveSlotSourceKey(normalizedSlot);
+        string json = GetSaveSlotJson(normalizedSlot);
         if (string.IsNullOrEmpty(json))
         {
+            WriteDebugLog("SAVE_LOAD", "No saved game found for slot=" + normalizedSlot + " key=" + key);
             return false;
         }
 
@@ -92,23 +100,27 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         }
         catch (Exception exception)
         {
+            WriteDebugWarningLog("SAVE_LOAD", "Json parse failed slot=" + normalizedSlot + " key=" + key + ": " + exception.Message);
             Debug.LogWarning("[BridgeGrandpas] Save load failed: " + exception.Message);
             return false;
         }
 
         if (data == null || data.Grandpas == null || data.Grandpas.Count == 0)
         {
+            WriteDebugWarningLog("SAVE_LOAD", "Save rejected slot=" + normalizedSlot + " key=" + key +
+                ": data/grandpas missing. jsonLength=" + json.Length);
             return false;
         }
 
         ClearPlayableStateForLoad();
         RestoreSaveData(data);
+        WriteDebugLog("SAVE_LOAD", "Loaded game slot=" + normalizedSlot + " key=" + key + ". " + DebugStateSnapshot());
         return true;
     }
 
     private bool HasSavedGame()
     {
-        return !string.IsNullOrEmpty(PlayerPrefs.GetString(SaveKey, ""));
+        return HasAnySaveSlot();
     }
 
     private void SaveGameFromMenu()
@@ -118,10 +130,7 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
             return;
         }
 
-        SaveGame();
-        Notify("Сохранено: блокнот прижал страницу, чтобы её не унесло ветром.");
-        MarkNotebookDirty();
-        RefreshAllUi();
+        ShowSaveSlotScreen(SaveSlotScreenMode.Save);
     }
 
     private void LoadGameFromMenu()
@@ -132,21 +141,12 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
             return;
         }
 
-        if (!TryLoadGame())
-        {
-            Notify("Сохранение не прочиталось. Блокнот делает вид, что так и было.");
-            return;
-        }
-
-        SelectOverview();
-        BeginStartIrisFade();
-        MarkNotebookDirty();
-        RefreshAllUi();
-        Notify("Загружено: дедовская коммуна вернулась к старым записям.");
+        ShowSaveSlotScreen(SaveSlotScreenMode.Load);
     }
 
     private void ClearPlayableStateForLoad()
     {
+        WriteDebugLog("SAVE_LOAD", "Clearing playable state before restore.");
         selectedGrandpa = null;
         selectedBuilding = null;
         hoveredTarget = null;
@@ -178,6 +178,10 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
 
     private void RestoreSaveData(SaveData data)
     {
+        WriteDebugLog("SAVE_LOAD", "RestoreSaveData started. savedGrandpas=" +
+            (data.Grandpas == null ? 0 : data.Grandpas.Count) +
+            " savedBuildings=" + (data.Buildings == null ? 0 : data.Buildings.Count) +
+            " savedObservations=" + (data.Observations == null ? 0 : data.Observations.Count));
         stock = data.Stock;
         stock.ClampNonNegative();
         suspicion = Mathf.Clamp(data.Suspicion, 0f, MaxSuspicion);
@@ -202,6 +206,7 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         RestorePendingObservationCards(data.PendingObservationCards);
         CreateStarterCommuneProps();
         RefreshCozyDecor();
+        WriteDebugLog("SAVE_LOAD", "RestoreSaveData completed. " + DebugStateSnapshot());
     }
 
     private void RestoreBuildings(List<BuildingSaveData> savedBuildings)
@@ -287,14 +292,28 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
 
     private void SaveGame()
     {
+        SaveGameToSlot(startMenuSelectedSaveSlot);
+    }
+
+    private void SaveGameToSlot(int slotIndex)
+    {
         if (!gameStarted)
         {
             return;
         }
 
+        int normalizedSlot = NormalizeSaveSlotIndex(slotIndex);
+        string key = SaveSlotKey(normalizedSlot);
         SaveData data = BuildSaveData();
-        PlayerPrefs.SetString(SaveKey, JsonUtility.ToJson(data));
+        PlayerPrefs.SetString(key, JsonUtility.ToJson(data));
         PlayerPrefs.Save();
+        WriteDebugLog("SAVE", "Saved game slot=" + normalizedSlot + " key=" + key +
+            " buildings=" + data.Buildings.Count +
+            " grandpas=" + data.Grandpas.Count +
+            " junkPiles=" + data.JunkPiles.Count +
+            " observations=" + data.Observations.Count +
+            " pendingCards=" + data.PendingObservationCards.Count +
+            " " + DebugStateSnapshot());
     }
 
     private SaveData BuildSaveData()

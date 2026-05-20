@@ -108,6 +108,7 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         plansOldMenFollowupResolved = true;
         plansOldMenCollectorGrandpaId = grandpa.Id;
         plansOldMenFollowupOpen = false;
+        WriteDebugLog("JOURNAL_CHOICE", "Plans old men collector selected: " + DebugGrandpaSnapshot(grandpa));
 
         AddNotebookObservation(observation);
         SetGrandpaWorkMode(grandpa, GrandpaWorkMode.JunkCollector);

@@ -61,12 +61,18 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
     {
         label = UserFacingGrandpaText(label);
         text = UserFacingGrandpaText(text);
-        if (string.IsNullOrWhiteSpace(text) || ObservationAlreadyQueuedOrWritten(text))
+        if (string.IsNullOrWhiteSpace(text))
         {
             return;
         }
 
-        observationLeads.Add(new ObservationLead
+        if (ObservationAlreadyQueuedOrWritten(text))
+        {
+            WriteDebugLog("OBS_SKIP", "Observation already queued/written label=" + label + " text=" + text);
+            return;
+        }
+
+        ObservationLead lead = new ObservationLead
         {
             Id = nextObservationLeadId++,
             Label = string.IsNullOrWhiteSpace(label) ? "наблюдение" : label,
@@ -76,7 +82,11 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
             FallbackPosition = fallback,
             RequiredZoom = Mathf.Clamp01(requiredZoom),
             State = ObservationLeadState.Queued
-        });
+        };
+        observationLeads.Add(lead);
+        WriteDebugLog("OBS_QUEUE", "Queued id=" + lead.Id + " seq=" + lead.Sequence + " label=" + lead.Label +
+            " requiredZoom=" + lead.RequiredZoom.ToString("0.00", System.Globalization.CultureInfo.InvariantCulture) +
+            " fallback=" + fallback);
     }
 
     private bool ObservationAlreadyQueuedOrWritten(string text)
@@ -137,6 +147,8 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         if (activeObservationLead.Progress >= 1f)
         {
             activeObservationLead.State = ObservationLeadState.CardReady;
+            WriteDebugLog("OBS_SCAN", "Scan completed id=" + activeObservationLead.Id + " label=" + activeObservationLead.Label +
+                " text=" + activeObservationLead.Text);
             CreateObservationCard(activeObservationLead);
             observationRecordedUntil = Time.time + 2.2f;
             observationScanHint = "CARD PRINTED";

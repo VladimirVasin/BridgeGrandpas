@@ -18,6 +18,11 @@ public sealed partial class BridgeGrandpasGame
 
     private GameInteractionMode ResolveInteractionMode()
     {
+        if (escapeMenuOpen)
+        {
+            return GameInteractionMode.Dialog;
+        }
+
         if (vhsModeEnabled)
         {
             return GameInteractionMode.VhsCamera;

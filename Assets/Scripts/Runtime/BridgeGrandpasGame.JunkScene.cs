@@ -28,6 +28,8 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         }
 
         RefreshJunkDepotVisual();
+        WriteDebugLog("JUNK_INIT", "Reset junk piles for new game. piles=" + junkPiles.Count +
+            " columns=" + JunkPileColumns + " rows=" + JunkPileRows + " rangeX=" + JunkPileMinX + ".." + JunkPileMaxX);
     }
 
     private Vector3 EvenJunkPilePosition(int column, int row, int columns, float minX, float maxX)
@@ -57,6 +59,8 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         if (savedPiles == null || savedPiles.Count == 0 || savedPiles.Count != JunkPileColumns * JunkPileRows)
         {
             float savedJunk = stock.Junk;
+            WriteDebugWarningLog("JUNK_RESTORE", "Saved junk piles missing or wrong count. savedCount=" +
+                (savedPiles == null ? 0 : savedPiles.Count) + " expected=" + (JunkPileColumns * JunkPileRows));
             ResetJunkPilesForNewGame();
             stock.Junk = savedJunk;
             RefreshJunkDepotVisual();
@@ -75,6 +79,7 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         }
 
         RefreshJunkDepotVisual();
+        WriteDebugLog("JUNK_RESTORE", "Restored junk piles. piles=" + junkPiles.Count + " stockJunk=" + RateF(stock.Junk));
     }
 
     private void ClearJunkScene()

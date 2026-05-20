@@ -255,14 +255,7 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         float fade = Mathf.SmoothStep(0f, 1f, Mathf.Clamp01(titleElapsed / 0.62f));
         float subtitleAlpha = fade * (0.68f + Mathf.Sin(titleElapsed * 0.48f + 1.2f) * 0.08f);
         ApplyStartDayIntroTitleLetterReveal(titleElapsed, fade);
-
-        if (startDayIntroSubtitleLettersRoot != null)
-        {
-            startDayIntroSubtitleLettersRoot.anchoredPosition = new Vector2(0f, StartDayIntroSubtitleY + Mathf.Sin(titleElapsed * 0.43f + 0.8f) * 2.5f);
-        }
-
-        SetStartDayIntroLetterAlpha(startDayIntroSubtitleLetters, subtitleAlpha);
-        ApplyStartDayIntroLetterTickLine(startDayIntroSubtitleLetters, startDayIntroSubtitleLetterRects, titleElapsed, 7, 7.5f, 2.4f);
+        ApplyStartDayIntroSubtitleLetterGlitch(titleElapsed, subtitleAlpha);
     }
 
     private void ApplyStartDayIntroTitleLetterReveal(float titleElapsed, float baseFade)
@@ -377,6 +370,7 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
     private void ResetStartDayIntroSubtitleLetterRects()
     {
         ResetStartDayIntroLetterRects(startDayIntroSubtitleLetterRects);
+        ResetStartDayIntroSubtitleLetterPositions();
     }
 
     private void ResetStartDayIntroLetterRects(RectTransform[] rects)

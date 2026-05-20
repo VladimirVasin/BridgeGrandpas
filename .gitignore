@@ -27,6 +27,7 @@ Desktop.ini
 # Unity cache / crash files
 sysinfo.txt
 *.stackdump
+/debug.log
 
 # Local raw audio sources
 *.wav

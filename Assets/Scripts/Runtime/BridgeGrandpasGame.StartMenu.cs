@@ -49,7 +49,8 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
 
     private void CreateMenuBackground(Transform parent)
     {
-        Texture2D menuTexture = Resources.Load<Texture2D>("Menu");
+        startMenuDefaultTexture = Resources.Load<Texture2D>("Menu");
+        startMenuEscapeTexture = Resources.Load<Texture2D>("MenuEscape");
         GameObject imageObject = new GameObject("Menu Background", typeof(RectTransform), typeof(CanvasRenderer), typeof(RawImage));
         imageObject.transform.SetParent(parent, false);
         RectTransform rect = imageObject.GetComponent<RectTransform>();
@@ -60,9 +61,9 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         rect.offsetMax = Vector2.zero;
 
         RawImage image = imageObject.GetComponent<RawImage>();
-        image.texture = menuTexture;
-        image.color = menuTexture == null ? new Color(0.025f, 0.020f, 0.018f, 1f) : Color.white;
+        startMenuBackgroundImage = image;
         image.raycastTarget = false;
+        ApplyStartMenuBackground(false);
 
         RectTransform shade = CreatePanel("Menu Shade", parent, new Color(0f, 0f, 0f, 0.38f));
         startMenuShadeRect = shade;
@@ -111,16 +112,21 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         layout.childForceExpandWidth = true;
         layout.childForceExpandHeight = false;
 
-        CreateMenuButton("Новая игра", buttons, BeginStartMenuLoading);
+        RectTransform primaryButton = CreateMenuButton("Новая игра", buttons, BeginStartMenuLoading);
+        startMenuPrimaryButton = primaryButton.GetComponent<Button>();
+        startMenuPrimaryButtonText = primaryButton.GetComponentInChildren<Text>(true);
+
         RectTransform loadButton = CreateMenuButton("Загрузить", buttons, BeginStartMenuLoad);
-        Button load = loadButton.GetComponent<Button>();
-        if (load != null)
+        startMenuLoadButton = loadButton.GetComponent<Button>();
+        startMenuLoadButtonText = loadButton.GetComponentInChildren<Text>(true);
+        if (startMenuLoadButton != null)
         {
-            load.interactable = HasSavedGame();
+            startMenuLoadButton.interactable = HasSavedGame();
         }
 
         CreateMenuButton("Выход", buttons, QuitGameFromMenu);
         CreateMenuLoadingBar(contentRoot);
+        CreateSaveSlotScreen(contentRoot);
     }
 
     private void CreateMenuLoadingBar(Transform parent)
@@ -200,12 +206,18 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
             return;
         }
 
-        BeginStartMenuLoading(true);
+        ShowSaveSlotScreen(SaveSlotScreenMode.Load);
     }
 
     private void BeginStartMenuLoading(bool loadSavedGame)
     {
-        if (gameStarted || startMenuLoading)
+        if (gameStarted)
+        {
+            CloseEscapeMenu();
+            return;
+        }
+
+        if (startMenuLoading)
         {
             return;
         }
@@ -241,7 +253,8 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         Button[] buttons = startMenuButtonsRect.GetComponentsInChildren<Button>(true);
         for (int i = 0; i < buttons.Length; i++)
         {
-            buttons[i].interactable = interactable;
+            bool needsSaveToEnable = buttons[i] == startMenuLoadButton && !escapeMenuOpen;
+            buttons[i].interactable = interactable && (!needsSaveToEnable || HasSavedGame());
         }
     }
 

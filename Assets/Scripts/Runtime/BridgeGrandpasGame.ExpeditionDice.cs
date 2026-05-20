@@ -121,6 +121,10 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
             grandpa.ExpeditionRewardMultiplier *= expeditionDiceRewardMultiplier * luckReward;
             grandpa.ExpeditionRiskMultiplier *= expeditionDiceRiskMultiplier * luckRisk;
             grandpa.ExpeditionNarrativeResolved = true;
+            WriteDebugLog("EXPEDITION_DICE", DebugGrandpaSnapshot(grandpa) + " roll=" + expeditionDiceResult +
+                " rewardMul=" + expeditionDiceRewardMultiplier.ToString("0.00", System.Globalization.CultureInfo.InvariantCulture) +
+                " riskMul=" + expeditionDiceRiskMultiplier.ToString("0.00", System.Globalization.CultureInfo.InvariantCulture) +
+                " result=" + expeditionDiceResultText);
             Notify(grandpa.Name + " " + expeditionDiceResultText + ". Кубик: " + expeditionDiceResult + ".");
             Transform diceTarget = grandpa.Root != null && grandpa.Root.activeInHierarchy ? grandpa.Root.transform : EventObservationTarget();
             QueueObservationLead("кубик вылазки", "Вылазка " + grandpa.Name + ": кубик показал " +

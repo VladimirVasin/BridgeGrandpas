@@ -14,11 +14,13 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         Building building = buildings[type];
         if (building.Built)
         {
+            WriteDebugWarningLog("BUILD", "TryBuild ignored: already built type=" + type);
             return false;
         }
 
         if (!free && !Spend(building.BuildCost))
         {
+            WriteDebugWarningLog("BUILD", "TryBuild failed: insufficient resources type=" + type + " cost=" + building.BuildCost.ShortText() + " stock{" + DebugStockSnapshot() + "}");
             Notify("Ресурсов не хватает. Дедушки смотрят на смету с уважением.");
             return false;
         }
@@ -40,6 +42,7 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
             : NotebookBuildPhrase(type) + ". Уют под мостом вырос на " + RateF(CozyForBuild(type)) + ".";
         QueueObservationLead(NotebookObjectName(type), observationText,
             building.Root != null ? building.Root.transform : null, building.Position, 0.12f);
+        WriteDebugLog("BUILD", "Built type=" + type + " free=" + free + " level=" + building.Level + " " + DebugStateSnapshot());
         return true;
     }
 
@@ -47,6 +50,7 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
     {
         if (!building.Built)
         {
+            WriteDebugWarningLog("UPGRADE", "TryUpgrade failed: building is not built type=" + building.Type);
             Notify("Сначала надо построить объект.");
             return;
         }
@@ -54,6 +58,7 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         ResourceStock cost = UpgradeCost(building);
         if (!Spend(cost))
         {
+            WriteDebugWarningLog("UPGRADE", "TryUpgrade failed: insufficient resources type=" + building.Type + " cost=" + cost.ShortText() + " stock{" + DebugStockSnapshot() + "}");
             Notify("На улучшение не хватает ресурсов.");
             return;
         }
@@ -67,6 +72,7 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         QueueObservationLead(NotebookObjectName(building.Type), NotebookObjectName(building.Type) +
             " укреплён до уровня " + building.Level + ". Дедушки делают вид, что так было всегда.",
             building.Root != null ? building.Root.transform : null, building.Position, 0.18f);
+        WriteDebugLog("UPGRADE", "Upgraded type=" + building.Type + " level=" + building.Level + " " + DebugStateSnapshot());
     }
 
     private void TryBudSelected()
@@ -99,6 +105,7 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
 
         grandpa.Root = CreateGrandpaVisual(grandpa, position);
         grandpas.Add(grandpa);
+        WriteDebugLog("GRANDPA_SPAWN", DebugGrandpaSnapshot(grandpa) + " position=" + position);
 
         if (role == GrandpaRole.Philosopher || role == GrandpaRole.RadioReceiver)
         {

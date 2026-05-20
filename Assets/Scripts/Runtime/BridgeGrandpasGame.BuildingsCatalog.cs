@@ -33,6 +33,7 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
 
     private void BuildInitialState()
     {
+        WriteDebugLog("INIT", "BuildInitialState started.");
         ResetNotebookObservations();
         TryBuild(BuildingType.FireBarrel, true);
         Building fire;
@@ -51,6 +52,8 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         Notify("Два дедушки обжили сухое пятно под мостом. Государство уже помещается в двух пальто.");
         QueueObservationLead(PlansOldMenObservationLabel, PlansOldMenObservationText,
             second.Root != null ? second.Root.transform : null, second.Target, 0.05f);
+        WriteDebugLog("INIT", "BuildInitialState completed. first=" + DebugGrandpaSnapshot(first) +
+            " second=" + DebugGrandpaSnapshot(second) + " " + DebugStateSnapshot());
     }
 }
 

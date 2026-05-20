@@ -1,3 +1,4 @@
+using System.Globalization;
 using UnityEngine;
 #if ENABLE_INPUT_SYSTEM
 using UnityEngine.InputSystem;
@@ -17,6 +18,7 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
     {
         dayClockElapsedSeconds = 0f;
         UpdateWatchTimeText();
+        WriteDebugLog("DAY_CLOCK", "Clock reset to 00:00.");
     }
 
     private void UpdateDayClock(float deltaTime)
@@ -26,6 +28,8 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         int currentDay = DayClockIndex(dayClockElapsedSeconds);
         if (currentDay > previousDay)
         {
+            WriteDebugLog("DAY_ROLLOVER", "Day clock advanced previous=" + previousDay + " current=" + currentDay +
+                " elapsed=" + dayClockElapsedSeconds.ToString("0.00", CultureInfo.InvariantCulture));
             EndGrandpaWorkModesAtDayEnd();
         }
     }

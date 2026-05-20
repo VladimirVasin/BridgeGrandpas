@@ -136,6 +136,9 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         ShowThought(grandpa, "Пойду наверх", 2.4f);
 
         suspicion += 0.8f;
+        WriteDebugLog("EXPEDITION_START", DebugGrandpaSnapshot(grandpa) + " type=" + type +
+            " duration=" + ExpeditionDuration(grandpa, type).ToString("0.00", System.Globalization.CultureInfo.InvariantCulture) +
+            " cost=" + cost.ShortText());
         Notify(grandpa.Name + " собирается наверх: " + ExpeditionName(type) + ".");
         QueueObservationLead("уход наверх", grandpa.Name + " ушёл наверх: " + ExpeditionName(type) +
             ". В блокноте оставлено место под возвращение.",
@@ -178,6 +181,8 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         grandpa.ExpeditionRewardMultiplier = 1f;
         grandpa.ExpeditionRiskMultiplier = 1f;
         ShowThought(grandpa, "Я видел верх", 3.2f);
+        WriteDebugLog("EXPEDITION_COMPLETE", DebugGrandpaSnapshot(grandpa) + " type=" + grandpa.ExpeditionType +
+            " reward=" + reward.ShortText() + " risk=" + RateF(risk) + " " + DebugStateSnapshot());
         Notify(grandpa.Name + " вернулся: +" + reward.ShortText() + ", подозрение +" + RateF(risk) + ".");
         QueueObservationLead("возвращение", grandpa.Name + " вернулся сверху: +" + reward.ShortText() +
             ", город насторожился на " + RateF(risk) + ".",
