@@ -51,14 +51,15 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
 
         if (notebookTabGroup != null)
         {
-            notebookTabGroup.alpha = t;
-            notebookTabGroup.blocksRaycasts = !vhsModeEnabled && !watchModeEnabled && t > 0.35f;
-            notebookTabGroup.interactable = !vhsModeEnabled && !watchModeEnabled && t > 0.35f;
+            bool tabsVisible = !fakeCorruptedSaveActive;
+            notebookTabGroup.alpha = tabsVisible ? t : 0f;
+            notebookTabGroup.blocksRaycasts = tabsVisible && !vhsModeEnabled && !watchModeEnabled && t > 0.35f;
+            notebookTabGroup.interactable = tabsVisible && !vhsModeEnabled && !watchModeEnabled && t > 0.35f;
         }
 
         if (notebookLegendText != null)
         {
-            notebookLegendText.transform.parent.gameObject.SetActive(!vhsModeEnabled && !watchModeEnabled && t < 0.25f);
+            notebookLegendText.transform.parent.gameObject.SetActive(!fakeCorruptedSaveActive && !vhsModeEnabled && !watchModeEnabled && t < 0.25f);
         }
     }
 
@@ -72,6 +73,12 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         RefreshNotebookPeek();
         ClearChildren(notebookLeftPageContent);
         ClearChildren(notebookPageContent);
+        if (fakeCorruptedSaveActive)
+        {
+            BuildFakeCorruptedEmptyNotebook();
+            return;
+        }
+
         if (currentNotebookPage == NotebookPage.Observations)
         {
             BuildNotebookObservationsSpread();
@@ -127,6 +134,24 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         }
 
         notebookPeekText.text = "";
+    }
+
+    private void BuildFakeCorruptedEmptyNotebook()
+    {
+        if (notebookTitleText != null)
+        {
+            notebookTitleText.text = "";
+        }
+
+        if (notebookPreviousObservationCorner != null)
+        {
+            notebookPreviousObservationCorner.gameObject.SetActive(false);
+        }
+
+        if (notebookNextObservationCorner != null)
+        {
+            notebookNextObservationCorner.gameObject.SetActive(false);
+        }
     }
 
     private string NotebookPageTitle(NotebookPage page)

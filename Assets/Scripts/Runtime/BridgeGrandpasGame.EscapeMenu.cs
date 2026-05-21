@@ -17,6 +17,12 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
 
     private bool UpdateEscapeMenuFlow(float deltaTime)
     {
+        if (escapeMenuBsodActive)
+        {
+            UpdateEscapeMenuBsod();
+            return true;
+        }
+
         if (WasEscapePressed())
         {
             if (saveSlotScreenOpen)
@@ -45,9 +51,15 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
             return false;
         }
 
-        UpdateEscapeMenuHum();
+        if (!escapeMenuBsodTriggeredThisOpen)
+        {
+            UpdateEscapeMenuHum();
+        }
+
         UpdateStartMenuAnimation(deltaTime);
         UpdateEscapeMenuMadness();
+        UpdateEscapeMenuBsod();
+        UpdateEscapeMenuPostBsod(deltaTime);
         return true;
     }
 
@@ -59,6 +71,8 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         }
 
         escapeMenuOpen = true;
+        MarkEscapeMenuVisitedForFakeUnityErrorMusic();
+        ResetEscapeMenuPostBsodMenuState();
         startMenuLoading = false;
         PauseGameForEscapeMenu();
         SilenceEscapeMenuMusic();
@@ -106,8 +120,10 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         HideSaveSlotScreenOnly();
         StopEscapeMenuHum();
         EndEscapeMenuMadness();
+        ResetEscapeMenuPostBsodMenuState();
         ResumeEscapeMenuMusic();
         ResumeGameFromEscapeMenu();
+        RestoreBackgroundMusicAfterFakeUnityErrorEscapeReturn();
         SetStartMenuFireLayersVisible(true);
         ApplyStartMenuBackground(false);
         ApplyStartMenuButtonMode(false);
@@ -148,6 +164,12 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
 
     private void ApplyStartMenuButtonMode(bool inGameMenu)
     {
+        if (inGameMenu && escapeMenuPostBsodMenuActive)
+        {
+            ApplyEscapeMenuPostBsodButtonMode();
+            return;
+        }
+
         ConfigureStartMenuButton(
             startMenuPrimaryButton,
             startMenuPrimaryButtonText,

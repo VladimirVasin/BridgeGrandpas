@@ -68,6 +68,8 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
                 return "1FireBarrel";
             case "dry_spot":
                 return "2DrySpot";
+            case "corrupted_account":
+                return "685a2880-4327-4748-a5bd-d25a39679662";
             default:
                 return key;
         }
@@ -84,6 +86,11 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         if (text.Contains("сухое"))
         {
             return "dry_spot";
+        }
+
+        if (text.Contains("учёт") || text.Contains("учет") || text.Contains("account") || text.Contains("observer"))
+        {
+            return "corrupted_account";
         }
 
         if (text.Contains("первые"))

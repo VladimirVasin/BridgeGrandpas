@@ -166,6 +166,12 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
 
     private void OnDestroy()
     {
+        ReleaseFakeScreenshotResourcesForShutdown();
+        RestoreFakeExitForShutdown();
+        RestoreFakeMicrophoneCheckForShutdown();
+        RestoreFakeAudioRecordingForShutdown();
+        RestoreFakeCreditsForShutdown();
+        RestoreFakeUnityErrorPauseForShutdown();
         RestoreEscapeMenuPauseForShutdown();
         if (debugLogReady)
         {

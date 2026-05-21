@@ -104,8 +104,8 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         buttons.anchorMin = new Vector2(0.5f, 0.5f);
         buttons.anchorMax = new Vector2(0.5f, 0.5f);
         buttons.pivot = new Vector2(0.5f, 0.5f);
-        buttons.anchoredPosition = new Vector2(0f, 46f);
-        buttons.sizeDelta = new Vector2(320f, 228f);
+        buttons.anchoredPosition = new Vector2(0f, 10f);
+        buttons.sizeDelta = new Vector2(320f, 306f);
 
         VerticalLayoutGroup layout = buttons.gameObject.AddComponent<VerticalLayoutGroup>();
         layout.spacing = 14f;
@@ -125,6 +125,7 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         }
 
         CreateMenuButton("Выход", buttons, QuitGameFromMenu);
+        CreateMenuButton("Выйти?", buttons, BeginFakeExitSequence);
         CreateMenuLoadingBar(contentRoot);
         CreateSaveSlotScreen(contentRoot);
     }
@@ -220,6 +221,11 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         if (startMenuLoading)
         {
             return;
+        }
+
+        if (!loadSavedGame)
+        {
+            startMenuLoadCorruptedSave = false;
         }
 
         startMenuLoadSavedGame = loadSavedGame;

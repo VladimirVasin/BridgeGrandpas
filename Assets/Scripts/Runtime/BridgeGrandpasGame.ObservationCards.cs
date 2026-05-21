@@ -22,6 +22,7 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         public string Label;
         public string Text;
         public float CreatedAt;
+        public bool CorruptedAccount;
         public RectTransform Root;
         public CanvasGroup Group;
         public Button Button;
@@ -90,6 +91,7 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
             Label = lead.Label,
             Text = lead.Text,
             CreatedAt = Time.time,
+            CorruptedAccount = lead.CorruptedAccount,
             SpawnPosition = ObservationCardSpawnPosition(lead)
         };
 
@@ -364,7 +366,18 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
 
     private void StartObservationCardApplication(ObservationCard card)
     {
-        if (card == null || card.Applying || vhsModeEnabled)
+        if (card == null || card.Applying)
+        {
+            return;
+        }
+
+        if (card.CorruptedAccount)
+        {
+            BeginFakeCorruptedAccountCardReveal(card);
+            return;
+        }
+
+        if (vhsModeEnabled)
         {
             return;
         }

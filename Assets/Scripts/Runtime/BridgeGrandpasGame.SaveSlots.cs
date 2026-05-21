@@ -34,7 +34,7 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         panel.anchorMax = new Vector2(0.5f, 0.5f);
         panel.pivot = new Vector2(0.5f, 0.5f);
         panel.anchoredPosition = new Vector2(0f, 18f);
-        panel.sizeDelta = new Vector2(620f, 438f);
+        panel.sizeDelta = new Vector2(660f, 540f);
         Outline outline = panel.gameObject.AddComponent<Outline>();
         outline.effectColor = new Color(0.92f, 0.56f, 0.20f, 0.38f);
         outline.effectDistance = new Vector2(2f, -2f);
@@ -55,8 +55,8 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         saveSlotListRoot.anchorMin = new Vector2(0.5f, 0.5f);
         saveSlotListRoot.anchorMax = new Vector2(0.5f, 0.5f);
         saveSlotListRoot.pivot = new Vector2(0.5f, 0.5f);
-        saveSlotListRoot.anchoredPosition = new Vector2(0f, -22f);
-        saveSlotListRoot.sizeDelta = new Vector2(520f, 252f);
+        saveSlotListRoot.anchoredPosition = new Vector2(0f, -28f);
+        saveSlotListRoot.sizeDelta = new Vector2(560f, 340f);
         VerticalLayoutGroup layout = saveSlotListRoot.gameObject.AddComponent<VerticalLayoutGroup>();
         layout.spacing = 12f;
         layout.childForceExpandWidth = true;
@@ -157,6 +157,11 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
                 button.interactable = HasSaveSlot(slot);
             }
         }
+
+        if (saveSlotScreenMode == SaveSlotScreenMode.Load && HasFakeCorruptedSaveSlot())
+        {
+            CreateFakeCorruptedSaveSlotButton();
+        }
     }
 
     private void SelectSaveSlot(int slotIndex)
@@ -183,6 +188,7 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         }
 
         HideSaveSlotScreenOnly();
+        startMenuLoadCorruptedSave = false;
         if (gameStarted)
         {
             if (!TryLoadGameFromSlot(normalizedSlot))
@@ -243,6 +249,33 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         return "<b>Слот " + slotIndex + "</b>\nДень " + day + " | " +
             FormatDayClockElapsedSeconds(data.DayClockElapsedSeconds) +
             " | деды: " + data.Grandpas.Count + " | постройки: " + built;
+    }
+
+    private void CreateFakeCorruptedSaveSlotButton()
+    {
+        RectTransform buttonRect = CreateMenuButton(FakeCorruptedSaveSlotLabel(), saveSlotListRoot, SelectFakeCorruptedSaveSlot);
+        LayoutElement layout = buttonRect.GetComponent<LayoutElement>();
+        if (layout != null)
+        {
+            layout.minHeight = 78f;
+            layout.preferredHeight = 84f;
+        }
+
+        Text label = buttonRect.GetComponentInChildren<Text>(true);
+        if (label != null)
+        {
+            label.alignment = TextAnchor.MiddleLeft;
+            label.fontSize = 15;
+            label.color = new Color(1f, 0.64f, 0.55f);
+            label.rectTransform.offsetMin = new Vector2(20f, 4f);
+            label.rectTransform.offsetMax = new Vector2(-20f, -4f);
+        }
+    }
+
+    private string FakeCorruptedSaveSlotLabel()
+    {
+        return "<b><color=#ff5b4d>Слот ???</color></b>\n" +
+            "<color=#b9a0a0>00:00 | observer.dll не отвечает | под мостом ничего нет</color>";
     }
 
     private bool HasAnySaveSlot()

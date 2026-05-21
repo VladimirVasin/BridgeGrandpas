@@ -49,12 +49,14 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.AmbienceFallback.cs" />
+    <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.FakeWebcamAccess.cs" />
     <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.GroundLitter.cs" />
     <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.JunkCollectors.cs" />
     <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.NotebookMode.cs" />
     <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.DebugLog.cs" />
     <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.NotebookButtons.cs" />
     <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasNotebookWritingText.cs" />
+    <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.FakeCorruptedSaveAudio.cs" />
     <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.ExpeditionDice.cs" />
     <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.Camera.cs" />
     <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.ObservationCardFan.cs" />
@@ -62,9 +64,12 @@
     <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.StartDayIntro.cs" />
     <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasHudButtonAudio.cs" />
     <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.AutoBudding.cs" />
+    <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.EscapeMenuBsod.cs" />
     <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.cs" />
     <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.Ambience.cs" />
+    <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.FakeWebcamAccessAudio.cs" />
     <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.VhsOverlay.cs" />
+    <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.FakeUnityErrorWebcam.cs" />
     <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasIrisFadeGraphic.cs" />
     <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.RulesAndText.cs" />
     <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.BuildingsCatalog.cs" />
@@ -81,6 +86,7 @@
     <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.VhsObservationUi.cs" />
     <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.WatchMode.cs" />
     <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.NotebookObservations.cs" />
+    <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.FakeUnityErrorAudio.cs" />
     <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.IrisFade.cs" />
     <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.VhsOverlayRuntime.cs" />
     <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.EscapeMenuMadness.cs" />
@@ -88,11 +94,14 @@
     <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.StartMenu.cs" />
     <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.BuildingAnimation.cs" />
     <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.Thoughts.cs" />
+    <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.FakeUnityErrorVisuals.cs" />
     <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.CameraForeground.cs" />
     <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.BridgeTraffic.cs" />
     <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.UiRuntime.cs" />
     <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.VisualAtmosphere.cs" />
+    <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.FakeUnityErrorMusic.cs" />
     <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.Expeditions.cs" />
+    <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.FakeWebcamAccessUi.cs" />
     <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.GrandpaAnimation.cs" />
     <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.CameraBreathingAudio.cs" />
     <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.DialogChoices.cs" />
@@ -100,7 +109,9 @@
     <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.EscapeMenuHum.cs" />
     <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.NatureAmbience.cs" />
     <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.SaveLoad.cs" />
+    <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.FakeMicrophoneCheck.cs" />
     <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.CommuneProps.cs" />
+    <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.EscapeMenuPostBsod.cs" />
     <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.EscapeMenuMadnessText.cs" />
     <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.Production.cs" />
     <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.JunkModels.cs" />
@@ -112,12 +123,17 @@
     <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.Trays.cs" />
     <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.UiModalSetup.cs" />
     <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.CityAmbience.cs" />
+    <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.FakeCredits.cs" />
+    <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.StartDayIntroDisclaimer.cs" />
     <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.ObservationCards.cs" />
     <Compile Include="Assets\TutorialInfo\Scripts\Readme.cs" />
+    <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.FakeExit.cs" />
     <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.NotebookUiSetup.cs" />
     <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.Scene.cs" />
+    <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.FakeSystemScan.cs" />
     <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.NotebookObservationLinks.cs" />
     <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.StartMenuAnimation.cs" />
+    <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.FakeUnityError.cs" />
     <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.InteractionMode.cs" />
     <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.Movement.cs" />
     <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.Simulation.cs" />
@@ -127,8 +143,10 @@
     <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.Cloth.cs" />
     <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasButtonVisual.cs" />
     <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.NotebookObservationPaging.cs" />
+    <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.FakeCorruptedAccountReveal.cs" />
     <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.NotebookVisual.cs" />
     <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.EventsRuntime.cs" />
+    <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.FakeScreenshot.cs" />
     <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.WatchUi.cs" />
     <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.ObservationHighlights.cs" />
     <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.TextCatalog.cs" />
@@ -136,8 +154,10 @@
     <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.NotebookPages.cs" />
     <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.Wind.cs" />
     <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.ObservationCardArt.cs" />
+    <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.FakeAudioRecording.cs" />
     <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.Materials.cs" />
     <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.ImportedGrandpa.cs" />
+    <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.FakeCorruptedSave.cs" />
     <Compile Include="Assets\Scripts\Runtime\BridgeGrandpasGame.CitySkyline.cs" />
   </ItemGroup>
   <ItemGroup>

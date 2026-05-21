@@ -103,6 +103,12 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
 
     private void UpdateBackgroundMusic()
     {
+        if (IsBackgroundMusicSuppressedAfterFakeUnityError())
+        {
+            StopSuppressedFakeUnityErrorMusic();
+            return;
+        }
+
         if (musicSource == null || ingameMusicClips == null || ingameMusicClips.Length == 0)
         {
             return;

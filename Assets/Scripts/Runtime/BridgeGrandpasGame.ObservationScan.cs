@@ -37,7 +37,9 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         public Transform Target;
         public Vector3 FallbackPosition;
         public float RequiredZoom;
+        public float ScanSeconds;
         public float Progress;
+        public bool CorruptedAccount;
         public ObservationLeadState State;
         public RectTransform HighlightRoot;
         public CanvasGroup HighlightGroup;
@@ -81,6 +83,7 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
             Target = target != null ? target : DefaultObservationTarget(),
             FallbackPosition = fallback,
             RequiredZoom = Mathf.Clamp01(requiredZoom),
+            ScanSeconds = ObservationScanSeconds,
             State = ObservationLeadState.Queued
         };
         observationLeads.Add(lead);
@@ -131,7 +134,8 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         bool focusHeld = IsObservationFocusHeld();
         if (zoomEnough && focusHeld)
         {
-            float speed = (0.62f + centerScore * 0.48f) / ObservationScanSeconds;
+            float scanSeconds = Mathf.Max(0.1f, activeObservationLead.ScanSeconds);
+            float speed = (0.62f + centerScore * 0.48f) / scanSeconds;
             activeObservationLead.Progress = Mathf.Clamp01(activeObservationLead.Progress + deltaTime * speed);
             observationScanHint = "RECORDING";
             vhsTrackingPulse = Mathf.Max(vhsTrackingPulse, 0.32f);

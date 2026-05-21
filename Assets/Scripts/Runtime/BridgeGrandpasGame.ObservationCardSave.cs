@@ -12,7 +12,7 @@ public sealed partial class BridgeGrandpasGame
         for (int i = 0; i < observationCards.Count; i++)
         {
             ObservationCard card = observationCards[i];
-            if (card == null || card.Applying || string.IsNullOrWhiteSpace(card.Text))
+            if (card == null || card.Applying || card.CorruptedAccount || string.IsNullOrWhiteSpace(card.Text))
             {
                 continue;
             }

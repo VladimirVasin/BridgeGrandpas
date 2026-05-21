@@ -112,7 +112,9 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
 
     private bool ShouldDuckEscapeMenuAudioSource(AudioSource source)
     {
-        if (source == null || source == escapeMenuHumSource || source == menuMusicSource)
+        if (source == null || source == escapeMenuHumSource || source == escapeMenuBsodSquealSource ||
+            source == escapeMenuPostBsodClickSource || source == fakeUnityErrorAudioSource || source == fakeCreditsMusicSource ||
+            source == fakeScreenshotAudioSource || source == menuMusicSource)
         {
             return false;
         }

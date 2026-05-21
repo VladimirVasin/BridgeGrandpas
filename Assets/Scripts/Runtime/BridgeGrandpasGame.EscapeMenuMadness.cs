@@ -22,12 +22,15 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
     private readonly Dictionary<Text, string> escapeMenuMadnessOriginalTexts = new Dictionary<Text, string>();
     private float escapeMenuMadnessOpenedAt;
     private float escapeMenuMadness;
+    private bool escapeMenuMadnessDisabledThisOpen;
 
     private void BeginEscapeMenuMadness()
     {
         EnsureEscapeMenuMadnessVisuals();
+        ResetEscapeMenuBsodForNewMenu();
         escapeMenuMadnessOpenedAt = Time.unscaledTime;
         escapeMenuMadness = 0f;
+        escapeMenuMadnessDisabledThisOpen = false;
         escapeMenuMadnessOriginalTexts.Clear();
         if (escapeMenuMadnessRoot != null)
         {
@@ -42,7 +45,7 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
 
     private void UpdateEscapeMenuMadness()
     {
-        if (!escapeMenuOpen)
+        if (!escapeMenuOpen || escapeMenuBsodActive || escapeMenuBsodTriggeredThisOpen || escapeMenuMadnessDisabledThisOpen)
         {
             return;
         }
@@ -62,6 +65,11 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         ApplyEscapeMenuMadnessToLayout(tick, intensity, burst);
         ApplyEscapeMenuMadnessToButtons(tick, buttonIntensity, buttonIntensity <= 0f ? 0f : burst);
         ApplyEscapeMenuMadnessToMenuText(tick, buttonIntensity, buttonIntensity <= 0f ? 0f : burst);
+
+        if (elapsed >= EscapeMenuMadnessRampSeconds)
+        {
+            BeginEscapeMenuBsod();
+        }
     }
 
     private void EndEscapeMenuMadness()
@@ -83,8 +91,33 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         }
 
         ResetEscapeMenuMadnessTransforms();
+        EndEscapeMenuBsod();
         escapeMenuMadness = 0f;
+        escapeMenuMadnessDisabledThisOpen = false;
         escapeMenuMadnessOriginalTexts.Clear();
+    }
+
+    private void DisableEscapeMenuMadnessAfterBsod()
+    {
+        escapeMenuMadnessDisabledThisOpen = true;
+        escapeMenuMadness = 0f;
+        ClearEscapeMenuMadnessOverlay();
+        ResetEscapeMenuMadnessButtonVisuals();
+        ResetEscapeMenuMadnessTransforms();
+        if (escapeMenuMadnessGroup != null)
+        {
+            escapeMenuMadnessGroup.alpha = 0f;
+        }
+
+        if (escapeMenuMadnessBlackoutImage != null)
+        {
+            escapeMenuMadnessBlackoutImage.color = new Color(0f, 0f, 0f, 0f);
+        }
+
+        if (escapeMenuMadnessRoot != null)
+        {
+            escapeMenuMadnessRoot.gameObject.SetActive(false);
+        }
     }
 
     private void EnsureEscapeMenuMadnessVisuals()

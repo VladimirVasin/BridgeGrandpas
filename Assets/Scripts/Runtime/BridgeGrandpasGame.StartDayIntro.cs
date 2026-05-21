@@ -9,7 +9,7 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         NoeStrobe
     }
 
-    private const float StartDayIntroDarkHold = 2f;
+    private const float StartDayIntroDarkHold = 6f;
     private const float StartDayIntroTitleHold = 6f;
     private const float StartDayIntroStrobeInterval = 0.035f;
     private const float StartDayIntroFinalCropTime = 0.48f;
@@ -58,6 +58,7 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         startDayIntroBlackout = blackout.GetComponent<Image>();
         startDayIntroBlackout.raycastTarget = true;
         SetupStartDayIntroGlitch(blackout);
+        SetupStartDayIntroDisclaimer(blackout);
 
         startDayIntroTitle = CreateText("Day Intro Title", blackout, 430, FontStyle.Bold, TextAnchor.MiddleCenter, Color.white);
         startDayIntroTitle.horizontalOverflow = HorizontalWrapMode.Overflow;
@@ -195,6 +196,7 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         startDayIntroSubtitle.gameObject.SetActive(false);
         SetStartDayIntroTitleLettersVisible(false);
         SetStartDayIntroSubtitleLettersVisible(false);
+        ResetStartDayIntroDisclaimer();
         ResetStartDayIntroGlitch();
         ResetStartDayIntroMusicDistortion();
         startDayIntroBlackout.color = Color.black;
@@ -211,6 +213,7 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         startDayIntroElapsed += deltaTime;
         float titleElapsed = startDayIntroElapsed - StartDayIntroDarkHold;
         bool titlePhase = titleElapsed >= 0f && titleElapsed < StartDayIntroTitleHold;
+        UpdateStartDayIntroDisclaimer(startDayIntroElapsed, titlePhase);
         int strobePulse = Mathf.Max(0, Mathf.FloorToInt(titleElapsed / (StartDayIntroStrobeInterval * 2f)));
         bool redFrame = titlePhase && Mathf.Repeat(titleElapsed, StartDayIntroStrobeInterval * 2f) < StartDayIntroStrobeInterval;
         bool useStrobe = ActiveStartDayIntroStyle == StartDayIntroStyle.NoeStrobe;
@@ -352,6 +355,7 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
     {
         startDayIntroActive = false;
         ResetStartDayIntroTitlePose();
+        HideStartDayIntroDisclaimer();
         if (startDayIntroCanvas != null)
         {
             startDayIntroCanvas.gameObject.SetActive(false);

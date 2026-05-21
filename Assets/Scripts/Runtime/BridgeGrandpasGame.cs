@@ -141,7 +141,8 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
             return;
         }
 
-        WriteDebugLog("SESSION", "StartNewGame requested. loadSaved=" + startMenuLoadSavedGame);
+        WriteDebugLog("SESSION", "StartNewGame requested. loadSaved=" + startMenuLoadSavedGame +
+            " loadCorrupted=" + startMenuLoadCorruptedSave);
         StopMenuMusic();
         if (startMenuCanvas != null)
         {
@@ -153,6 +154,19 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         SetupUi();
         SetupBackgroundMusic();
         SetupAmbience();
+        if (startMenuLoadCorruptedSave)
+        {
+            ResetDayClock();
+            BuildInitialState();
+            startMenuLoadSavedGame = false;
+            startMenuLoadCorruptedSave = false;
+            startMenuLoading = false;
+            gameStarted = true;
+            BeginFakeCorruptedSaveScene();
+            BeginStartIrisFade();
+            return;
+        }
+
         if (startMenuLoadSavedGame && TryLoadGame())
         {
             Notify("Старые записи подняты из-под мокрой обложки.");
@@ -175,6 +189,39 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
     {
         float deltaTime = Time.deltaTime;
         float unscaledDeltaTime = Time.unscaledDeltaTime;
+        UpdateFakeScreenshot(unscaledDeltaTime);
+        if (UpdateFakeExitSequence(unscaledDeltaTime))
+        {
+            return;
+        }
+        if (UpdateFakeUnityError(unscaledDeltaTime))
+        {
+            return;
+        }
+        if (UpdateFakeMicrophoneCheck(unscaledDeltaTime))
+        {
+            return;
+        }
+        if (UpdateFakeAudioRecording(unscaledDeltaTime))
+        {
+            return;
+        }
+        if (UpdateFakeWebcamAccess(unscaledDeltaTime))
+        {
+            return;
+        }
+        if (UpdateFakeSystemScan(unscaledDeltaTime))
+        {
+            return;
+        }
+        if (UpdateFakeCorruptedAccountReveal(unscaledDeltaTime))
+        {
+            return;
+        }
+        if (UpdateFakeCredits(unscaledDeltaTime))
+        {
+            return;
+        }
 
         if (!gameStarted)
         {
@@ -194,6 +241,24 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
 
         if (deltaTime <= 0f)
         {
+            return;
+        }
+
+        if (fakeCorruptedSaveActive)
+        {
+            UpdateFakeCorruptedSave(deltaTime);
+            UpdateStartIrisFade(deltaTime);
+            UpdateNotebookMode(deltaTime);
+            UpdateWatchMode(deltaTime);
+            UpdateCameraControls(deltaTime);
+            UpdateVhsOverlay(deltaTime);
+            UpdateObservationCards(deltaTime);
+            HandlePointer();
+            UpdateMicroHudPanel(deltaTime);
+            UpdateMarkers();
+            UpdateBillboards();
+            UpdateCameraForeground();
+            UpdateFakeCorruptedSave(deltaTime);
             return;
         }
 

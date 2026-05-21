@@ -120,7 +120,7 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
 
     private bool HasSavedGame()
     {
-        return HasAnySaveSlot();
+        return HasAnySaveSlot() || HasFakeCorruptedSaveSlot();
     }
 
     private void SaveGameFromMenu()

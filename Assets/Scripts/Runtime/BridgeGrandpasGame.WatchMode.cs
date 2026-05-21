@@ -86,7 +86,29 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
 
     private string FormatWatchTime()
     {
+        if (fakeCorruptedSaveActive)
+        {
+            return FakeCorruptedWatchText();
+        }
+
         return FormatDayClockElapsedSeconds(dayClockElapsedSeconds);
+    }
+
+    private string FakeCorruptedWatchText()
+    {
+        string[] values =
+        {
+            "??:??",
+            "8E:13",
+            "NO:00",
+            "0/:#/",
+            "--:--",
+            "23:9?",
+            "ЯЯ:ЯЯ",
+            "88:88"
+        };
+        int index = Mathf.Abs(Mathf.FloorToInt(Time.unscaledTime * 3.7f)) % values.Length;
+        return values[index];
     }
 
     private float CurrentDayClockElapsedSeconds()

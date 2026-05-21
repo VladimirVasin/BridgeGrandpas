@@ -260,7 +260,7 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
 
         if (startMenuButtonsRect != null)
         {
-            startMenuButtonsRect.anchoredPosition = new Vector2(startMenuCursorParallax.x * 3f, 46f + Mathf.Sin(t * 0.72f) * 2f + startMenuCursorParallax.y * 2f);
+            startMenuButtonsRect.anchoredPosition = new Vector2(startMenuCursorParallax.x * 3f, 10f + Mathf.Sin(t * 0.72f) * 2f + startMenuCursorParallax.y * 2f);
         }
 
         if (startMenuButtonsGroup != null)
@@ -293,7 +293,9 @@ public sealed partial class BridgeGrandpasGame : MonoBehaviour
         {
             int percent = Mathf.RoundToInt(eased * 100f);
             string dots = new string('.', 1 + Mathf.FloorToInt(t * 4f) % 3);
-            string action = startMenuLoadSavedGame ? "Читаем старые записи" : "Готовим место под мостом";
+            string action = startMenuLoadCorruptedSave
+                ? "Читаем повреждённую запись"
+                : startMenuLoadSavedGame ? "Читаем старые записи" : "Готовим место под мостом";
             startMenuLoadingText.text = action + dots + " " + percent + "%";
         }
 
